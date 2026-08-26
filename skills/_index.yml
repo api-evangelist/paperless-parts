@@ -1,0 +1,29 @@
+generated: '2026-08-26'
+method: generated
+source: openapi/paperless-parts-v1-openapi.yml, openapi/paperless-parts-v2-openapi.yml
+note: >-
+  Four packaged Agent Skills covering the marquee Paperless Parts integration flows. Every
+  operationId referenced in these skills was verified to exist in the provider's published OpenAPI
+  documents before the skill was written; none is invented. Conventions, error and reversibility
+  rules are pulled from conventions/paperless-parts-conventions.yml.
+skills:
+  - name: paperless-parts-sync-new-orders-to-erp
+    file: paperless-parts-sync-new-orders-to-erp.md
+    api: Paperless Parts API v2
+    summary: Pull newly placed orders in full and write the ERP identifier back onto them.
+    operations: [NewOrderNumbers, OrderDetails, UpdateOrder, AccountDetails, ContactDetails]
+  - name: paperless-parts-poll-streaming-api-events
+    file: paperless-parts-poll-streaming-api-events.md
+    api: Paperless Parts API v1
+    summary: Consume the poll-based Streaming API for a managed integration and record integration actions.
+    operations: [ListManagedIntegrations, CreateManagedIntegration, PostManagedIntegrationHeartbeat, PollEvents, ListEvents, CreateIntegrationAction, ListIntegrationActions]
+  - name: paperless-parts-build-a-quote
+    file: paperless-parts-build-a-quote.md
+    api: Paperless Parts API v2
+    summary: Compose a quote from parts, line items, operations, add-ons, discounts and files, then move its status.
+    operations: [CreateGeometricPart, CreateManualPart, GetPartStatus, CreateQuote, CreateQuoteItem, updateQuoteItem, CreateOperation, bulkUpdateOperations, CreateDiscount, createQuoteFile, SetQuoteStatus, QuoteDetails]
+  - name: paperless-parts-sync-customers-and-pricing-tables
+    file: paperless-parts-sync-customers-and-pricing-tables.md
+    api: Paperless Parts API v2
+    summary: Converge accounts/contacts/facilities against a CRM and bulk-load custom tables and purchased components.
+    operations: [ListAccounts, CreateAccoumt, AccountDetails, UpdateCompany, ListContacts, CreateContact, UpdateCustomer, CreateFacility, CreateBillingAddress, ListPaymentTerms, GetCustomTablesList, GetCustomTableDetails, BulkUpsertCustomTable, ListPurchasedComponents, PostPurchasedComponentCSV]

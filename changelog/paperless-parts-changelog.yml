@@ -1,0 +1,41 @@
+generated: '2026-08-26'
+method: searched
+source: https://www.paperlessparts.com/product-updates/
+url: https://www.paperlessparts.com/product-updates/
+scheme: dated product-update posts, no version numbers
+current_version: 'n/a — the changelog does not carry version identifiers'
+api_changelog: false
+note: >-
+  Paperless Parts maintains a dated product-updates page covering platform releases. It is a
+  PRODUCT changelog, not an API changelog: no entry announces an endpoint, schema or version change,
+  and neither docs.paperlessparts.com nor the OpenAPI documents carry release notes. Cadence reads
+  as monthly-to-quarterly rather than fixed. Entries below were read from the page on 2026-08-26;
+  the page paginates behind a "Load more" control, and the earliest entry visible without paging was
+  2025-02-26.
+cadence: irregular; roughly monthly to quarterly
+entries:
+  - date: '2026-08-18'
+    title: Finalize Quote Improvements
+    type: enhancement
+    breaking: false
+  - date: '2026-08-03'
+    title: Exclusion Filters for Saved Views
+    type: enhancement
+    breaking: false
+  - date: '2026-06-03'
+    title: Multi-Site Feature Set
+    type: feature
+    breaking: false
+  - date: '2026-05-05'
+    title: Wingman 2.0
+    type: feature
+    breaking: false
+  - date: '2025-12-03'
+    title: Orders Updates
+    type: enhancement
+    breaking: false
+  - date: '2025-02-26'
+    title: Autodesk Fusion Integration
+    type: feature
+    breaking: false
+    note: earliest entry visible without paginating

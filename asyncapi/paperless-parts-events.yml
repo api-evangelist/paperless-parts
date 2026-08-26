@@ -1,0 +1,133 @@
+generated: '2026-08-26'
+method: derived
+source: >-
+  openapi/paperless-parts-v1-openapi.yml , https://www.paperlessparts.com/api/ ,
+  https://github.com/part-os/core-python
+asyncapi_spec: null
+webhooks: false
+event_surface: poll
+summary: >-
+  Paperless Parts has a real, first-class event surface — the "Streaming API" — but it is NOT
+  webhooks and NOT AsyncAPI. It is a poll-based event feed exposed as two ordinary REST operations
+  in the v1 OpenAPI, and the platform never calls out to a subscriber URL. There is no callback
+  registration endpoint, no webhook secret, no signature header, no delivery-retry semantics and no
+  `webhooks:` block in either published spec. Any integration reacting to Paperless Parts events
+  must run a poller (or the first-party Python SDK's listener loop, which is a poller with a nicer
+  interface). No AsyncAPI document is published, and none is authored here.
+note: >-
+  Because the surface is neither an AsyncAPI document nor a webhook catalog, no `AsyncAPI` and no
+  `Webhooks` pointer is wired into apis.yml. Emitting `Webhooks` would assert a push surface
+  Paperless Parts does not operate.
+transport:
+  style: HTTP long-poll / repeated GET
+  authentication: same account API token as the rest of the REST API
+  ordering: not documented
+  at_least_once: >-
+    Implied — an event stays in the poll response until a dispatch record is created for it, which
+    is what `create_dispatch_records=true` does. Re-delivery on failure is the consumer's problem.
+  poll_interval: NOT DOCUMENTED — no recommended or maximum poll rate is published anywhere
+operations:
+  - operationId: ListEvents
+    method: GET
+    path: /events/public
+    version: v1
+    summary: Returns a list of events
+    description: Returns a list of events. Use the ID provided from the event to create integration actions.
+    parameters:
+      - name: event_type_in
+        in: query
+        description: Filter to return events of a specified event type
+      - name: was_dispatched
+        in: query
+        description: Filter to return only events that have associated dispatch records
+    response: array of Event
+  - operationId: PollEvents
+    method: GET
+    path: /managed_integrations/public/{managed_integration_uuid}/poll
+    version: v1
+    summary: Returns a list of new events
+    description: Returns a list of events that have not yet been dispatched for the managed integration.
+    parameters:
+      - name: managed_integration_uuid
+        in: path
+        description: The unique identifier for the managed integration whose events you want to poll
+      - name: create_dispatch_records
+        in: query
+        description: >-
+          Whether you would like to create associated dispatch records for all events returned for
+          this page. If set to true (or left unspecified), the events returned will not show up in
+          the next response from this endpoint.
+      - name: event_type_in
+        in: query
+      - name: was_dispatched
+        in: query
+    response: array of Event
+event_schema:
+  name: Event
+  source: openapi/paperless-parts-v1-openapi.yml#/components/schemas/Event
+  fields:
+    - name: uuid
+      type: string
+      format: uuid
+    - name: type
+      type: string
+      description: The event type
+      example: integration_action.requested
+    - name: data
+      type: object
+      description: Data relevant to the event
+    - name: related_object
+      type: string
+      format: uuid
+      nullable: true
+    - name: related_object_type
+      type: string
+    - name: created
+      type: string
+      read_only: true
+      example: '2020-08-25T18:00:53+00:00'
+event_types:
+  documented_in_spec:
+    - id: integration_action.requested
+      source: the `type` field's example value in the Event schema
+  note: >-
+    The full event-type vocabulary is NOT published. The OpenAPI carries exactly one example value
+    and the `event_type_in` filter takes an unconstrained string, so a consumer cannot enumerate
+    what events exist without either reading the Salesforce-hosted help article or observing live
+    traffic. The first-party SDK ships OrderListener and QuoteListener, which implies order- and
+    quote-creation events exist, but their type strings are not published in any machine-readable
+    artifact.
+supporting_surface:
+  managed_integrations:
+    note: >-
+      Events are scoped to a "managed integration", registered and heartbeated through the v1
+      Integration Actions endpoints.
+    operations:
+      - ListManagedIntegrations
+      - CreateManagedIntegration
+      - GetManagedIntegration
+      - UpdateManagedIntegration
+      - PostManagedIntegrationHeartbeat
+      - ListIntegrationActions
+      - CreateIntegrationAction
+  sdk:
+    repository: https://github.com/part-os/core-python
+    classes:
+      - paperless.listeners.BaseListener
+      - paperless.listeners.OrderListener
+      - paperless.listeners.QuoteListener
+docs:
+  - https://www.paperlessparts.com/api/
+  - https://help.paperlessparts.com/s/article/paperless-parts-streaming-api
+  - https://help.paperlessparts.com/s/article/integration-development-guide
+docs_note: >-
+  The two help.paperlessparts.com articles returned HTTP 200 but are Salesforce Experience Cloud
+  pages that render client-side; an unauthenticated crawler receives a shell with a "CSS Error"
+  loader and no article body, so their content could not be read in this pass. Everything above is
+  taken from the OpenAPI and the SDK repository instead.
+gaps:
+  - no AsyncAPI document
+  - no webhook / push delivery, only polling
+  - no published event-type vocabulary
+  - no published poll interval or rate ceiling
+  - the event surface exists only in v1; v2 does not carry it

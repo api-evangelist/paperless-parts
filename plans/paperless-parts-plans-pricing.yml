@@ -1,0 +1,21 @@
+generated: '2026-08-26'
+method: searched
+source: https://www.paperlessparts.com/pricing/
+plan_count: 0
+pricing_model: contact-sales
+note: >-
+  Paperless Parts publishes no priced tiers. https://www.paperlessparts.com/pricing/ returned HTTP
+  200 on 2026-08-26 and is titled "Pricing Request": it states that "Paperless Parts' pricing tiers
+  are designed to meet the unique needs of any sized business" but names no tier, no price, no
+  billing period, no included quota and no overage. The page is a lead-capture form with a phone
+  number ((617) 858-5731). API access is not sold separately — the REST API and the Streaming API
+  are features of the platform subscription, reached by generating a token in Settings >
+  Integrations > API Token, so there is no developer-facing self-serve plan either. plan_count: 0
+  is the measurement, not a gap in this pass.
+plans: []
+api_access:
+  self_serve: false
+  requires: an existing Paperless Parts platform subscription
+  token_issuance: Settings > Integrations > API Token
+  free_tier: false
+  trial: not published

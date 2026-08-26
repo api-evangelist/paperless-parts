@@ -1,0 +1,24 @@
+generated: '2026-08-26'
+method: searched
+source: >-
+  https://docs.paperlessparts.com/ , https://docs.paperlessparts.com/v2 ,
+  https://www.paperlessparts.com/api/ , openapi/paperless-parts-v1-openapi.yml ,
+  openapi/paperless-parts-v2-openapi.yml
+limit_count: 0
+note: >-
+  Paperless Parts publishes NO rate limits. Both OpenAPI documents were searched for RateLimit-*,
+  X-RateLimit-*, Retry-After and HTTP 429 and contain none of them — no 429 response is declared on
+  any of the 155 operations across v1 and v2, and no response headers are declared at all. The
+  developer landing page at paperlessparts.com/api/ does not mention throttling, quotas or
+  concurrency limits. The Streaming API is poll-based (GET /managed_integrations/public/{uuid}/poll),
+  which makes an undocumented polling ceiling a real operational unknown for any integration built
+  on it. This is an honest zero, not an unchecked field.
+limits: []
+response_headers: []
+status_on_exhaustion: not documented
+docs: https://docs.paperlessparts.com/v2
+gaps:
+  - no 429 response declared on any operation in either published OpenAPI
+  - no rate-limit response headers declared anywhere
+  - no documented poll interval or ceiling for the Streaming API poll endpoint
+  - no published per-key, per-account or per-endpoint quota

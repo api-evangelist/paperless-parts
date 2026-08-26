@@ -1,0 +1,383 @@
+# Paperless Parts
+
+> Leading secure, ITAR-compliant cloud-based sales and quoting platform for custom part manufacturers. Patented geometry engine and P3L pricing language enable job shops to quote faster, more accurately, and grow revenue.
+
+![Paperless Parts Logo](https://paperlessparts.com/wp-content/uploads/paperless-parts-full-logo-2022.svg)
+
+Paperless Parts is a Boston-based Series B SaaS company leading the digital transformation for custom part manufacturers. Founded in 2017, we help job shops and contract manufacturers increase revenue and win more business through modern quoting software.
+
+## Company Information
+
+- **Legal Name**: Paperless Parts, Inc.
+- **Founded**: 2017
+- **Headquarters**: 60 State Street, Floor 8, Boston, MA 02109
+- **Employees**: 150+
+- **Funding**: $33.5M+ (Series B led by OpenView Venture Partners)
+- **Mission**: Drive innovation forward by making manufacturing more accessible
+- **Fact Sheet**: [paperlessparts.com/facts/](https://www.paperlessparts.com/facts/)
+
+## Contact
+
+- Sales: <https://www.paperlessparts.com/demo/>
+- Support: support@paperlessparts.com
+- Phone: +1-617-858-5731
+- Help Center: <https://help.paperlessparts.com>
+
+## Platform Overview
+
+Paperless Parts provides cloud-native quoting software for job shops and contract manufacturers. The platform streamlines the entire quote-to-cash process with automated costing, pricing logic, and secure collaboration tools.
+
+### Core Features
+
+- **Geometric Pricing Engine**: Patented technology that analyzes part geometry to automate costing and pricing
+- **P3L Pricing Language**: Configurable pricing logic that adapts to any shop workflow
+- **Manufacturability Analysis**: Automated DFM warnings for CNC machining, sheet metal, and additive processes
+- **Requirements Review**: AI-powered Wingman™ functionality for capturing workflow from prints
+- **3D Part Viewer**: Browser-based CAD viewing without native software
+- **PDF Viewer**: Search within PDFs for tolerances, MIL-SPECs, and ASTM specifications
+- **BOM Builder**: Automatic extraction of bill of materials from CAD assemblies
+- **Quote Analytics**: Win rate analysis, turnaround tracking, and profitability insights
+- **Secure File Sharing**: ITAR-compliant file sharing with access controls and expiration
+- **Team Collaboration**: In-context chat, task assignment, and workflow management
+- **Nesting**: Built-in sheet metal nesting for material optimization
+
+### Manufacturing Processes Supported
+
+- CNC Machining (3-axis, 4-axis, 5-axis, mill-turn, live tooling)
+- Sheet Metal Fabrication (laser cutting, waterjet, punching, bending, welding)
+- Swiss Screw Machining
+- Additive Manufacturing (FDM, SLS, SLA, PBF, MJF, Binder Jetting)
+- Wire EDM
+- Waterjet Cutting
+
+### Industries Served
+
+- Aerospace & Defense (ITAR, CMMC, FedRAMP compliant)
+- Medical Devices (ISO 13485, FDA 21 CFR Part 11, PPAP)
+- Semiconductor
+- Automotive
+- Technology
+- Industrial Equipment
+- Robotics
+- Energy
+
+## Security & Compliance
+
+Paperless Parts has designed its compliance program to support customers requiring CMMC Level 2 who use Paperless Parts as an External Cloud Service Provider (CSP) to handle Controlled Unclassified Information (CUI).
+
+### Defense Industrial Base Approach
+
+1. **Infrastructure**: Built on AWS GovCloud (FedRAMP High authorized), located entirely in the United States
+2. **System Security Plan**: Based on FedRAMP Moderate baseline, third-party assessment completed September 2023
+3. **Personnel**: 100% US Persons system administrators and support staff located in the United States
+
+### Certifications
+
+- ITAR Registered
+- FedRAMP Moderate Equivalent (verified by authorized FedRAMP assessor)
+- CMMC Level 2 Support
+- DFARS 7012 Compliant
+- SOC 2
+
+## Who is Paperless Parts For?
+
+- **Job Shops**: Cut quote turnaround time, standardize pricing, and take on more complex work
+- **Low-Volume Rapid Prototype Businesses**: Automate quoting for 1,000–50,000 unique parts/year
+- **Contract Manufacturers**: Speed up turnaround on large quote packages with customizable workflows
+- **Multi-Site Manufacturers**: Centralize quoting across multiple ERP systems and locations
+- **Metal Service Providers**: Simplify custom part quoting to maximize profitability
+
+## ERP Integrations
+
+- JobBOSS / JobBOSS² (ECI Software Solutions - Strategic Partnership)
+- ProShop ERP
+- E2 Shop System
+- Epicor (10, 11, Kinetic)
+- Global Shop Solutions
+- Made2Manage
+- Infor SyteLine
+- Infor VISUAL
+- NetSuite
+- Genius ERP
+- Fulcrum
+
+## Business Tool Integrations
+
+- HubSpot (CRM)
+- Salesforce (CRM)
+- QuickBooks (Accounting)
+- Sage 50 (Accounting)
+- PowerBI (Analytics)
+- Trello (Project Management)
+- Datanomix (Production Monitoring)
+
+## CAD File Formats Supported
+
+STEP, STP, IGES, IGS, SAT, SLDPRT, SLDASM, X_T, X_B, PRT, ASM, CATPart, CATProduct, IPT, IAM, 3MF, STL, OBJ, DXF, DWG
+
+## Pricing
+
+Not seat-based. Tailored to shop size, complexity, modules, integrations, and contract length. Pricing always reflects a minimum 3x ROI commitment. Tiers: Growth, Professional, Enterprise.
+
+## Customer Results
+
+- Quote turnaround reduction: Up to 66% faster
+- Time savings: 10+ hours per week
+- Volume increase: 4x quote volume capacity
+- Win rate improvement: 30%+
+- Draft-to-send improvement: 30% reduction year over year
+
+## Platform Statistics
+
+- 1M+ job files uploaded
+- $1M+ in orders processed daily
+- 800+ custom part manufacturing businesses served
+
+## Support
+
+- Average response time: 30 minutes
+- Channels: Email, In-app, Phone, Knowledge Base
+- Dedicated implementation team with industry expertise
+- Typical onboarding: 10–12 weeks
+
+## Leadership
+
+- **Jason Ray** - Co-Founder & CEO (US Navy veteran, Babson MBA)
+- **Jay Jacobs** - Co-Founder (Founded RAPID Manufacturing, world's largest prototype sheet metal shop)
+- **Scott Sawyer** - Co-Founder & CTO (Former VP of Engineering at Ecovent)
+- **Matt Sordillo** - Co-Founder
+- **Steve Lynch** - Co-Founder
+
+## API
+
+- LLM Data API: <https://www.paperlessparts.com/llm-api/>
+- Format: application/json
+
+## Most Visited Pages
+
+- <https://www.paperlessparts.com/> — Homepage
+- <https://www.paperlessparts.com/demo/> — Request Demo
+- <https://www.paperlessparts.com/pricing/> — Pricing
+- <https://www.paperlessparts.com/manufacturing-software/> — Manufacturing Software Overview
+- <https://www.paperlessparts.com/careers/> — Careers
+- <https://www.paperlessparts.com/resources/cmmc-2-0-paperless-parts-what-job-shops-and-contract-manufacturers-need-to-know/> — CMMC 2.0 Guide
+- <https://www.paperlessparts.com/demo/> — Demo
+- <https://www.paperlessparts.com/manufacturers/> — For Manufacturers
+- <https://www.paperlessparts.com/integrations/> — Integrations
+- <https://www.paperlessparts.com/never-miss-with-paperless-parts-introducing-requirements-review/> — Requirements Review Introduction
+- <https://www.paperlessparts.com/pricing-costing-automation/> — Pricing & Costing Automation
+- <https://www.paperlessparts.com/oem/> — OEM
+- <https://www.paperlessparts.com/demos/> — Demos
+- <https://www.paperlessparts.com/leadership/> — Leadership
+- <https://www.paperlessparts.com/demo-eci-partnership/> — ECI Partnership Demo
+- <https://www.paperlessparts.com/case-studies/> — Case Studies
+- <https://www.paperlessparts.com/resources/> — Resources
+- <https://www.paperlessparts.com/company/> — About
+- <https://www.paperlessparts.com/job-shop-software/> — Job Shop Software
+- <https://www.paperlessparts.com/company/contact/> — Contact
+- <https://www.paperlessparts.com/quote-workflow-management/> — Quote Workflow Management
+- <https://www.paperlessparts.com/processes/cnc-machining/> — CNC Machining
+- <https://www.paperlessparts.com/demos/bom-builder/> — BOM Builder Demo
+- <https://www.paperlessparts.com/press-news/> — Press & News
+- <https://www.paperlessparts.com/processes/sheet-metal-fabrication/> — Sheet Metal Fabrication
+- <https://www.paperlessparts.com/by-role/> — By Role
+- <https://www.paperlessparts.com/security/> — Security
+- <https://www.paperlessparts.com/events/> — Events
+- <https://www.paperlessparts.com/product-updates/> — Product Updates
+- <https://www.paperlessparts.com/resources/2025-manufacturing-industry-benchmark-report/> — 2025 Manufacturing Industry Benchmark Report
+- <https://www.paperlessparts.com/customer-stories/zero-hour-parts/> — Customer Story: Zero Hour Parts
+- <https://www.paperlessparts.com/software-for-manufacturers-ppc/> — Software for Manufacturers
+
+## Help Center Documentation
+
+### Getting Started
+- <https://help.paperlessparts.com/s/article/logging-in-to-paperless-parts> — Logging In
+- <https://help.paperlessparts.com/s/article/setting-up-your-organization> — Setting Up Your Organization
+- <https://help.paperlessparts.com/s/article/how-we-build-paperless-parts> — How We Build Paperless Parts
+- <https://help.paperlessparts.com/s/article/two-factor-authentication-2fa> — Two-Factor Authentication
+- <https://help.paperlessparts.com/s/article/single-sign-on-march-13th-2023> — Single Sign-On
+- <https://help.paperlessparts.com/s/article/how-to-reach-support> — How to Reach Support
+- <https://help.paperlessparts.com/s/article/privacy-policy> — Privacy Policy
+
+### Quoting
+- <https://help.paperlessparts.com/s/article/creating-a-new-quote> — Creating a New Quote
+- <https://help.paperlessparts.com/s/article/Quote-Setup> — Quote Setup
+- <https://help.paperlessparts.com/s/article/pricing-a-part> — Pricing a Part
+- <https://help.paperlessparts.com/s/article/costing-a-part> — Costing a Part
+- <https://help.paperlessparts.com/s/article/pricing-table> — Pricing Table
+- <https://help.paperlessparts.com/s/article/costing-table> — Costing Table
+- <https://help.paperlessparts.com/s/article/setting-up-quote-items> — Setting Up Quote Items
+- <https://help.paperlessparts.com/s/article/sending-quotes> — Sending Quotes
+- <https://help.paperlessparts.com/s/article/quote-actions> — Quote Actions
+- <https://help.paperlessparts.com/s/article/quote-notes> — Quote Notes
+- <https://help.paperlessparts.com/s/article/the-digital-quote> — The Digital Quote
+- <https://help.paperlessparts.com/s/article/digital-quote-settings> — Digital Quote Settings
+- <https://help.paperlessparts.com/s/article/Configuring-finalized-quotes> — Configuring Finalized Quotes
+- <https://help.paperlessparts.com/s/article/tracking-outstanding-quotes> — Tracking Outstanding Quotes
+- <https://help.paperlessparts.com/s/article/final-touches-add-ons-discounts-and-dynamic-lead-times> — Add-ons, Discounts & Dynamic Lead Times
+- <https://help.paperlessparts.com/s/article/discounts> — Discounts
+- <https://help.paperlessparts.com/s/article/dynamic-lead-times-guide> — Dynamic Lead Times
+- <https://help.paperlessparts.com/s/article/shipping-options> — Shipping Options
+- <https://help.paperlessparts.com/s/article/how-do-i-copy-pricing-between-quote-items> — Copy Pricing Between Quote Items
+- <https://help.paperlessparts.com/s/article/working-with-existing-quotes-after-an-update-to-pricing-configuration> — Working with Existing Quotes After Pricing Config Updates
+- <https://help.paperlessparts.com/s/article/Saved-Views> — Saved Views
+- <https://help.paperlessparts.com/s/article/Quote-Management> — Quote Management (dashboard link)
+
+### Part Viewer & Files
+- <https://help.paperlessparts.com/s/article/3d-viewer-tools> — 3D Viewer Tools
+- <https://help.paperlessparts.com/s/article/part-viewer-display-options> — Part Viewer Display Options
+- <https://help.paperlessparts.com/s/article/3D-viewing-limits> — 3D Viewing Limits
+- <https://help.paperlessparts.com/s/article/pdf-viewer-guide> — PDF Viewer Guide
+- <https://help.paperlessparts.com/s/article/PDF-file-processing> — PDF File Processing
+- <https://help.paperlessparts.com/s/article/CAD-assembly-file-processing> — CAD Assembly File Processing
+- <https://help.paperlessparts.com/s/article/supported-file-types> — Supported File Types
+- <https://help.paperlessparts.com/s/article/swap-primary-and-supporting-files> — Swap Primary and Supporting Files
+- <https://help.paperlessparts.com/s/article/Found-in-files-extractions> — Found-in-Files Extractions
+- <https://help.paperlessparts.com/s/article/PDF-Extraction-Beta> — PDF Extraction Beta
+
+### Assembly & BOM
+- <https://help.paperlessparts.com/s/article/The-BOM-Builder> — The BOM Builder
+- <https://help.paperlessparts.com/s/article/intro-to-the-assembly-toolkit> — Intro to the Assembly Toolkit
+- <https://help.paperlessparts.com/s/article/quoting-an-assembly-part-from-a-model> — Quoting an Assembly Part from a Model
+- <https://help.paperlessparts.com/s/article/quoting-an-assembly-part-from-a-pdf> — Quoting an Assembly Part from a PDF
+- <https://help.paperlessparts.com/s/article/quoting-children-of-assemblies-as-separate-parts> — Quoting Children of Assemblies as Separate Parts
+- <https://help.paperlessparts.com/s/article/assemblies-data-types-and-terminology> — Assemblies Data Types and Terminology
+- <https://help.paperlessparts.com/s/article/add-an-existing-part-in-your-library-to-an-assembly-bom> — Add Existing Part to Assembly BOM
+- <https://help.paperlessparts.com/s/article/building-boms-additional-faq> — Building BOMs FAQ
+- <https://help.paperlessparts.com/s/article/quoting-a-part-with-hardware-from-a-model> — Quoting a Part with Hardware from a Model
+
+### Processes & Manufacturing
+- <https://help.paperlessparts.com/s/article/milling-process> — Milling Process
+- <https://help.paperlessparts.com/s/article/milling-interrogation> — Milling Interrogation
+- <https://help.paperlessparts.com/s/article/milling-feature-iteration> — Milling Feature Iteration
+- <https://help.paperlessparts.com/s/article/sheet-metal-process> — Sheet Metal Process
+- <https://help.paperlessparts.com/s/article/sheet-metal-interrogation> — Sheet Metal Interrogation
+- <https://help.paperlessparts.com/s/article/sheet-metal-feature-iteration> — Sheet Metal Feature Iteration
+- <https://help.paperlessparts.com/s/article/lathe-process> — Lathe Process
+- <https://help.paperlessparts.com/s/article/lathe-interrogation> — Lathe Interrogation
+- <https://help.paperlessparts.com/s/article/lathe-feature-iteration> — Lathe Feature Iteration
+- <https://help.paperlessparts.com/s/article/additive-process> — Additive Process
+- <https://help.paperlessparts.com/s/article/wire-edm-process> — Wire EDM Process
+- <https://help.paperlessparts.com/s/article/tube-laser-process> — Tube Laser Process
+- <https://help.paperlessparts.com/s/article/tube-laser-interrogation> — Tube Laser Interrogation
+- <https://help.paperlessparts.com/s/article/tube-laser-feature-iteration> — Tube Laser Feature Iteration
+- <https://help.paperlessparts.com/s/article/cast-urethane-process> — Cast Urethane Process
+- <https://help.paperlessparts.com/s/article/assigning-a-process-material-and-finish> — Assigning a Process, Material & Finish
+- <https://help.paperlessparts.com/s/article/feature-iteration> — Feature Iteration
+- <https://help.paperlessparts.com/s/article/interrogations-basics> — Interrogations Basics
+- <https://help.paperlessparts.com/s/article/custom-interrogations> — Custom Interrogations
+- <https://help.paperlessparts.com/s/article/Part-setup-tool> — Part Setup Tool
+- <https://help.paperlessparts.com/s/article/Entering-part-number-revision-and-description> — Entering Part Number, Revision & Description
+- <https://help.paperlessparts.com/s/article/purchased-components> — Purchased Components
+- <https://help.paperlessparts.com/s/article/common-part-errors-and-troubleshooting> — Common Part Errors & Troubleshooting
+
+### Nesting
+- <https://help.paperlessparts.com/s/article/multi-component-sheet-metal-nesting> — Multi-Component Sheet Metal Nesting
+- <https://help.paperlessparts.com/s/article/multi-component-linear-nesting> — Multi-Component Linear Nesting
+- <https://help.paperlessparts.com/s/article/manual-component-nesting> — Manual Component Nesting
+- <https://help.paperlessparts.com/s/article/multi-component-nesting-module> — Multi-Component Nesting Module
+
+### P3L Pricing Language
+- <https://help.paperlessparts.com/s/article/what-is-paperless-parts-pricing-language-p3l> — What is P3L?
+- <https://help.paperlessparts.com/s/article/p3l-lists> — P3L Lists
+- <https://help.paperlessparts.com/s/article/operation-p3l-cheat-sheet> — Operation P3L Cheat Sheet
+- <https://help.paperlessparts.com/s/article/pricing-items-p3l-cheat-sheet> — Pricing Items P3L Cheat Sheet
+- <https://help.paperlessparts.com/s/article/discounts-p3l-cheat-sheet> — Discounts P3L Cheat Sheet
+- <https://help.paperlessparts.com/s/article/add-ons-p3l-cheat-sheet> — Add-ons P3L Cheat Sheet
+- <https://help.paperlessparts.com/s/article/custom-table-p3l> — Custom Table P3L
+- <https://help.paperlessparts.com/s/article/custom-tables> — Custom Tables
+- <https://help.paperlessparts.com/s/article/quantity-specific-variables> — Quantity Specific Variables
+- <https://help.paperlessparts.com/s/article/drop-down-variables> — Drop-Down Variables
+- <https://help.paperlessparts.com/s/article/custom-operation-generation> — Custom Operation Generation
+- <https://help.paperlessparts.com/s/article/additional-examples-material> — Additional Examples: Material
+- <https://help.paperlessparts.com/s/article/additional-examples-outside-service> — Additional Examples: Outside Service
+
+### Configuration
+- <https://help.paperlessparts.com/s/article/company-settings> — Company Settings
+- <https://help.paperlessparts.com/s/article/setting-up-operations> — Setting Up Operations
+- <https://help.paperlessparts.com/s/article/processes> — Processes
+- <https://help.paperlessparts.com/s/article/operations> — Operations
+- <https://help.paperlessparts.com/s/article/managing-materials> — Managing Materials
+- <https://help.paperlessparts.com/s/article/adding-a-supplier-material> — Adding a Supplier Material
+- <https://help.paperlessparts.com/s/article/smart-rfq-settings> — Smart RFQ Settings
+- <https://help.paperlessparts.com/s/article/the-smart-rfq-form> — The Smart RFQ Form
+- <https://help.paperlessparts.com/s/article/accounting-settings> — Accounting Settings
+- <https://help.paperlessparts.com/s/article/email-notifications> — Email Notifications
+- <https://help.paperlessparts.com/s/article/creating-email-templates> — Creating Email Templates
+- <https://help.paperlessparts.com/s/article/improving-email-deliverability> — Improving Email Deliverability
+- <https://help.paperlessparts.com/s/article/workflows> — Workflows
+- <https://help.paperlessparts.com/s/article/user-profile-settings> — User Profile Settings
+- <https://help.paperlessparts.com/s/article/online-checkout-in-paperless-parts> — Online Checkout
+
+### Team & Permissions
+- <https://help.paperlessparts.com/s/article/team-page-and-user-permissions> — Team Page & User Permissions
+- <https://help.paperlessparts.com/s/article/functionality-for-multi-organizational-users> — Multi-Organizational Users
+- <https://help.paperlessparts.com/s/article/internal-collaboration> — Internal Collaboration
+- <https://help.paperlessparts.com/s/article/tasks> — Tasks
+
+### Analytics
+- <https://help.paperlessparts.com/s/article/analytics> — Analytics
+- <https://help.paperlessparts.com/s/article/setting-up-an-analytics-dashboard> — Setting Up an Analytics Dashboard
+- <https://help.paperlessparts.com/s/article/analytics-query-builder-deep-dive> — Analytics Query Builder Deep Dive
+- <https://help.paperlessparts.com/s/article/exporting-quotes-orders-and-accounts-contacts> — Exporting Quotes, Orders & Contacts
+
+### Orders & Post-Order
+- <https://help.paperlessparts.com/s/article/order-facilitation> — Order Facilitation
+- <https://help.paperlessparts.com/s/article/post-order-changes-and-limitations> — Post-Order Changes & Limitations
+- <https://help.paperlessparts.com/s/article/filtering-orders> — Filtering Orders
+- <https://help.paperlessparts.com/s/article/accepting-credit-cards-in-paperless-parts> — Accepting Credit Cards
+- <https://help.paperlessparts.com/s/article/online-metals-material-calculator> — Online Metals Material Calculator
+- <https://help.paperlessparts.com/s/article/online-metals-available-materials> — Online Metals Available Materials
+
+### Part Library & Accounts
+- <https://help.paperlessparts.com/s/article/the-part-library> — The Part Library (subtopic)
+- <https://help.paperlessparts.com/s/article/navigate-and-manage-the-part-library> — Navigate & Manage the Part Library
+- <https://help.paperlessparts.com/s/article/uploading-parts-to-your-part-library> — Uploading Parts to Your Part Library
+- <https://help.paperlessparts.com/s/article/similar-parts-search-beta> — Similar Parts Search
+- <https://help.paperlessparts.com/s/article/accounts-and-contacts> — Accounts & Contacts
+- <https://help.paperlessparts.com/s/article/import-historical-work-february-22nd-2023> — Import Historical Work
+
+### AI & Automation
+- <https://help.paperlessparts.com/s/article/requirements-review> — Requirements Review
+- <https://help.paperlessparts.com/s/article/wingman-assistance> — Wingman Assistance
+- <https://help.paperlessparts.com/s/article/building-review-rules> — Building Review Rules
+
+### Integrations & API
+- <https://help.paperlessparts.com/s/article/integration-development-guide> — Integration Development Guide
+- <https://help.paperlessparts.com/s/article/integration-manager> — Integration Manager
+- <https://help.paperlessparts.com/s/article/paperless-parts-streaming-api> — Streaming API
+- <https://help.paperlessparts.com/s/article/paperless-parts-managed-connector-ppmc-guide> — PPMC Guide
+- <https://help.paperlessparts.com/s/article/ppmc-whitelisting-guide> — PPMC Whitelisting Guide
+- <https://help.paperlessparts.com/s/article/ppmc-connectivity---next-steps> — PPMC Connectivity Next Steps
+- <https://help.paperlessparts.com/s/article/getting-paperless-parts-access-to-mssql> — Getting Access to MSSQL
+- <https://help.paperlessparts.com/s/article/quickbooks-online-integration> — QuickBooks Online Integration
+- <https://help.paperlessparts.com/s/article/autodesk-fusion-integration> — Autodesk Fusion Integration
+- <https://help.paperlessparts.com/s/article/vendor-rfqs-early-access> — Vendor RFQs
+- <https://help.paperlessparts.com/s/article/5-minute-tutorial-create-a-simple-paperless-parts-trello-integration-using-zapier-and-the-paperless-parts-streaming-api> — Trello Integration via Zapier Tutorial
+- <https://help.paperlessparts.com/s/article/chat-with-msc> — Chat with MSC
+
+### Security & Compliance
+- <https://help.paperlessparts.com/s/article/itar-and-data-security-with-paperless-parts> — ITAR & Data Security
+- <https://help.paperlessparts.com/s/article/staying-secure-with-paperless-parts> — Staying Secure with Paperless Parts
+- <https://help.paperlessparts.com/s/article/how-do-i-whitelist-my-ip-address> — Whitelisting Your IP Address
+
+## Links
+
+- Website: <https://www.paperlessparts.com>
+- Request Demo: <https://www.paperlessparts.com/demo/>
+- Customer Stories: <https://www.paperlessparts.com/customer-stories/>
+- Case Studies: <https://www.paperlessparts.com/case-studies/>
+- Blog: <https://www.paperlessparts.com/blog/>
+- Integrations: <https://www.paperlessparts.com/integrations/>
+- ROI Calculator: <https://www.paperlessparts.com/roi-calculator/>
+- Careers: <https://www.paperlessparts.com/careers/>
+- Aerospace & Defense: <https://www.paperlessparts.com/aerospace-industry/>
+- Medical Devices: <https://www.paperlessparts.com/medical-devices/>
+- CNC Machining: <https://www.paperlessparts.com/processes/cnc-machining/>
+- About: <https://www.paperlessparts.com/company/>
+- Contact: <https://www.paperlessparts.com/company/contact/>
+- Press: <https://www.paperlessparts.com/press/>
+- LinkedIn: <https://www.linkedin.com/company/paperlessparts>
+- Twitter: <https://twitter.com/paperlessparts>
+- YouTube: <https://www.youtube.com/@PaperlessParts>
+- Facebook: <https://www.facebook.com/paperlessparts>

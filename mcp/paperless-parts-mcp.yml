@@ -1,0 +1,104 @@
+generated: '2026-08-26'
+method: derived
+status: candidate
+source: openapi/paperless-parts-v2-openapi.yml, openapi/paperless-parts-v1-openapi.yml
+searched:
+  - what: hosted / remote MCP server published by Paperless Parts
+    result: none found
+    evidence:
+      - probed: https://api.paperlessparts.com/ (and /openapi.json, /docs, /graphql, /schema)
+        status: 404
+      - probed: https://www.paperlessparts.com/llms.txt
+        status: 200
+        note: >-
+          The provider's own llms.txt lists an "API" section with two links (the REST docs and an
+          "LLM Data API" page) and names no MCP server, no tools and no MCP endpoint.
+      - probed: npm registry search "paperless-parts"
+        result: >-
+          no first-party MCP package; @baruchiro/paperless-mcp targets Paperless-ngx, a completely
+          different product, and is third-party
+deployment:
+  mode: none
+  endpoint: null
+  install: null
+  package: null
+  auth: unknown
+  verified: searched
+note: >-
+  Paperless Parts ships NO MCP server — remote or stdio. The tool list below is a DERIVED CANDIDATE
+  built from the operationIds in the published v2 OpenAPI, offered as a starting point for anyone
+  (including Paperless Parts) who wants to stand one up. It is not callable. No `MCPServer` pointer
+  is wired into apis.yml, because claiming one would credit Paperless Parts with an agent surface
+  it does not serve. Each candidate tool inherits its real input schema from the named operation's
+  parameters and requestBody in the spec.
+tools:
+  - name: list_quotes
+    description: List quote headers
+    source_operation: openapi/paperless-parts-v2-openapi.yml#ListQuoteHeaders
+  - name: get_quote
+    description: Get full quote detail by quote number
+    source_operation: openapi/paperless-parts-v2-openapi.yml#QuoteDetails
+  - name: get_new_quote_numbers
+    description: List quote numbers newly sent since a watermark
+    source_operation: openapi/paperless-parts-v2-openapi.yml#NewQuoteNumbers
+  - name: create_quote
+    description: Create a quote
+    source_operation: openapi/paperless-parts-v2-openapi.yml#CreateQuote
+  - name: set_quote_status
+    description: Change a quote's status
+    source_operation: openapi/paperless-parts-v2-openapi.yml#SetQuoteStatus
+  - name: create_quote_item
+    description: Add a line item to a quote
+    source_operation: openapi/paperless-parts-v2-openapi.yml#CreateQuoteItem
+  - name: get_quote_item
+    description: Get a quote line item
+    source_operation: openapi/paperless-parts-v2-openapi.yml#getQuoteItem
+  - name: list_new_orders
+    description: List order numbers newly placed since a watermark
+    source_operation: openapi/paperless-parts-v2-openapi.yml#NewOrderNumbers
+  - name: get_order
+    description: Get full order detail by order number
+    source_operation: openapi/paperless-parts-v2-openapi.yml#OrderDetails
+  - name: update_order
+    description: Update an order (e.g. write back an ERP code)
+    source_operation: openapi/paperless-parts-v2-openapi.yml#UpdateOrder
+  - name: list_jobs
+    description: List jobs
+    source_operation: openapi/paperless-parts-v2-openapi.yml#ListJobs
+  - name: get_job
+    description: Get job detail
+    source_operation: openapi/paperless-parts-v2-openapi.yml#JobDetails
+  - name: list_parts
+    description: List parts in the part library
+    source_operation: openapi/paperless-parts-v2-openapi.yml#ListParts
+  - name: get_part_status
+    description: Get the processing status of an uploaded part
+    source_operation: openapi/paperless-parts-v2-openapi.yml#GetPartStatus
+  - name: list_accounts
+    description: List customer accounts
+    source_operation: openapi/paperless-parts-v2-openapi.yml#ListAccounts
+  - name: get_account
+    description: Get a customer account
+    source_operation: openapi/paperless-parts-v2-openapi.yml#AccountDetails
+  - name: list_contacts
+    description: List customer contacts
+    source_operation: openapi/paperless-parts-v2-openapi.yml#ListContacts
+  - name: create_contact
+    description: Create a customer contact
+    source_operation: openapi/paperless-parts-v2-openapi.yml#CreateContact
+  - name: list_materials
+    description: List materials available to the shop
+    source_operation: openapi/paperless-parts-v2-openapi.yml#ListMaterials
+  - name: list_processes
+    description: List manufacturing processes configured for the shop
+    source_operation: openapi/paperless-parts-v2-openapi.yml#ProcessesList
+  - name: list_purchased_components
+    description: List purchased components
+    source_operation: openapi/paperless-parts-v2-openapi.yml#ListPurchasedComponents
+  - name: get_custom_table
+    description: Read a custom pricing table
+    source_operation: openapi/paperless-parts-v2-openapi.yml#GetCustomTableDetails
+  - name: poll_events
+    description: Poll undispatched Streaming API events for a managed integration
+    source_operation: openapi/paperless-parts-v1-openapi.yml#PollEvents
+    note: v1 only — v2 does not publish the Events surface

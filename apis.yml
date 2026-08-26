@@ -1,23 +1,159 @@
 aid: paperless-parts
 name: Paperless Parts
-description: 'Paperless Parts is a company surfaced via the API Evangelist harvest backlog (source: secondary-market)
-  and added to the network as a stub for full-pipeline profiling.'
+description: >-
+  Paperless Parts, Inc. is a Boston-based manufacturing software company founded in 2017 that
+  builds a secure, ITAR-compliant cloud quoting and sales platform for custom part manufacturers —
+  job shops, contract manufacturers and rapid-prototype businesses working in CNC machining, sheet
+  metal fabrication, Swiss screw machining, wire EDM, waterjet and additive manufacturing. A
+  patented geometry engine analyses uploaded CAD to automate costing, and the P3L pricing language
+  lets a shop encode its own pricing logic. The company publishes a public REST API in two live
+  versions (v1 and v2) at api.paperlessparts.com, covering quotes, quote items, orders, jobs, parts,
+  processes, contacts and accounts, custom pricing tables, purchased components, and a managed
+  integrations framework with a poll-based Streaming API for reacting to platform events. A
+  first-party Python SDK is published on GitHub under the part-os organization.
+image: https://paperlessparts.com/wp-content/uploads/paperless-parts-full-logo-2022.svg
 url: https://raw.githubusercontent.com/api-evangelist/paperless-parts/refs/heads/main/apis.yml
 x-type: company
 x-source: harvest:secondary-market
-x-tier: stub
-x-tier-reason: harvest
 specificationVersion: '0.20'
 created: '2026-08-26'
 modified: '2026-08-26'
 tags:
 - Company
-apis: []
+- Manufacturing
+- Quoting
+- CNC Machining
+- Sheet Metal
+- ERP
+- CRM
+- Job Shops
+- Aerospace and Defense
+- Pricing
+- Estimating
+- Industrial
 maintainers:
 - FN: Kin Lane
   email: kin@apievangelist.com
 - FN: APIs.json
   email: info@apis.io
+apis:
+- name: Paperless Parts API v2
+  description: >-
+    Version 2 of the Paperless Parts REST API — 101 operations across 58 paths covering Quotes
+    (headers, items, operations, add-ons, discounts, pricing items, files), Orders, Jobs and job
+    operations, Parts (geometric, manual, assemblies, flat-pattern DXF), Processes and operation /
+    add-on / discount definitions, Contacts, Accounts, facilities, billing addresses, payment terms
+    and users, Custom Tables and Purchased Components. Authorized with an account API token in the
+    Authorization header.
+  humanURL: https://docs.paperlessparts.com/v2
+  baseURL: https://api.paperlessparts.com/v2
+  tags:
+  - Quoting
+  - Orders
+  - Jobs
+  - Parts
+  - Manufacturing
+  properties:
+  - type: OpenAPI
+    url: openapi/paperless-parts-v2-openapi.yml
+  - type: Overlay
+    url: overlays/paperless-parts-v2-overlay.yaml
+  - type: Documentation
+    url: https://docs.paperlessparts.com/v2
+- name: Paperless Parts API v1
+  description: >-
+    Version 1 of the Paperless Parts REST API — 54 operations across 33 paths covering Quotes,
+    Quote Items, Orders, Customers (contacts, accounts, facilities, billing addresses, payment
+    terms), Custom Tables, Purchased Components, Integration Actions / managed integrations, and
+    the Events endpoints that back the Paperless Parts Streaming API. Authorized with an account
+    API token in the Authorization header.
+  humanURL: https://docs.paperlessparts.com/
+  baseURL: https://api.paperlessparts.com/v1
+  tags:
+  - Quoting
+  - Orders
+  - Customers
+  - Events
+  properties:
+  - type: OpenAPI
+    url: openapi/paperless-parts-v1-openapi.yml
+  - type: Overlay
+    url: overlays/paperless-parts-v1-overlay.yaml
+  - type: Documentation
+    url: https://docs.paperlessparts.com/
 common:
+- type: VulnerabilityDisclosure
+  url: security/paperless-parts-vulnerability-disclosure.yml
 - type: Website
-  url: https://forgeglobal.com/paperless-parts_stock/
+  url: https://www.paperlessparts.com/
+- type: DeveloperPortal
+  url: https://www.paperlessparts.com/api/
+- type: Documentation
+  url: https://docs.paperlessparts.com/
+- type: APIReference
+  url: https://docs.paperlessparts.com/v2
+- type: GettingStarted
+  url: https://help.paperlessparts.com/s/article/integration-development-guide
+- type: Support
+  url: https://help.paperlessparts.com/s/
+- type: Blog
+  url: https://www.paperlessparts.com/blog/
+- type: GitHubOrganization
+  url: https://github.com/part-os
+- type: Pricing
+  url: https://www.paperlessparts.com/pricing/
+- type: SignUp
+  url: https://www.paperlessparts.com/demo/
+- type: Login
+  url: https://app.paperlessparts.com/
+- type: TermsOfService
+  url: https://help.paperlessparts.com/s/article/general-terms
+- type: PrivacyPolicy
+  url: https://www.paperlessparts.com/privacy-policy/
+- type: Compliance
+  url: https://www.paperlessparts.com/security/
+- type: ChangeLog
+  url: https://www.paperlessparts.com/product-updates/
+- type: Integrations
+  url: https://www.paperlessparts.com/integrations/
+- type: LLMsTxt
+  url: llms/paperless-parts-llms.txt
+- type: Packages
+  url: packages/paperless-parts-packages.yml
+- type: SDKs
+  url: packages/paperless-parts-packages.yml
+- type: WellKnown
+  url: well-known/paperless-parts-well-known.yml
+- type: Authentication
+  url: authentication/paperless-parts-authentication.yml
+- type: Conventions
+  url: conventions/paperless-parts-conventions.yml
+- type: ErrorCatalog
+  url: errors/paperless-parts-problem-types.yml
+- type: Lifecycle
+  url: lifecycle/paperless-parts-lifecycle.yml
+- type: Conformance
+  url: conformance/paperless-parts-conformance.yml
+- type: DataModel
+  url: data-model/paperless-parts-data-model.yml
+- type: DomainSecurity
+  url: security/paperless-parts-domain-security.yml
+- type: Plans
+  url: plans/paperless-parts-plans-pricing.yml
+- type: RateLimits
+  url: rate-limits/paperless-parts-rate-limits.yml
+- type: AgentSkill
+  url: skills/_index.yml
+- type: Security
+  url: https://www.paperlessparts.com/vulnerability-disclosure-policy/
+- type: Events
+  url: asyncapi/paperless-parts-events.yml
+- type: MCP
+  url: mcp/paperless-parts-mcp.yml
+- type: SourceCode
+  url: https://github.com/part-os/core-python
+x-enrichment:
+  date: '2026-08-26'
+  status: enriched
+  artifacts_added: 28
+  pass: local-v1

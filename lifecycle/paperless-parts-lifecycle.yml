@@ -1,0 +1,67 @@
+generated: '2026-08-26'
+method: searched
+source: >-
+  https://docs.paperlessparts.com/ , https://docs.paperlessparts.com/v2 ,
+  https://www.paperlessparts.com/product-updates/ , https://www.paperlessparts.com/api/ ,
+  openapi/paperless-parts-v1-openapi.yml , openapi/paperless-parts-v2-openapi.yml
+versioning:
+  style: url-path
+  current: v2
+  versions:
+    - id: v1
+      base: https://api.paperlessparts.com/v1
+      spec_version: '1.0'
+      status: live
+      deprecated: false
+      operations: 54
+      note: >-
+        Still the ONLY place the Events / Streaming API and Integration Actions endpoints are
+        published. Not marked deprecated anywhere.
+    - id: v2
+      base: https://api.paperlessparts.com/v2
+      spec_version: '2.0'
+      status: live
+      deprecated: false
+      operations: 101
+      note: Adds Jobs, Parts, Processes, users, and the granular quote-composition surface.
+deprecation_policy:
+  published: false
+  sunset_header: false
+  deprecation_header: false
+  rfc8594: false
+  evidence: >-
+    Zero operations are flagged `deprecated: true` in either OpenAPI document, and no deprecation,
+    sunset or end-of-life policy is published on docs.paperlessparts.com, paperlessparts.com/api/
+    or the product-updates changelog. v1 has been superseded by v2 in feature scope but carries no
+    deprecation notice and no announced retirement date — a consumer has no published signal about
+    how long v1 will remain callable.
+status_page:
+  published: false
+  evidence: >-
+    status.paperlessparts.com does not resolve (DNS NXDOMAIN, probed 2026-08-26) and no status,
+    uptime or incident-history page is linked from paperlessparts.com, the docs host or the
+    llms.txt. paperlessparts.statuspage.io redirects to Atlassian's own marketing page, i.e. no
+    such Statuspage exists.
+sla:
+  published: false
+  evidence: no uptime or support SLA is published on any public Paperless Parts page
+changelog:
+  published: true
+  url: https://www.paperlessparts.com/product-updates/
+  scope: product releases, not API versioning
+  note: >-
+    Dated product-update posts covering the application. It is NOT an API changelog: no entry
+    records an endpoint addition, a schema change or a version cut. See
+    changelog/paperless-parts-changelog.yml.
+support:
+  channels:
+    - type: help-center
+      url: https://help.paperlessparts.com/s/
+    - type: email
+      value: support@paperlessparts.com
+    - type: email
+      value: dev@paperlessparts.com
+      note: engineering contact declared in the core-python SDK pyproject.toml
+    - type: phone
+      value: '+1-617-858-5731'
+deprecated_operations: []

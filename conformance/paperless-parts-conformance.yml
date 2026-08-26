@@ -1,0 +1,131 @@
+generated: '2026-08-26'
+method: searched
+source: >-
+  https://www.paperlessparts.com/security/ , https://www.paperlessparts.com/llms.txt ,
+  https://www.paperlessparts.com/vulnerability-disclosure-policy/ ,
+  openapi/paperless-parts-v1-openapi.yml , openapi/paperless-parts-v2-openapi.yml
+summary: >-
+  Paperless Parts' conformance story is almost entirely a DEFENSE-SECTOR COMPLIANCE story, not an
+  API-standards one. The company publishes a substantial, named security posture (ITAR, FedRAMP
+  Moderate equivalent on AWS GovCloud, CMMC Level 2 support, DFARS 252.204-7012, SOC 2) because its
+  customers machine parts for aerospace and defense primes. Against cross-cutting API standards it
+  conforms to very little: plain REST over JSON with a header API key, and none of OAuth 2.0, OIDC,
+  RFC 9457, SCIM, OData or JSON:API.
+standards:
+  - id: openapi-3.0
+    conforms: true
+    evidence: two published OpenAPI 3.0.2 documents at docs.paperlessparts.com (openapi.yaml, v2.openapi.yaml)
+  - id: rest
+    conforms: true
+    evidence: resource-oriented paths, GET/POST/PATCH/PUT/DELETE, JSON bodies
+  - id: api-key-header-auth
+    conforms: true
+    evidence: 'securitySchemes.app_id: apiKey in header, name Authorization, value "API-Token <token>"'
+  - id: oauth2
+    conforms: false
+    evidence: no oauth2 securityScheme in either spec; no authorization server published
+  - id: oidc
+    conforms: false
+    evidence: >-
+      No OIDC on the API. help.paperlessparts.com does serve a /.well-known/openid-configuration,
+      but that is the Salesforce Experience Cloud help center's own identity surface, not the API's.
+  - id: rfc9457-problem-details
+    conforms: false
+    evidence: >-
+      No application/problem+json anywhere; 4xx responses are declared text/plain with no schema.
+      The live host returns an undocumented {error, detail, path, status_code} JSON envelope.
+  - id: rfc8594-sunset-header
+    conforms: false
+    evidence: no Sunset or Deprecation header declared or documented
+  - id: idempotency-key
+    conforms: false
+    evidence: no Idempotency-Key header in either spec or in the developer documentation
+  - id: pagination
+    conforms: true
+    evidence: page + page_size query parameters on list operations in both versions
+  - id: json-api
+    conforms: false
+    evidence: responses are plain JSON objects/arrays, not the JSON:API media type or document shape
+  - id: scim
+    conforms: false
+    evidence: >-
+      v2 exposes GET /users/public and PATCH /users/public/{userUuid} but with vendor schemas, not
+      SCIM 2.0 URNs or /scim/v2 paths
+  - id: odata
+    conforms: false
+    evidence: no $metadata surface and no OData query options
+  - id: graphql
+    conforms: false
+    evidence: POST https://api.paperlessparts.com/graphql returned HTTP 404 on 2026-08-26
+  - id: asyncapi
+    conforms: false
+    evidence: >-
+      An event surface exists (the Streaming API) but it is exposed as REST poll endpoints, not as
+      a published AsyncAPI document or a broker/webhook subscription
+  - id: mcp
+    conforms: false
+    evidence: no Model Context Protocol server is published by Paperless Parts
+  - id: a2a-agent-card
+    conforms: false
+    evidence: >-
+      /.well-known/agent-card.json and /.well-known/agent.json returned 404 on www and api hosts and
+      a soft-200 SPA shell on docs, probed 2026-08-26
+  - id: llms-txt
+    conforms: true
+    evidence: >-
+      A real 24KB llms.txt is served at https://www.paperlessparts.com/llms.txt (HTTP 200,
+      text/plain) with company facts, platform capabilities, compliance posture and a large
+      classified link index
+domain_standards:
+  note: >-
+    Discrete-manufacturing quoting has no widely adopted machine-readable interchange standard of
+    the SCIM/FHIR/OpenRTB kind, and Paperless Parts declares none in either contract. What the
+    contract DOES declare is defense-supply-chain regulatory shape (ITAR / DFARS / CMMC) and CAD
+    geometry file formats. REWARD-ONLY: no domain standard is asserted here, because none is present
+    in the spec.
+  probed:
+    - id: step-iso-10303
+      declared_in_contract: false
+      note: >-
+        The API accepts CAD uploads and exposes a flat-pattern DXF download
+        (GET /parts/public/part_files/{uuid}/flat_pattern_dxf), so DXF is a real interchange format
+        in the contract, but the spec does not declare conformance to ISO 10303 / STEP AP242.
+    - id: x12-edi
+      declared_in_contract: false
+      note: no EDI 850/855/856 message shapes in the contract despite the purchase-order domain
+    - id: mtconnect
+      declared_in_contract: false
+      note: Paperless Parts is a quoting/sales system, not a shop-floor machine-data system
+compliance_program:
+  published: true
+  url: https://www.paperlessparts.com/security/
+  certifications:
+    - id: itar
+      name: ITAR Registered
+      source: https://www.paperlessparts.com/security/
+    - id: fedramp-moderate-equivalent
+      name: FedRAMP Moderate Equivalent
+      detail: >-
+        Verified by an authorized FedRAMP third-party assessor; system security plan based on the
+        FedRAMP Moderate baseline, third-party assessment completed September 2023. Infrastructure
+        runs on AWS GovCloud (FedRAMP High authorized), entirely within the United States.
+      source: https://www.paperlessparts.com/llms.txt
+    - id: cmmc-level-2
+      name: CMMC Level 2 support
+      detail: >-
+        Designed to support customers requiring CMMC Level 2 who use Paperless Parts as an External
+        Cloud Service Provider handling Controlled Unclassified Information (CUI).
+      source: https://www.paperlessparts.com/llms.txt
+    - id: dfars-252-204-7012
+      name: DFARS 7012 compliant
+      source: https://www.paperlessparts.com/llms.txt
+    - id: soc2
+      name: SOC 2
+      source: https://www.paperlessparts.com/llms.txt
+    - id: nist-800-171
+      name: NIST (800-171 control family referenced)
+      source: https://www.paperlessparts.com/security/
+  personnel_control: 100% US Persons system administrators and support staff, located in the United States
+  customer_regimes_served:
+    - Aerospace & Defense (ITAR, CMMC, FedRAMP)
+    - Medical Devices (ISO 13485, FDA 21 CFR Part 11, PPAP)

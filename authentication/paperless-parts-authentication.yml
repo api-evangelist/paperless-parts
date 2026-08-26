@@ -1,0 +1,63 @@
+generated: '2026-08-26'
+method: searched
+source: >-
+  openapi/paperless-parts-v1-openapi.yml , openapi/paperless-parts-v2-openapi.yml ,
+  https://www.paperlessparts.com/api/ , https://github.com/part-os/core-python
+docs: https://www.paperlessparts.com/api/
+summary:
+  types:
+    - apiKey
+  api_key_in:
+    - header
+  oauth2: false
+  openid_connect: false
+  mutual_tls: false
+  scopes: false
+model: >-
+  A single account-scoped API token, sent in the Authorization header with an "API-Token " prefix.
+  There is no OAuth 2.0, no OpenID Connect, no mTLS and no scope system — the token that reads a
+  quote is the same token that can facilitate an order or bulk-overwrite a pricing table. An agent
+  cannot be granted a narrower credential.
+schemes:
+  - name: app_id
+    type: apiKey
+    in: header
+    parameter: Authorization
+    value_format: 'API-Token <api_token>'
+    description: API key to authorize requests.
+    applies_to: every operation in both v1 and v2 (declared as a document-level security requirement)
+    sources:
+      - openapi/paperless-parts-v1-openapi.yml
+      - openapi/paperless-parts-v2-openapi.yml
+issuance:
+  location: Paperless Parts application, Settings > Integrations > API Token
+  actor: account administrator
+  self_serve: false
+  requires: an active Paperless Parts subscription — there is no public developer signup
+lifecycle:
+  create: true
+  revoke: true
+  regenerate: true
+  rotation_policy: not published
+  expiry: not published
+  source: https://www.paperlessparts.com/api/
+scoping:
+  granularity: account-wide
+  scopes: none
+  per_environment_keys: not published
+  test_vs_live_prefix: none published
+  note: >-
+    The token has no visible prefix convention (unlike sk_test_/sk_live_ style schemes), so an
+    integration cannot tell from the credential alone which account or environment it addresses.
+sdk_handling:
+  repository: https://github.com/part-os/core-python
+  note: >-
+    "The SDK handles this for you when you include this access token when instantiating your
+    PaperlessClient object" — the SDK README also warns that the token "should never be committed
+    to your version control system".
+gaps:
+  - no OAuth 2.0 or OIDC, so no delegated or user-consented access
+  - no scopes, so no least-privilege credential for an agent or a partner
+  - no documented token expiry or rotation policy
+  - no separate sandbox/test credential documented
+  - no 401 or 403 response declared on any operation in either published OpenAPI

@@ -1,0 +1,53 @@
+generated: '2026-08-26'
+method: derived
+source: openapi/paperless-parts-v1-openapi.yml, openapi/paperless-parts-v2-openapi.yml
+format: vendor
+note: 'Paperless Parts does NOT use RFC 9457 application/problem+json. The published specs declare 4xx responses
+  with text/plain bodies and no error schema. The live api.paperlessparts.com host returns a JSON envelope on unmatched
+  routes — observed 2026-08-26 on GET https://api.paperlessparts.com/openapi.json: {"error": "Not found", "detail":
+  "The requested resource was not found on this server.", "path": "...", "status_code": ...} — but that envelope
+  is not documented in either OpenAPI. Authenticated error bodies were not observed; no API token was used.'
+envelope:
+  observed_fields:
+  - error
+  - detail
+  - path
+  - status_code
+  observed_on: https://api.paperlessparts.com/openapi.json
+  observed_status: 404
+  observed_date: '2026-08-26'
+  method: probed
+  caveat: unauthenticated 404 only; documented error shapes are absent from the specs
+declared_status_codes:
+  v1:
+    '404': 27
+    '400': 1
+  v2:
+    '404': 58
+problems:
+- status: 404
+  title: Not found response
+  media_types:
+  - text/plain
+  source_operation: openapi/paperless-parts-v1-openapi.yml#NewQuoteNumbers
+- status: 404
+  title: Not found response
+  media_types:
+  - text/plain
+  source_operation: openapi/paperless-parts-v1-openapi.yml#post /orders/public/facilitate_order
+- status: 400
+  title: Bad request — validation error. Returned when required fields are missing, field values are invalid, or
+    mutually exclusive fields are combined with `use_latest_pricing`.
+  media_types:
+  - application/json
+  source_operation: openapi/paperless-parts-v1-openapi.yml#CreateQuoteItem
+- status: 404
+  title: Not found. Returned when the `quote` or `part` UUID does not exist or does not belong to your account.
+  media_types:
+  - application/json
+  source_operation: openapi/paperless-parts-v1-openapi.yml#CreateQuoteItem
+- status: 404
+  title: Quote file not found
+  media_types:
+  - application/json
+  source_operation: openapi/paperless-parts-v2-openapi.yml#createQuoteFile

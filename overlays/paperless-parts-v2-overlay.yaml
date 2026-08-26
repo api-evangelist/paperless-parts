@@ -1,0 +1,27 @@
+overlay: 1.0.0
+info:
+  title: API Evangelist enhancements for Paperless Parts API v2
+  version: 1.0.0
+extends: openapi/paperless-parts-v2-openapi.yml
+x-generated: '2026-08-26'
+x-method: generated
+x-source: openapi/paperless-parts-v2-openapi.yml
+actions:
+- target: $.info
+  update:
+    x-apievangelist-slug: paperless-parts
+    x-apievangelist-provider: Paperless Parts, Inc.
+    x-apievangelist-api-version: v2
+    x-apievangelist-operations: 101
+    x-apievangelist-auth: 'apiKey header Authorization: "API-Token <token>"'
+    x-apievangelist-pagination: page + page_size query parameters
+    x-apievangelist-harvested-from: https://docs.paperlessparts.com/v2.openapi.yaml
+- target: $.info
+  update:
+    x-apievangelist-note: info.termsOfService points at https://www.paperlessparts.com/web-service-agreement/
+      which returned HTTP 404 when probed on 2026-08-26; the live terms are published at https://help.paperlessparts.com/s/article/general-terms
+- target: $.servers
+  update:
+  - url: https://api.paperlessparts.com/v2
+    description: 'Paperless Parts production API, version v2 (the published server object is templated:
+      {url}/{version})'

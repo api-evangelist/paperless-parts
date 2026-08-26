@@ -1,0 +1,98 @@
+generated: '2026-08-26'
+method: probed
+source: live GET probes of /.well-known/* on every Paperless Parts host in apis.yml and OpenAPI servers[]
+note: >-
+  Only one .well-known document is genuinely served across the Paperless Parts estate: an OpenID
+  Connect discovery document on help.paperlessparts.com, which is the Salesforce Experience Cloud
+  help center's own identity surface — NOT the Paperless Parts API's auth (the API is API-key only,
+  see authentication/paperless-parts-authentication.yml). api.paperlessparts.com returns a real
+  JSON 404 envelope on every path, so its negatives are trustworthy. www.paperlessparts.com is
+  WordPress and returns a 404 status with a full HTML 404 page. docs.paperlessparts.com is a
+  create-react-app SPA that answers HTTP 200 with the same 976-byte HTML shell for EVERY path — a
+  catch-all, not a document; every docs-host row below is a soft-200 and is recorded as a miss.
+  No security.txt (RFC 9116) is published on any host.
+hit_count: 1
+soft_404_control:
+  host: https://docs.paperlessparts.com
+  probe: /.well-known/api-catalog
+  status: 200
+  bytes: 976
+  body: '<!doctype html>... create-react-app shell, identical for every path'
+  verdict: catch-all — all 200s on this host are soft-404s
+hosts:
+  - host: https://www.paperlessparts.com
+    documents:
+      - path: /.well-known/security.txt
+        status: 404
+      - path: /.well-known/openid-configuration
+        status: 404
+      - path: /.well-known/oauth-authorization-server
+        status: 404
+      - path: /.well-known/api-catalog
+        status: 404
+      - path: /.well-known/ai-plugin.json
+        status: 404
+      - path: /.well-known/agent-card.json
+        status: 404
+      - path: /.well-known/agent.json
+        status: 404
+  - host: https://api.paperlessparts.com
+    documents:
+      - path: /.well-known/security.txt
+        status: 404
+      - path: /.well-known/openid-configuration
+        status: 404
+      - path: /.well-known/oauth-authorization-server
+        status: 404
+      - path: /.well-known/api-catalog
+        status: 404
+      - path: /.well-known/ai-plugin.json
+        status: 404
+      - path: /.well-known/agent-card.json
+        status: 404
+      - path: /.well-known/agent.json
+        status: 404
+  - host: https://docs.paperlessparts.com
+    documents:
+      - path: /.well-known/security.txt
+        status: 200
+        soft_404: true
+      - path: /.well-known/openid-configuration
+        status: 200
+        soft_404: true
+      - path: /.well-known/oauth-authorization-server
+        status: 200
+        soft_404: true
+      - path: /.well-known/api-catalog
+        status: 200
+        soft_404: true
+      - path: /.well-known/ai-plugin.json
+        status: 200
+        soft_404: true
+      - path: /.well-known/agent-card.json
+        status: 200
+        soft_404: true
+      - path: /.well-known/agent.json
+        status: 200
+        soft_404: true
+  - host: https://help.paperlessparts.com
+    documents:
+      - path: /.well-known/openid-configuration
+        status: 200
+        content_type: application/json;charset=UTF-8
+        file: paperless-parts-help-openid-configuration.json
+        note: >-
+          Real OIDC discovery document, 2493 bytes, issued by the Salesforce Experience Cloud site
+          that hosts help.paperlessparts.com. It governs help-center sign-in, not the REST API.
+      - path: /.well-known/security.txt
+        status: 401
+      - path: /.well-known/oauth-authorization-server
+        status: 401
+      - path: /.well-known/api-catalog
+        status: 401
+      - path: /.well-known/ai-plugin.json
+        status: 401
+      - path: /.well-known/agent-card.json
+        status: 401
+      - path: /.well-known/agent.json
+        status: 401

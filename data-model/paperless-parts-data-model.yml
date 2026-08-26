@@ -1,0 +1,835 @@
+generated: '2026-08-26'
+method: derived
+source: openapi/paperless-parts-v2-openapi.yml, openapi/paperless-parts-v1-openapi.yml
+note: Entity graph derived from components.schemas $ref links and *_id / *_uuid reference fields in the published
+  Paperless Parts OpenAPI documents. Paperless Parts uses integer ids on the v1 CRM entities (account_id, contact_id)
+  and UUIDs on the v2 quoting/job entities (quoteUuid, quoteItemUuid, partUuid, operationUuid). No id-prefix scheme
+  is published.
+identifier_schemes:
+- scheme: integer
+  entities:
+  - Account
+  - Contact
+  - Facility
+  - BillingAddress
+  - PaymentTerms
+  - Job
+  - PurchasedComponent
+  evidence: path params accountId, contactId, facilityId, jobId are integers in the specs
+- scheme: uuid
+  entities:
+  - Quote
+  - QuoteItem
+  - Operation
+  - AddOn
+  - Discount
+  - PricingItem
+  - Part
+  - User
+  - ManagedIntegration
+  - IntegrationAction
+  - Event
+  evidence: path params quoteUuid, quoteItemUuid, operationUuid, partUuid, userUuid, managed_integration_uuid declared
+    format uuid
+- scheme: business-number
+  entities:
+  - Quote
+  - Order
+  evidence: /quotes/public/{quoteNumber} and /orders/public/{orderNumber} address records by human-facing number
+core_entities:
+- Quote
+- QuoteItem
+- QuoteComponent
+- QuoteOperation
+- Order
+- OrderItem
+- OrderComponent
+- Job
+- JobOperation
+- Part
+- Account
+- Contact
+- Facility
+- CustomTable
+- PurchasedComponent
+- ManagedIntegration
+- Event
+versions:
+  v1:
+    spec: openapi/paperless-parts-v1-openapi.yml
+    schema_count: 84
+    entities_with_relationships: 24
+    entities:
+    - entity: Account
+      fields: 21
+      relationships:
+      - kind: has_many
+        via: billing_addresses
+        target: BillingAddress
+      - kind: has_one
+        via: salesperson
+        target: SalesPerson
+      - kind: has_one
+        via: sold_to_address
+        target: Address
+    - entity: ComponentChild
+      fields: 2
+      relationships:
+      - kind: belongs_to
+        via: child_id
+        target: child
+    - entity: Contact
+      fields: 13
+      relationships:
+      - kind: has_one
+        via: address
+        target: Address
+      - kind: belongs_to
+        via: account_id
+        target: account
+      - kind: has_one
+        via: salesperson
+        target: SalesPerson
+    - entity: CustomTableBody
+      fields: 3
+      relationships:
+      - kind: has_many
+        via: config
+        target: CustomTableColumnConfig
+      - kind: has_many
+        via: data
+        target: CustomTableRowData
+    - entity: CustomTableDetails
+      fields: 4
+      relationships:
+      - kind: has_many
+        via: related_entities
+        target: CustomTableRelatedEntity
+    - entity: CustomTableRows
+      fields: 1
+      relationships:
+      - kind: has_many
+        via: rows
+        target: CustomTableRowData
+    - entity: Facility
+      fields: 6
+      relationships:
+      - kind: belongs_to
+        via: account_id
+        target: account
+      - kind: has_one
+        via: address
+        target: Address
+      - kind: has_one
+        via: salesperson
+        target: SalesPerson
+    - entity: IntegrationAction
+      fields: 11
+      relationships:
+      - kind: belongs_to
+        via: entity_id
+        target: entity
+    - entity: ManagedIntegration
+      fields: 26
+      relationships:
+      - kind: belongs_to
+        via: integration_template_id
+        target: integration_template
+      - kind: has_one
+        via: logo
+        target: ManagedIntegrationLogo
+    - entity: Order
+      fields: 25
+      relationships:
+      - kind: has_one
+        via: billing_info
+        target: AddressInfo
+      - kind: has_one
+        via: contact
+        target: OrderContact
+      - kind: has_one
+        via: customer
+        target: OrderCustomer
+      - kind: has_one
+        via: estimator
+        target: OrderUser
+      - kind: has_one
+        via: number
+        target: OrderNumber
+      - kind: has_many
+        via: order_items
+        target: OrderItem
+      - kind: has_one
+        via: payment_details
+        target: OrderPaymentDetails
+      - kind: has_one
+        via: sales_person
+        target: OrderUser
+      - kind: has_one
+        via: salesperson
+        target: OrderUser
+      - kind: has_one
+        via: send_from_facility
+        target: Facility
+      - kind: has_many
+        via: shipments
+        target: OrderShipment
+      - kind: has_one
+        via: shipping_info
+        target: AddressInfo
+      - kind: has_one
+        via: shipping_option
+        target: OrderShippingOption
+    - entity: OrderAddOn
+      fields: 7
+      relationships:
+      - kind: has_many
+        via: costing_variables
+        target: OrderCostingVariable
+    - entity: OrderComponent
+      fields: 24
+      relationships:
+      - kind: has_many
+        via: children
+        target: ComponentChild
+      - kind: has_one
+        via: material
+        target: OrderMaterial
+      - kind: has_many
+        via: material_operations
+        target: OrderOperation
+      - kind: belongs_to
+        via: part_uuid
+        target: part
+      - kind: has_one
+        via: process
+        target: OrderProcess
+      - kind: has_one
+        via: purchased_component
+        target: QuotePurchasedComponent
+      - kind: has_many
+        via: shop_operations
+        target: OrderOperation
+      - kind: has_many
+        via: supporting_files
+        target: OrderSupportingFile
+    - entity: OrderCustomer
+      fields: 6
+      relationships:
+      - kind: has_one
+        via: company
+        target: OrderCompany
+    - entity: OrderItem
+      fields: 26
+      relationships:
+      - kind: has_many
+        via: components
+        target: OrderComponent
+      - kind: belongs_to
+        via: quote_item_id
+        target: quote_item
+      - kind: belongs_to
+        via: root_component_id
+        target: root_component
+      - kind: has_many
+        via: ordered_add_ons
+        target: OrderAddOn
+    - entity: OrderOperation
+      fields: 14
+      relationships:
+      - kind: has_many
+        via: costing_variables
+        target: OrderCostingVariable
+      - kind: has_many
+        via: quantities
+        target: OperationQuantity
+    - entity: OrderShipment
+      fields: 6
+      relationships:
+      - kind: has_many
+        via: shipment_items
+        target: OrderShipmentItem
+    - entity: OrderShipmentItem
+      fields: 3
+      relationships:
+      - kind: belongs_to
+        via: order_item_id
+        target: order_item
+    - entity: Quote
+      fields: 34
+      relationships:
+      - kind: has_one
+        via: contact
+        target: QuoteContact
+      - kind: has_one
+        via: customer
+        target: QuoteCustomer
+      - kind: has_one
+        via: estimator
+        target: SalesPerson
+      - kind: has_one
+        via: send_from_facility
+        target: Facility
+      - kind: has_one
+        via: number
+        target: QuoteNumber
+      - kind: has_one
+        via: order_numbers
+        target: OrderNumberArray
+      - kind: has_one
+        via: parent_quote
+        target: ParentQuote
+      - kind: has_one
+        via: parent_supplier_order
+        target: ParentSupplierOrder
+      - kind: has_many
+        via: quote_items
+        target: QuoteItem
+      - kind: has_one
+        via: request_for_quote
+        target: RequestForQuote
+      - kind: has_one
+        via: revision_number
+        target: RevisionNumber
+      - kind: has_one
+        via: sales_person
+        target: SalesPerson
+      - kind: has_one
+        via: salesperson
+        target: SalesPerson
+    - entity: QuoteAddOn
+      fields: 6
+      relationships:
+      - kind: has_many
+        via: quantities
+        target: QuoteAddOnQuantity
+      - kind: has_many
+        via: costing_variables
+        target: QuoteCostingVariable
+    - entity: QuoteComponent
+      fields: 29
+      relationships:
+      - kind: has_many
+        via: add_ons
+        target: QuoteAddOn
+      - kind: has_many
+        via: quantities
+        target: QuoteQuantity
+      - kind: has_many
+        via: children
+        target: ComponentChild
+      - kind: has_one
+        via: material
+        target: OrderMaterial
+      - kind: has_many
+        via: material_operations
+        target: QuoteOperation
+      - kind: belongs_to
+        via: part_uuid
+        target: part
+      - kind: has_one
+        via: process
+        target: OrderProcess
+      - kind: has_one
+        via: purchased_component
+        target: QuotePurchasedComponent
+      - kind: has_many
+        via: shop_operations
+        target: QuoteOperation
+      - kind: has_many
+        via: supporting_files
+        target: OrderSupportingFile
+    - entity: QuoteItem
+      fields: 12
+      relationships:
+      - kind: belongs_to
+        via: root_component_id
+        target: root_component
+      - kind: has_many
+        via: components
+        target: QuoteComponent
+    - entity: QuoteOperation
+      fields: 14
+      relationships:
+      - kind: has_many
+        via: costing_variables
+        target: QuoteCostingVariable
+      - kind: has_many
+        via: quantities
+        target: OperationQuantity
+    - entity: QuoteQuantity
+      fields: 26
+      relationships:
+      - kind: has_many
+        via: expedites
+        target: QuoteExpedite
+    - entity: QuoteRevisionPair
+      fields: 2
+      relationships:
+      - kind: has_one
+        via: quote
+        target: QuoteNumber
+      - kind: has_one
+        via: revision_number
+        target: RevisionNumber
+  v2:
+    spec: openapi/paperless-parts-v2-openapi.yml
+    schema_count: 109
+    entities_with_relationships: 37
+    entities:
+    - entity: Account
+      fields: 20
+      relationships:
+      - kind: has_many
+        via: billing_address
+        target: Address
+      - kind: has_one
+        via: salesperson
+        target: SalesPerson
+      - kind: has_one
+        via: sold_to_address
+        target: Address
+      - kind: has_one
+        via: metadata
+        target: Metadata
+    - entity: Assembly
+      fields: 2
+      relationships:
+      - kind: has_many
+        via: parts
+        target: Part
+      - kind: has_many
+        via: nodes
+        target: PartNode
+    - entity: ComponentChild
+      fields: 2
+      relationships:
+      - kind: belongs_to
+        via: child_id
+        target: child
+    - entity: Contact
+      fields: 12
+      relationships:
+      - kind: has_one
+        via: address
+        target: Address
+      - kind: belongs_to
+        via: account_id
+        target: account
+      - kind: has_one
+        via: salesperson
+        target: SalesPerson
+      - kind: has_one
+        via: metadata
+        target: Metadata
+    - entity: CustomTableBody
+      fields: 3
+      relationships:
+      - kind: has_many
+        via: config
+        target: CustomTableColumnConfig
+      - kind: has_many
+        via: data
+        target: CustomTableRowData
+    - entity: CustomTableDetails
+      fields: 4
+      relationships:
+      - kind: has_many
+        via: related_entities
+        target: CustomTableRelatedEntity
+    - entity: CustomTableRows
+      fields: 1
+      relationships:
+      - kind: has_many
+        via: rows
+        target: CustomTableRowData
+    - entity: Facility
+      fields: 6
+      relationships:
+      - kind: belongs_to
+        via: account_id
+        target: account
+      - kind: has_one
+        via: address
+        target: Address
+      - kind: has_one
+        via: salesperson
+        target: SalesPerson
+    - entity: Job
+      fields: 22
+      relationships:
+      - kind: belongs_to
+        via: account_id
+        target: account
+      - kind: belongs_to
+        via: contact_id
+        target: contact
+      - kind: belongs_to
+        via: quote_component_id
+        target: quote_component
+      - kind: belongs_to
+        via: quote_item_id
+        target: quote_item
+      - kind: belongs_to
+        via: order_item_id
+        target: order_item
+      - kind: belongs_to
+        via: part_uuid
+        target: part
+      - kind: belongs_to
+        via: process_id
+        target: process
+      - kind: belongs_to
+        via: material_id
+        target: material
+      - kind: belongs_to
+        via: parent_id
+        target: parent
+      - kind: belongs_to
+        via: root_job_id
+        target: root_job
+    - entity: JobAddOn
+      fields: 7
+      relationships:
+      - kind: belongs_to
+        via: add_on_def_id
+        target: add_on_def
+    - entity: JobOperation
+      fields: 11
+      relationships:
+      - kind: belongs_to
+        via: op_def_id
+        target: op_def
+    - entity: Order
+      fields: 21
+      relationships:
+      - kind: has_one
+        via: billing_info
+        target: AddressInfo
+      - kind: has_one
+        via: contact
+        target: OrderContact
+      - kind: has_one
+        via: customer
+        target: OrderCustomer
+      - kind: has_one
+        via: estimator
+        target: SalesPerson
+      - kind: has_one
+        via: number
+        target: OrderNumber
+      - kind: has_many
+        via: order_items
+        target: OrderItem
+      - kind: has_one
+        via: payment_details
+        target: OrderPaymentDetails
+      - kind: has_one
+        via: salesperson
+        target: SalesPerson
+      - kind: has_many
+        via: shipments
+        target: OrderShipment
+      - kind: has_one
+        via: shipping_info
+        target: AddressInfo
+      - kind: has_one
+        via: shipping_option
+        target: OrderShippingOption
+    - entity: OrderAddOn
+      fields: 7
+      relationships:
+      - kind: has_many
+        via: costing_variables
+        target: OrderCostingVariable
+    - entity: OrderComponent
+      fields: 26
+      relationships:
+      - kind: has_many
+        via: children
+        target: ComponentChild
+      - kind: has_one
+        via: material
+        target: OrderMaterial
+      - kind: has_many
+        via: material_operations
+        target: OrderOperation
+      - kind: belongs_to
+        via: part_uuid
+        target: part
+      - kind: has_one
+        via: process
+        target: OrderProcess
+      - kind: has_one
+        via: purchased_component
+        target: QuotePurchasedComponent
+      - kind: has_many
+        via: shop_operations
+        target: OrderOperation
+      - kind: has_many
+        via: supporting_files
+        target: OrderSupportingFile
+    - entity: OrderCustomer
+      fields: 6
+      relationships:
+      - kind: has_one
+        via: company
+        target: OrderCompany
+    - entity: OrderItem
+      fields: 25
+      relationships:
+      - kind: has_many
+        via: components
+        target: OrderComponent
+      - kind: belongs_to
+        via: quote_item_id
+        target: quote_item
+      - kind: belongs_to
+        via: root_component_id
+        target: root_component
+      - kind: has_many
+        via: ordered_add_ons
+        target: OrderAddOn
+      - kind: has_many
+        via: pricing_items
+        target: OrderPricingItem
+    - entity: OrderOperation
+      fields: 14
+      relationships:
+      - kind: has_many
+        via: costing_variables
+        target: OrderCostingVariable
+      - kind: has_many
+        via: quantities
+        target: OperationQuantity
+    - entity: OrderPricingItem
+      fields: 11
+      relationships:
+      - kind: has_many
+        via: costing_variables
+        target: OrderCostingVariable
+    - entity: OrderShipment
+      fields: 6
+      relationships:
+      - kind: has_many
+        via: shipment_items
+        target: OrderShipmentItem
+    - entity: OrderShipmentItem
+      fields: 3
+      relationships:
+      - kind: belongs_to
+        via: order_item_id
+        target: order_item
+    - entity: Part
+      fields: 23
+      relationships:
+      - kind: belongs_to
+        via: part_master_uuid
+        target: part_master
+      - kind: belongs_to
+        via: material_id
+        target: material
+    - entity: PartNode
+      fields: 3
+      relationships:
+      - kind: belongs_to
+        via: parent_uuid
+        target: parent
+      - kind: belongs_to
+        via: child_uuid
+        target: child
+    - entity: Quote
+      fields: 26
+      relationships:
+      - kind: has_one
+        via: contact
+        target: QuoteContact
+      - kind: has_one
+        via: customer
+        target: QuoteCustomer
+      - kind: has_one
+        via: estimator
+        target: SalesPerson
+      - kind: has_one
+        via: number
+        target: QuoteNumber
+      - kind: has_one
+        via: order_numbers
+        target: OrderNumberArray
+      - kind: has_one
+        via: parent_quote
+        target: ParentQuote
+      - kind: has_one
+        via: parent_supplier_order
+        target: ParentSupplierOrder
+      - kind: has_many
+        via: quote_items
+        target: QuoteItem
+      - kind: has_one
+        via: request_for_quote
+        target: RequestForQuote
+      - kind: has_one
+        via: revision_number
+        target: RevisionNumber
+      - kind: has_one
+        via: salesperson
+        target: SalesPerson
+    - entity: QuoteAddOn
+      fields: 6
+      relationships:
+      - kind: has_many
+        via: quantities
+        target: QuoteAddOnQuantity
+      - kind: has_many
+        via: costing_variables
+        target: QuoteCostingVariable
+    - entity: QuoteComponent
+      fields: 28
+      relationships:
+      - kind: has_many
+        via: add-ons
+        target: QuoteAddOn
+      - kind: has_many
+        via: quantities
+        target: QuoteQuantity
+      - kind: has_many
+        via: children
+        target: ComponentChild
+      - kind: has_many
+        via: discounts
+        target: QuoteDiscount
+      - kind: has_one
+        via: material
+        target: OrderMaterial
+      - kind: has_many
+        via: material_operations
+        target: QuoteOperation
+      - kind: belongs_to
+        via: part_uuid
+        target: part
+      - kind: has_many
+        via: pricing_items
+        target: QuoteLinePricingItem
+      - kind: has_one
+        via: process
+        target: OrderProcess
+      - kind: has_one
+        via: purchased_component
+        target: QuotePurchasedComponent
+      - kind: has_many
+        via: shop_operations
+        target: QuoteOperation
+      - kind: has_many
+        via: supporting_files
+        target: OrderSupportingFile
+    - entity: QuoteDiscount
+      fields: 7
+      relationships:
+      - kind: belongs_to
+        via: quote_item_uuid
+        target: quote_item
+      - kind: has_many
+        via: costing_variables
+        target: OrderCostingVariable
+      - kind: has_many
+        via: discount_quantities
+        target: QuoteDiscountQuantity
+    - entity: QuoteHeader
+      fields: 21
+      relationships:
+      - kind: belongs_to
+        via: contact_id
+        target: contact
+      - kind: has_one
+        via: number
+        target: QuoteNumber
+      - kind: has_one
+        via: revision_number
+        target: RevisionNumber
+      - kind: has_one
+        via: metadata
+        target: Metadata
+    - entity: QuoteItem
+      fields: 11
+      relationships:
+      - kind: belongs_to
+        via: root_component_id
+        target: root_component
+      - kind: has_many
+        via: components
+        target: QuoteComponent
+      - kind: has_many
+        via: pricing_items
+        target: QuotePricingItem
+    - entity: QuoteLine
+      fields: 14
+      relationships:
+      - kind: has_one
+        via: metadata
+        target: Metadata
+    - entity: QuoteLineAddOn
+      fields: 5
+      relationships:
+      - kind: belongs_to
+        via: quote_item_uuid
+        target: quote_item
+    - entity: QuoteLineDiscount
+      fields: 8
+      relationships:
+      - kind: belongs_to
+        via: quote_item_uuid
+        target: quote_item
+      - kind: has_many
+        via: costing_variables
+        target: QuoteCostingVariable
+      - kind: has_one
+        via: costing_variable_overrides
+        target: CostingVariableOverrides
+    - entity: QuoteLineOperation
+      fields: 8
+      relationships:
+      - kind: has_many
+        via: costing_variables
+        target: QuoteCostingVariable
+      - kind: has_one
+        via: costing_variable_overrides
+        target: CostingVariableOverrides
+    - entity: QuoteLinePricingItem
+      fields: 8
+      relationships:
+      - kind: has_many
+        via: costing_variables
+        target: QuoteCostingVariable
+    - entity: QuoteOperation
+      fields: 14
+      relationships:
+      - kind: has_many
+        via: costing_variables
+        target: QuoteCostingVariable
+      - kind: has_many
+        via: quantities
+        target: OperationQuantity
+    - entity: QuotePricingItem
+      fields: 7
+      relationships:
+      - kind: has_many
+        via: costing_variables
+        target: OrderCostingVariable
+      - kind: has_many
+        via: pricing_item_quantities
+        target: QuotePricingItemQuantity
+    - entity: QuoteQuantity
+      fields: 17
+      relationships:
+      - kind: has_many
+        via: expedites
+        target: QuoteExpedite
+    - entity: QuoteRevisionPair
+      fields: 2
+      relationships:
+      - kind: has_one
+        via: quote
+        target: QuoteNumber
+      - kind: has_one
+        via: revision_number
+        target: RevisionNumber

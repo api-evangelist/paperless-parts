@@ -1,0 +1,231 @@
+generated: '2026-08-26'
+method: derived
+source: >-
+  openapi/paperless-parts-v1-openapi.yml, openapi/paperless-parts-v2-openapi.yml,
+  https://docs.paperlessparts.com/, https://www.paperlessparts.com/api/,
+  https://github.com/part-os/core-python
+summary: >-
+  Paperless Parts runs a conventional resource-oriented REST API over JSON, versioned in the URL
+  path (/v1, /v2), authorized with a single account-scoped API token. It is deliberately plain:
+  there is no idempotency mechanism, no rate-limit signaling, no RFC 9457 problem details, no
+  webhooks, and no request-id tracing documented anywhere in the two published OpenAPI documents or
+  on the developer pages. Everything below is either read out of the specs or explicitly recorded
+  as absent.
+authentication:
+  style: api-key
+  header: Authorization
+  format: 'API-Token <api_token>'
+  scheme_name: app_id
+  scoping: account-wide; the token grants access to every documented endpoint
+  issuance: Settings > Integrations > API Token in the Paperless Parts application
+  rotation: tokens can be created, revoked and regenerated from the Settings page
+  oauth: false
+  detail: authentication/paperless-parts-authentication.yml
+idempotency:
+  supported: false
+  header: null
+  evidence: >-
+    No Idempotency-Key or equivalent header appears in either OpenAPI document, and neither the
+    developer page nor the SDK README mentions retry-safe writes. POST /quotes/public,
+    POST /orders/public/facilitate_order, POST /parts/public/geometric_part and the other creates
+    are not documented as safe to retry.
+  agent_impact: >-
+    An agent that times out on a create has no published way to determine whether the write landed
+    other than a follow-up list/search call on a business key (erp_code, part_number, quote number).
+pagination:
+  style: page-number
+  params:
+    - name: page
+      in: query
+      description: 1-indexed page number
+    - name: page_size
+      in: query
+      description: rows per page
+  response_fields: not documented in the specs — list responses are declared as bare JSON arrays
+  cursor: false
+  evidence: page and page_size query parameters on the list operations in both v1 and v2
+filtering_and_search:
+  params:
+    - search
+    - account_id
+    - contact_id
+    - erp_code
+    - null_erp_code
+    - status_in
+    - type_in
+    - event_type_in
+    - was_dispatched
+    - part_number
+    - part_revision
+    - part_uuid
+    - parent_job
+    - root_job
+    - is_engineering_master
+    - material_family
+    - material_class
+    - material_name
+  convention: >-
+    Suffix _in denotes a comma-delimited set filter (status_in, type_in, event_type_in); erp_code /
+    null_erp_code exist specifically so an ERP can look records up by its own key.
+field_expansion:
+  supported: true
+  param: expand
+  scope: v2 only
+  evidence: an `expand` query parameter is declared on v2 operations
+  note: the set of expandable relations is not enumerated in the spec
+metadata:
+  supported: true
+  shape: a Metadata object is referenced by Account, Contact, QuoteHeader and QuoteLine in v2
+  query_param: metadata (v2)
+request_id_tracing:
+  supported: false
+  evidence: no X-Request-Id / Request-Id / traceparent header is declared or returned in either spec
+versioning:
+  style: url-path
+  versions:
+    - id: v1
+      base: https://api.paperlessparts.com/v1
+      status: live
+      operations: 54
+    - id: v2
+      base: https://api.paperlessparts.com/v2
+      status: live
+      operations: 101
+  server_object: '{url}/{version}, url default https://api.paperlessparts.com, version default v1 / v2'
+  overlap: >-
+    v2 is not a superset. v1 uniquely carries the Events / Streaming API surface (GET /events/public,
+    GET /managed_integrations/public/{uuid}/poll) and the Integration Actions endpoints; v2 uniquely
+    carries Jobs, Parts, Processes, users, quote operations/discounts/add-ons and quote file
+    management. An integration that needs both event polling and job management must call both
+    versions.
+error_envelope:
+  documented: false
+  observed:
+    fields: [error, detail, path, status_code]
+    example_probe: GET https://api.paperlessparts.com/openapi.json -> HTTP 404 application/json
+    date: '2026-08-26'
+  spec_declaration: >-
+    v1 declares 27 x 404 and 1 x 400; v2 declares 58 x 404 — all with text/plain content and no
+    schema. No 401, 403, 409, 422, 429 or 5xx response is declared anywhere in either document.
+  rfc9457: false
+  detail: errors/paperless-parts-problem-types.yml
+rate_limit_signaling:
+  documented: false
+  headers: []
+  status_on_exhaustion: not documented
+  evidence: no RateLimit-*, X-RateLimit-* or Retry-After header appears in either spec or the docs
+  detail: rate-limits/paperless-parts-rate-limits.yml
+content_types:
+  request: application/json (multipart for quote file upload)
+  response: application/json; text/csv on the purchased-components CSV endpoints
+  note: >-
+    Many 4xx responses are declared as text/plain, which is why the error catalog is recorded as
+    vendor-format rather than RFC 9457.
+dry_run_mode:
+  supported: false
+  evidence: no preview / validate-only / dry_run parameter in either spec
+reversibility:
+  grade: documented
+  applies: true
+  note: >-
+    Paperless Parts has a substantial write surface and a real, if uneven, reversal story. Quote and
+    order STATE changes are reversible by re-issuing the same status-change call, and most v2
+    child records (quote items, operations, discounts, add-ons, quote files, jobs, job operations,
+    job add-ons, contacts, accounts, payment terms, purchased components) have an explicit DELETE.
+    What is missing is a stated WINDOW: no Paperless Parts documentation, in either OpenAPI or on
+    the developer pages, says how long a delete can be undone, whether a deleted record is soft- or
+    hard-deleted, or whether an order can be reversed after facilitation. Because no window is
+    published anywhere, this grades `documented` and not `verified` — and no window is asserted
+    here, because inventing one would be worse than the gap.
+  surfaces:
+    - write: SetQuoteStatus (PATCH /quotes/public/{quoteNumber}/status_change)
+      reversal: SetQuoteStatus
+      mechanism: re-issue the status change with the prior status value
+      window: not stated
+      docs: https://docs.paperlessparts.com/v2
+    - write: CreateQuoteItem (POST /quotes/public/items)
+      reversal: deleteQuoteItem (DELETE /quotes/public/items/{quoteItemUuid})
+      window: not stated
+      docs: https://docs.paperlessparts.com/v2
+    - write: CreateOperation (POST /quotes/public/operations)
+      reversal: deleteOperation (DELETE /quotes/public/operations/{operationUuid})
+      window: not stated
+      docs: https://docs.paperlessparts.com/v2
+    - write: CreateDiscount (POST /quotes/public/discounts)
+      reversal: deleteDiscount (DELETE /quotes/public/discounts/{discountUuid})
+      window: not stated
+      docs: https://docs.paperlessparts.com/v2
+    - write: createQuoteFile (POST /quotes/public/{quoteUuid}/files)
+      reversal: deleteQuoteFile (DELETE /quotes/public/{quoteUuid}/files/{fileUuid})
+      window: not stated
+      docs: https://docs.paperlessparts.com/v2
+    - write: CreateJob (POST /orders/public/jobs)
+      reversal: DeleteJob (DELETE /orders/public/jobs/{jobId})
+      window: not stated
+      docs: https://docs.paperlessparts.com/v2
+    - write: CreateContact (POST /contacts/public)
+      reversal: DeleteContact (DELETE /contacts/public/{contactId}) — v2 only
+      window: not stated
+      note: v1 has no contact delete; the same record created through v1 can only be deleted through v2
+    - write: CreateAccoumt (POST /accounts/public)
+      reversal: DeleteAccount (DELETE /accounts/public/{accountId}) — v2 only
+      window: not stated
+      note: the operationId is misspelled "CreateAccoumt" in both published specs
+    - write: CreatePurchasedComponent (POST /suppliers/public/purchased_components)
+      reversal: DeletePurchasedComponent (DELETE /suppliers/public/purchased_components/{purchasedComponentId})
+      window: not stated
+  no_reversal:
+    - operation: facilitate_order (POST /orders/public/facilitate_order)
+      note: >-
+        Turns a quote into an order. No cancel, void or unfacilitate operation exists in either
+        spec. This is the highest-consequence write in the API and it has no published reversal.
+    - operation: BulkUpsertCustomTable (PUT /suppliers/public/custom_tables/{tableName}/row/bulk)
+      note: bulk row replacement on a pricing table; no snapshot, undo or restore operation exists.
+    - operation: PostPurchasedComponentCSV (POST /suppliers/public/purchased_components_csv)
+      note: bulk CSV import of purchased components; no undo operation exists.
+    - operation: CreateGeometricPart / CreateManualPart / CreateManualAssembly
+      note: no part delete operation is published in either version.
+cross_references:
+  errors: errors/paperless-parts-problem-types.yml
+  lifecycle: lifecycle/paperless-parts-lifecycle.yml
+  authentication: authentication/paperless-parts-authentication.yml
+  rate_limits: rate-limits/paperless-parts-rate-limits.yml
+  data_model: data-model/paperless-parts-data-model.yml
+spec_defects:
+  note: >-
+    Defects observed in the provider's own published OpenAPI documents while deriving this file.
+    Recorded so they can be pushed back to Paperless Parts; nothing here was corrected in the
+    harvested specs, which are saved verbatim.
+  items:
+    - id: duplicate-operationid
+      detail: >-
+        v1 uses the operationId `UpdateOrder` on TWO different operations —
+        PATCH /orders/public/{orderNumber} and PATCH /integration_actions/public/{integration_action_uuid}.
+        operationIds must be unique across the document; generated clients will collide.
+      spec: openapi/paperless-parts-v1-openapi.yml
+    - id: misspelled-operationid
+      detail: 'POST /accounts/public carries operationId `CreateAccoumt` (sic) in BOTH v1 and v2.'
+      spec: both
+    - id: missing-operationid
+      detail: >-
+        POST /orders/public/facilitate_order has no operationId in either version; neither do
+        GET and PATCH /parts/public/get_root_part/{partUuid} in v2. v1 also has one operation whose
+        operationId is the prose string "Get integration action details" rather than an identifier.
+      spec: both
+    - id: dead-terms-of-service
+      detail: >-
+        info.termsOfService in both documents is https://www.paperlessparts.com/web-service-agreement/,
+        which returned HTTP 404 on 2026-08-26.
+      spec: both
+    - id: no-error-schemas
+      detail: >-
+        All 4xx responses are declared with text/plain content and no schema, while the live host
+        returns JSON. No 401, 403, 409, 422, 429 or 5xx response is declared on any operation.
+      spec: both
+    - id: undiscoverable-spec-location
+      detail: >-
+        The specs are served from https://docs.paperlessparts.com/openapi.yaml and
+        https://docs.paperlessparts.com/v2.openapi.yaml, but nothing links to those URLs — the docs
+        host is a create-react-app SPA that fetches them at runtime, and neither the developer page
+        nor the llms.txt names them. They were located by reading the SPA's JavaScript bundle.
+      spec: both
