@@ -37,51 +37,203 @@ maintainers:
 - FN: APIs.json
   email: info@apis.io
 apis:
-- name: Paperless Parts API v2
+- aid: paperless-parts:paperless-parts-contacts-api
+  name: Paperless Parts Contacts API
   description: >-
-    Version 2 of the Paperless Parts REST API — 101 operations across 58 paths covering Quotes
-    (headers, items, operations, add-ons, discounts, pricing items, files), Orders, Jobs and job
-    operations, Parts (geometric, manual, assemblies, flat-pattern DXF), Processes and operation /
-    add-on / discount definitions, Contacts, Accounts, facilities, billing addresses, payment terms
-    and users, Custom Tables and Purchased Components. Authorized with an account API token in the
-    Authorization header.
+    Paperless Parts includes Customer Relationship Management (CRM) functionality to make it easy to send
+    quotes to new and existing customers, while keeping data consistent with third-party CRM and ERP systems.
+    Typical use cases for these endpoints are to bulk import customers from an existing customer database
+    and to synchronize new customers or changes from another system.
+
+
+    An account represents a single company or account to which you would send quotes. An account has zero
+    or more Contacts, each of which represents a person at that company and is identified uniquely by
+    their email address. An account also has facilities and billing addresses. Facilities represent destinations
+    to which orders can be shipped and BillingAddresses represent the bill to address for and order.
   humanURL: https://docs.paperlessparts.com/v2
   baseURL: https://api.paperlessparts.com/v2
   tags:
-  - Quoting
-  - Orders
-  - Jobs
-  - Parts
-  - Manufacturing
+  - Contacts
   properties:
   - type: OpenAPI
-    url: openapi/paperless-parts-v2-openapi.yml
-  - type: Overlay
-    url: overlays/paperless-parts-v2-overlay.yaml
+    url: openapi/paperless-parts-contacts-api-openapi.yml
   - type: Documentation
     url: https://docs.paperlessparts.com/v2
-- name: Paperless Parts API v1
-  description: >-
-    Version 1 of the Paperless Parts REST API — 54 operations across 33 paths covering Quotes,
-    Quote Items, Orders, Customers (contacts, accounts, facilities, billing addresses, payment
-    terms), Custom Tables, Purchased Components, Integration Actions / managed integrations, and
-    the Events endpoints that back the Paperless Parts Streaming API. Authorized with an account
-    API token in the Authorization header.
-  humanURL: https://docs.paperlessparts.com/
-  baseURL: https://api.paperlessparts.com/v1
+  - type: Documentation
+    url: https://docs.paperlessparts.com/
+- aid: paperless-parts:paperless-parts-custom-tables-api
+  name: Paperless Parts Custom Tables API
+  description: Endpoints for managing custom tables used by Operations to compute pricing.
+  humanURL: https://docs.paperlessparts.com/v2
+  baseURL: https://api.paperlessparts.com/v2
   tags:
-  - Quoting
-  - Orders
+  - Custom Tables
+  properties:
+  - type: OpenAPI
+    url: openapi/paperless-parts-custom-tables-api-openapi.yml
+  - type: Documentation
+    url: https://docs.paperlessparts.com/v2
+  - type: Documentation
+    url: https://docs.paperlessparts.com/
+- aid: paperless-parts:paperless-parts-customers-api
+  name: Paperless Parts Customers API
+  description: >-
+    Paperless Parts includes Customer Relationship Management (CRM) functionality to make it easy to send
+    quotes to new and existing customers, while keeping data consistent with third-party CRM and ERP systems.
+    Typical use cases for these endpoints are to bulk import customers from an existing customer database
+    and to synchronize new customers or changes from another system.
+
+
+    An account represents a single company or account to which you would send quotes. An account has zero
+    or more Contacts, each of which represents a person at that company and is identified uniquely by
+    their email address. An account also has facilities and billing addresses. Facilities represent destinations
+    to which orders can be shipped and BillingAddresses represent the bill to address for and order.
+  humanURL: https://docs.paperlessparts.com/v2
+  baseURL: https://api.paperlessparts.com/v2
+  tags:
   - Customers
+  properties:
+  - type: OpenAPI
+    url: openapi/paperless-parts-customers-api-openapi.yml
+  - type: Documentation
+    url: https://docs.paperlessparts.com/v2
+  - type: Documentation
+    url: https://docs.paperlessparts.com/
+- aid: paperless-parts:paperless-parts-events-api
+  name: Paperless Parts Events API
+  description: Endpoints for viewing communications between Paperless Parts and ERP integrations
+  humanURL: https://docs.paperlessparts.com/v2
+  baseURL: https://api.paperlessparts.com/v2
+  tags:
   - Events
   properties:
   - type: OpenAPI
-    url: openapi/paperless-parts-v1-openapi.yml
-  - type: Overlay
-    url: overlays/paperless-parts-v1-overlay.yaml
+    url: openapi/paperless-parts-events-api-openapi.yml
+  - type: Documentation
+    url: https://docs.paperlessparts.com/v2
+  - type: Documentation
+    url: https://docs.paperlessparts.com/
+- aid: paperless-parts:paperless-parts-integration-actions-api
+  name: Paperless Parts Integration Actions API
+  description: Endpoints for interacting with ERP integrations
+  humanURL: https://docs.paperlessparts.com/v2
+  baseURL: https://api.paperlessparts.com/v2
+  tags:
+  - Integration Actions
+  properties:
+  - type: OpenAPI
+    url: openapi/paperless-parts-integration-actions-api-openapi.yml
+  - type: Documentation
+    url: https://docs.paperlessparts.com/v2
+  - type: Documentation
+    url: https://docs.paperlessparts.com/
+- aid: paperless-parts:paperless-parts-jobs-api
+  name: Paperless Parts Jobs API
+  description: Endpoints for managing Jobs
+  humanURL: https://docs.paperlessparts.com/v2
+  baseURL: https://api.paperlessparts.com/v2
+  tags:
+  - Jobs
+  properties:
+  - type: OpenAPI
+    url: openapi/paperless-parts-jobs-api-openapi.yml
+  - type: Documentation
+    url: https://docs.paperlessparts.com/v2
+  - type: Documentation
+    url: https://docs.paperlessparts.com/
+- aid: paperless-parts:paperless-parts-orders-api
+  name: Paperless Parts Orders API
+  description: >-
+    Endpoints for identifying newly placed orders and pulling all information related to a particular
+    order. Also, a new order can be created via open API to turn an existing quote into order.
+  humanURL: https://docs.paperlessparts.com/v2
+  baseURL: https://api.paperlessparts.com/v2
+  tags:
+  - Orders
+  properties:
+  - type: OpenAPI
+    url: openapi/paperless-parts-orders-api-openapi.yml
+  - type: Documentation
+    url: https://docs.paperlessparts.com/v2
+  - type: Documentation
+    url: https://docs.paperlessparts.com/
+- aid: paperless-parts:paperless-parts-parts-api
+  name: Paperless Parts Parts API
+  description: Endpoints for managing Parts
+  humanURL: https://docs.paperlessparts.com/v2
+  baseURL: https://api.paperlessparts.com/v2
+  tags:
+  - Parts
+  properties:
+  - type: OpenAPI
+    url: openapi/paperless-parts-parts-api-openapi.yml
+  - type: Documentation
+    url: https://docs.paperlessparts.com/v2
+  - type: Documentation
+    url: https://docs.paperlessparts.com/
+- aid: paperless-parts:paperless-parts-processes-api
+  name: Paperless Parts Processes API
+  description: Endpoints for managing Processes, Operation Definitions, and Add on Definitions
+  humanURL: https://docs.paperlessparts.com/v2
+  baseURL: https://api.paperlessparts.com/v2
+  tags:
+  - Processes
+  properties:
+  - type: OpenAPI
+    url: openapi/paperless-parts-processes-api-openapi.yml
+  - type: Documentation
+    url: https://docs.paperlessparts.com/v2
+  - type: Documentation
+    url: https://docs.paperlessparts.com/
+- aid: paperless-parts:paperless-parts-purchased-components-api
+  name: Paperless Parts Purchased Components API
+  description: Endpoints for managing purchased components and purchased components columns.
+  humanURL: https://docs.paperlessparts.com/v2
+  baseURL: https://api.paperlessparts.com/v2
+  tags:
+  - Purchased Components
+  properties:
+  - type: OpenAPI
+    url: openapi/paperless-parts-purchased-components-api-openapi.yml
+  - type: Documentation
+    url: https://docs.paperlessparts.com/v2
+  - type: Documentation
+    url: https://docs.paperlessparts.com/
+- aid: paperless-parts:paperless-parts-quote-items-api
+  name: Paperless Parts Quote Items API
+  description: Endpoints for creating and managing line items on a quote.
+  humanURL: https://docs.paperlessparts.com/v2
+  baseURL: https://api.paperlessparts.com/v2
+  tags:
+  - Quote Items
+  properties:
+  - type: OpenAPI
+    url: openapi/paperless-parts-quote-items-api-openapi.yml
+  - type: Documentation
+    url: https://docs.paperlessparts.com/v2
+  - type: Documentation
+    url: https://docs.paperlessparts.com/
+- aid: paperless-parts:paperless-parts-quotes-api
+  name: Paperless Parts Quotes API
+  description: >-
+    Endpoints for identifying newly sent quotes, pulling all information related to a particular quote,
+    and updating a quote's status.
+  humanURL: https://docs.paperlessparts.com/v2
+  baseURL: https://api.paperlessparts.com/v2
+  tags:
+  - Quotes
+  properties:
+  - type: OpenAPI
+    url: openapi/paperless-parts-quotes-api-openapi.yml
+  - type: Documentation
+    url: https://docs.paperlessparts.com/v2
   - type: Documentation
     url: https://docs.paperlessparts.com/
 common:
+- type: Overlay
+  url: overlays/paperless-parts-v2-overlay.yaml
+- type: Overlay
+  url: overlays/paperless-parts-v1-overlay.yaml
 - type: VulnerabilityDisclosure
   url: security/paperless-parts-vulnerability-disclosure.yml
 - type: Website
