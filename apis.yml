@@ -11,6 +11,19 @@ description: >-
   processes, contacts and accounts, custom pricing tables, purchased components, and a managed
   integrations framework with a poll-based Streaming API for reacting to platform events. A
   first-party Python SDK is published on GitHub under the part-os organization.
+deliveryModel:
+  model: unknown
+  open_source: unknown
+  commercial: true
+  callable_host: false
+  label: Delivery model not determined — needs a product licence on record
+  confidence: low
+  source:
+  - openapi
+  - pricing
+  - repository-unlicensed
+  generated: '2026-08-28'
+  method: derived
 image: https://paperlessparts.com/wp-content/uploads/paperless-parts-full-logo-2022.svg
 url: https://raw.githubusercontent.com/api-evangelist/paperless-parts/refs/heads/main/apis.yml
 x-type: company
