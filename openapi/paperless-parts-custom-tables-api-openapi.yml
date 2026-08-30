@@ -1,0 +1,286 @@
+openapi: 3.2.0
+info:
+  title: Paperless Parts Custom Tables API
+  contact:
+    name: Paperless Parts
+    url: https://www.paperlessparts.com
+    email: support@paperlessparts.com
+  termsOfService: https://www.paperlessparts.com/web-service-agreement/
+  version: '1.0'
+  description: 'Operations tagged Custom Tables across 2 of this provider''s published API definitions: paperless-parts-v1-openapi.yml, paperless-parts-v2-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: '{url}/{version}'
+  variables:
+    url:
+      default: https://api.paperlessparts.com
+    version:
+      default: v1
+security:
+- app_id: []
+tags:
+- name: Custom Tables
+  description: Endpoints for managing custom tables used by Operations to compute pricing.
+paths:
+  /suppliers/public/custom_tables:
+    get:
+      summary: Get a list of all the custom tables defined for this account.
+      description: Get a list of all the custom tables defined for this account.
+      operationId: GetCustomTablesList
+      tags:
+      - Custom Tables
+      responses:
+        200:
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomTableListResults'
+        404:
+          description: Not found response
+          content:
+            text/plain:
+              schema:
+                title: Quote not found
+                type: string
+                example: 'Error: Not Found'
+    post:
+      summary: Create a new custom table.
+      description: Create a new custom table by supplying a name.
+      operationId: CreateNewCustomTable
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CustomTableName'
+      tags:
+      - Custom Tables
+      responses:
+        200:
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomTableName'
+        404:
+          description: Not found response
+          content:
+            text/plain:
+              schema:
+                title: Quote not found
+                type: string
+                example: 'Error: Not Found'
+    servers:
+    - url: '{url}/{version}'
+      variables:
+        url:
+          default: https://api.paperlessparts.com
+        version:
+          default: v1
+  /suppliers/public/custom_tables/{tableName}:
+    get:
+      summary: Get the details for a single table.
+      description: Get the details for a single table.
+      operationId: GetCustomTableDetails
+      parameters:
+      - $ref: '#/components/parameters/tableName'
+      tags:
+      - Custom Tables
+      responses:
+        200:
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomTableDetails'
+        404:
+          description: Not found response
+          content:
+            text/plain:
+              schema:
+                title: Quote not found
+                type: string
+                example: 'Error: Not Found'
+    patch:
+      summary: Update a table's definition.
+      description: Update a table's definition. You may rename the table, supply a new configuration, or supply new row data. Supplying new data without a new configuration will drop the existing data and populate the table with the new data (assuming the table has previously been configured) - this is not an append operation. Supplying a new configuration without new table data will apply the configuration and clear the table data. Supplying both a new configuration and new data will apply the configuration, drop the existing data, and populate the table with the new data.
+      operationId: UpdateCustomTableDetails
+      parameters:
+      - $ref: '#/components/parameters/tableName'
+      tags:
+      - Custom Tables
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CustomTableBody'
+      responses:
+        200:
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomTableDetails'
+        404:
+          description: Not found response
+          content:
+            text/plain:
+              schema:
+                title: Quote not found
+                type: string
+                example: 'Error: Not Found'
+    servers:
+    - url: '{url}/{version}'
+      variables:
+        url:
+          default: https://api.paperlessparts.com
+        version:
+          default: v1
+  /suppliers/public/custom_tables/{tableName}/row/bulk:
+    put:
+      summary: Bulk upsert rows for a single table.
+      description: Upserts rows for a single table. If a row already exists, it will be updated. Otherwise, the row will be created.
+      operationId: BulkUpsertCustomTable
+      parameters:
+      - $ref: '#/components/parameters/tableName'
+      tags:
+      - Custom Tables
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CustomTableRows'
+      responses:
+        200:
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  successes:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/CustomTableDetails'
+                  failures:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/CustomTableDetails'
+        404:
+          description: Not found response
+          content:
+            text/plain:
+              schema:
+                title: Quote not found
+                type: string
+                example: 'Error: Not Found'
+    servers:
+    - url: '{url}/{version}'
+      variables:
+        url:
+          default: https://api.paperlessparts.com
+        version:
+          default: v1
+components:
+  parameters:
+    tableName:
+      name: tableName
+      in: path
+      description: The name of the table
+      required: true
+      schema:
+        $ref: '#/components/schemas/TableName'
+  schemas:
+    TableName:
+      type: string
+      description: The name of the table
+      example: sample_table
+    CustomTableRows:
+      type: object
+      properties:
+        rows:
+          type: array
+          description: A list of table rows.
+          items:
+            $ref: '#/components/schemas/CustomTableRowData'
+    CustomTableDetails:
+      type: object
+      properties:
+        columns:
+          type: array
+          items:
+            type: string
+        name:
+          type: string
+        related_entities:
+          type: array
+          items:
+            $ref: '#/components/schemas/CustomTableRelatedEntity'
+        rows:
+          type: array
+          items:
+            type: object
+            description: The keys in this object will match the column names in the columns property above.
+    CustomTableName:
+      type: object
+      properties:
+        name:
+          type: string
+    CustomTableBody:
+      type: object
+      properties:
+        name:
+          type:
+          - string
+          - 'null'
+        config:
+          type:
+          - array
+          - 'null'
+          items:
+            $ref: '#/components/schemas/CustomTableColumnConfig'
+        data:
+          type:
+          - array
+          - 'null'
+          items:
+            $ref: '#/components/schemas/CustomTableRowData'
+    CustomTableListResults:
+      type: array
+      items:
+        type: string
+    CustomTableColumnConfig:
+      type: object
+      properties:
+        column_name:
+          type: string
+        value_type:
+          type: string
+          enum:
+          - numeric
+          - string
+          - boolean
+    CustomTableRowData:
+      type: object
+      description: The keys in this object must match the column names in the config property above, and the corresponding values must be castable to the specified types in the config property.
+    CustomTableRelatedEntity:
+      type: object
+      properties:
+        entity_type:
+          type: string
+          enum:
+          - operation
+          - process
+        name:
+          type: string
+  securitySchemes:
+    app_id:
+      type: apiKey
+      description: API key to authorize requests.
+      name: Authorization
+      in: header
+x-refined-from:
+- paperless-parts-v1-openapi.yml
+- paperless-parts-v2-openapi.yml

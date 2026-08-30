@@ -1,0 +1,737 @@
+openapi: 3.2.0
+info:
+  title: Paperless Parts Quote Items API
+  description: 'The Paperless Parts API provides access to your data, enabling developers to easily integrate Paperless Parts with third-party systems, such as Customer Relationship Management (CRM) and Enterprise Resource Planning (ERP) tools. The API is designed to support two primary use case. First, reading all information associated with a particular order or quote for import into another system. Second, managing customer data, either for an initial bulk import or for on-going synchronization with an external database.
+
+    ## Authorization ##
+
+    Requests are authorized via an API key. Administrators of a Paperless Parts account can generate an API Token which grants access to all of the endpoints documented here. The token obtained from the application must be added to the header of all requests using the key `"Authorization"` with the value `"API-Token <api_token>"`, where `<api_token>` is your Paperless Parts API Token.
+
+
+    You can use the "Execute" button in an endpoint''s documentation on this page to try out the endpoint. This will send a request to the endpoint on the Paperless Parts server and display the result on this page. Before doing so, however, you''ll need to click on the ''Authorize'' button at the top of the screen, and in the "Value" field enter `"API-Token <api_token>"`, where `<api_token>` is your API token as described above.
+
+
+    ## Overview ##
+
+    The API endpoints are organized around REST. API calls should be made to the `https://api.paperlessparts.com` base domain. URLs are designed to clearly describe an entity or collection of entities. HTTP verbs typically describe whether entities are being read, created, modified, or deleted. Where applicable, request and response bodies are in JSON format. Standard HTTP response codes, in addition to error messages, are used to help explain request failures.
+
+    ### Associations
+
+    Many entities in the API data model are associated with other entities. As a guiding principle, `GET` requests that fetch data nest associated entities in the JSON response. However, when creating or modifying entities, a flat (non-nested) object must be provided, as explained in the documentation for each endpoint. Associations are specified when writing data by using entity IDs in fields ending in `_id`.
+
+
+    For example, consider the relationship where a Company has many Customers. When fetching a Customer via a `GET` request, the associated Company will be nested as an object with key `company` in the response. When creating a Customer, the Company is specified via its integer id using the key `company_id`.
+
+    ### Events Overview
+
+    Events are a way of logging relevant actions that are taken within your account. For instance, when you create a new quote, Paperless Parts logs a `quote.created` event, and once you send that quote, we log another `quote.sent` event.
+
+
+    These logs offer you a trail of data that you can use to keep integrations in sync. By polling for new events, you can maintain an up-to-date record of what actions Paperless Parts has initiated that your integration has not. For instance, you could poll for `part.interrogation_succeeded` events and send out a notification upon receiving one.
+
+    ### HTTP Methods
+
+    The API endpoints support different HTTP methods depending on whether records are being read, created, or updated. To read an entity, use `GET`. To create a new entity, use `POST`. To modifying an entity, use `PATCH`. Note, `PATCH` is used rather than `PUT` to indicate that entities can be partially updated. In other words, in general, if a field is omitted from a `PATCH` request, that field''s value will stay the same (rather than be set to `null`). All fields requiring values are required to be included in `POST` requests.
+
+    > Note: Endpoints with a documented `PATCH` method can generally be used with a `PUT` method. The `PUT` is implemented as a partial update (as opposed to a replacement) and is supported for maximum compatibilty.
+
+
+    For example, consider the `email` field on the Customer entity, which is required. All Customers must have a non-null `email`. When creating a Customer via `POST`, the request body must contain an `email` key and its value cannot be `null` (other validation applies to that field, as well, including a valid email format and a unique value). When editing a Customer via `PATCH` request, it is not necessary to include an `email` key in the request body. If `email` is omitted, the existing email address will not be changed. If you send a `PATCH` request with `email=null`, then you will receive an error response indicating that a value for `email` is required.'
+  version: '1.0'
+  termsOfService: https://www.paperlessparts.com/web-service-agreement/
+  contact:
+    name: Paperless Parts
+    url: https://www.paperlessparts.com
+    email: support@paperlessparts.com
+servers:
+- url: '{url}/{version}'
+  variables:
+    url:
+      default: https://api.paperlessparts.com
+    version:
+      default: v1
+security:
+- app_id: []
+tags:
+- name: Quote Items
+  description: Endpoints for creating and managing line items on a quote.
+paths:
+  /quotes/public/items:
+    post:
+      summary: Create a new quote item
+      description: 'Creates a new quote item on an existing quote by attaching a part from the part library.
+
+
+        By default, the part is imported with the process, material, and quantities you specify, and pricing is calculated fresh using your current pricing rules.
+
+
+        When `use_latest_pricing` is `true`, the part is imported with the process, material, and quantities from the most recent quote on which this part appeared, including all subcomponents and subassemblies; no live pricing refresh is performed. Part must be root part to add to a quote.
+
+        '
+      operationId: CreateQuoteItem
+      tags:
+      - Quote Items
+      responses:
+        201:
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QuoteItem'
+        400:
+          description: Bad request — validation error. Returned when required fields are missing, field values are invalid, or mutually exclusive fields are combined with `use_latest_pricing`.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: quantities cannot be provided when use_latest_pricing is true
+        404:
+          description: Not found. Returned when the `quote` or `part` UUID does not exist or does not belong to your account.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Matching part not found
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - quote
+              - part
+              properties:
+                quote:
+                  type: string
+                  description: The UUID of the quote to add the line item to.
+                  example: 8f14e45f-ceea-467a-a866-ad5ef0911473
+                part:
+                  type: string
+                  description: The UUID of the part to import from the part library. Required in all cases, including when `use_latest_pricing` is `true`.
+                  example: 1679091c-5a88-46af-9fbe-81e0e6b21533
+                use_latest_pricing:
+                  type: boolean
+                  description: When `false` (the default), the part is imported with fresh pricing using the process, material, and quantities you supply. When `true`, costing and pricing are copied from the most recent quote on which this part appeared, including all subcomponents and subassemblies. See endpoint description for details on mutual exclusions and fallback behaviour.
+                  example: false
+                quantities:
+                  type: array
+                  description: The quantities to price the part at. Required when `use_latest_pricing` is `false` or omitted. Must not be provided when `use_latest_pricing` is `true`.
+                  items:
+                    type: integer
+                  example:
+                  - 1
+                  - 5
+                  - 10
+                process:
+                  type:
+                  - string
+                  - 'null'
+                  description: The UUID of the process to apply to the part. Optional. Must not be provided when `use_latest_pricing` is `true`.
+                  example: 45c48cce-2e2d-4e5a-8ee2-9c1e6b1b5b1e
+                material:
+                  type:
+                  - string
+                  - 'null'
+                  description: The UUID of the supplier material to apply to the part. Optional. Must not be provided when `use_latest_pricing` is `true`.
+                  example: d3d94468-fc4a-4670-b5c7-56c3d26a9a79
+                public_notes:
+                  type:
+                  - string
+                  - 'null'
+                  description: Notes visible to the customer. Optional. Must not be provided when `use_latest_pricing` is `true`.
+                private_notes:
+                  type:
+                  - string
+                  - 'null'
+                  description: Internal notes not visible to the customer. Optional. Must not be provided when `use_latest_pricing` is `true`.
+                estimated_annual_usage:
+                  type:
+                  - integer
+                  - 'null'
+                  description: Estimated annual usage quantity. Optional; only valid when the estimated annual usage feature is enabled for your account. Must not be provided when `use_latest_pricing` is `true`.
+                  example: 500
+                metadata:
+                  type: object
+                  description: Arbitrary key-value metadata to attach to the quote item. Optional. Must not be provided when `use_latest_pricing` is `true`.
+                  example: '{"crm_id": "1234"}'
+                unit_price_precision:
+                  type: integer
+                  description: The number of decimal places used when displaying unit prices (2–4). Optional; if the selected process defines a precision, that value takes precedence. Must not be provided when `use_latest_pricing` is `true`.
+                  example: 2
+components:
+  schemas:
+    QuotePurchasedComponent:
+      allOf:
+      - $ref: '#/components/schemas/AbstractPurchasedComponent'
+      - type: object
+        properties:
+          id:
+            type: string
+          properties:
+            type: array
+            items:
+              $ref: '#/components/schemas/PurchasedComponentProperty'
+    QuoteAddOn:
+      type: object
+      properties:
+        is_required:
+          type: boolean
+        name:
+          type: string
+        erp_code:
+          type: string
+        notes:
+          type: string
+        quantities:
+          type: array
+          items:
+            $ref: '#/components/schemas/QuoteAddOnQuantity'
+        costing_variables:
+          type: array
+          items:
+            $ref: '#/components/schemas/QuoteCostingVariable'
+    AbstractPurchasedComponent:
+      type: object
+      properties:
+        oem_part_number:
+          type: string
+          description: Unique identifier for purchased component within a supplier account
+          example: 064-1235
+        internal_part_number:
+          type:
+          - string
+          - 'null'
+          example: a
+        description:
+          type:
+          - string
+          - 'null'
+          example: any text you want
+        piece_price:
+          type: number
+          format: decimal
+          description: Cost per piece to 4 decimal places
+          example: 2.0
+    QuoteQuantity:
+      type: object
+      description: A quantity object represents a unit price and a numerical quantity associated with a component. A component can have many quantities, and the set of quantities represents the pricing options available to the recipient of a quote.
+      properties:
+        id:
+          type: integer
+        quantity:
+          type: integer
+        markup_1_price:
+          type:
+          - number
+          - 'null'
+          format: float
+          description: Users of Paperless Parts can specify up to two distinct markup values on a component.
+        markup_1_name:
+          type:
+          - string
+          - 'null'
+        markup_2_price:
+          type:
+          - number
+          - 'null'
+          format: float
+          description: Users of Paperless Parts can specify up to two distinct markup values on a component.
+        markup_2_name:
+          type:
+          - string
+          - 'null'
+        unit_price:
+          type: number
+          format: float
+        total_price:
+          type: number
+          format: float
+        total_price_with_required_add_ons:
+          type: number
+          format: float
+        lead_time:
+          type: integer
+          description: Days
+        expedites:
+          type: array
+          items:
+            $ref: '#/components/schemas/QuoteExpedite'
+        is_most_likely_won_quantity:
+          type: boolean
+          description: Whether or not this quantity is the most likely quantity to be won.
+        most_likely_won_quantity_percent:
+          type: integer
+        deliver_quantity:
+          type: integer
+        make_quantity:
+          type: integer
+        manual_total_unit_price:
+          type:
+          - number
+          - 'null'
+          format: float
+        total_component_overrides_cost:
+          type:
+          - number
+          - 'null'
+          format: float
+        total_discount:
+          type:
+          - number
+          - 'null'
+          format: float
+        total_discount_percentage:
+          type:
+          - number
+          - 'null'
+          format: float
+        total_inside_processing_cost:
+          type:
+          - number
+          - 'null'
+          format: float
+        total_outside_processing_cost:
+          type:
+          - number
+          - 'null'
+          format: float
+        total_price_before_discounts:
+          type:
+          - number
+          - 'null'
+          format: float
+        total_purchased_component_cost:
+          type:
+          - number
+          - 'null'
+          format: float
+        total_raw_material_cost:
+          type:
+          - number
+          - 'null'
+          format: float
+        unit_price_before_discounts:
+          type:
+          - number
+          - 'null'
+          format: float
+        yield_pct:
+          type:
+          - number
+          - 'null'
+          format: float
+    OrderMaterial:
+      type: object
+      description: This can also be null
+      properties:
+        id:
+          type: integer
+        display_name:
+          type: string
+        family:
+          type: string
+        material_class:
+          type: string
+        name:
+          type: string
+    OperationQuantity:
+      type: object
+      properties:
+        price:
+          type: number
+          format: float
+        manual_price:
+          type:
+          - number
+          - 'null'
+          format: float
+        lead_time:
+          type:
+          - integer
+          - 'null'
+        manual_lead_time:
+          type:
+          - integer
+          - 'null'
+        quantity:
+          type: integer
+    QuoteComponent:
+      type: object
+      description: Represents a component in the quote item. In the simplest case, there is a single root component. If the quote item is an assembly, the array will contain each component in the assembly. Components can be manufactured (i.e., parts), assemblies (i.e., top-level or sub-assembly), or purchased (e.g., hardware). Exactly one component in the array will be the root component, but it might not be the first element in the array.
+      properties:
+        id:
+          type: string
+        add_ons:
+          type: array
+          items:
+            $ref: '#/components/schemas/QuoteAddOn'
+        discounts:
+          type: array
+          items:
+            type: object
+        is_assembly:
+          type: boolean
+        obtain_method:
+          type:
+          - string
+          - 'null'
+        part_custom_attrs:
+          type: array
+          items:
+            type: object
+        pricing_items:
+          type: array
+          items:
+            type: object
+        quantities:
+          type: array
+          items:
+            $ref: '#/components/schemas/QuoteQuantity'
+        child_ids:
+          type: array
+          items:
+            type: integer
+        children:
+          type: array
+          items:
+            $ref: '#/components/schemas/ComponentChild'
+        description:
+          type:
+          - string
+          - 'null'
+        export_controlled:
+          type: boolean
+          description: Whether or not this component contains data that is export controlled (ITAR) by the US Government.
+        finishes:
+          type: array
+          items:
+            type: string
+          description: 'Note: this field is deprecated. Finishes now show up as Operations.'
+        innate_quantity:
+          type: integer
+          description: The quantity of this subcomponent that must be produced to make one top-level component.
+        is_root_component:
+          type: boolean
+        material:
+          $ref: '#/components/schemas/OrderMaterial'
+        material_operations:
+          type: array
+          items:
+            $ref: '#/components/schemas/QuoteOperation'
+        parent_ids:
+          type: array
+          items:
+            type: integer
+        part_name:
+          type: string
+        part_number:
+          type:
+          - string
+          - 'null'
+        part_url:
+          type: string
+          format: url
+        part_uuid:
+          type: string
+        process:
+          $ref: '#/components/schemas/OrderProcess'
+        purchased_component:
+          description: Reference to a purchased component object within the supplier account. Will be not null when type == 'purchased'
+          $ref: '#/components/schemas/QuotePurchasedComponent'
+        revision:
+          type:
+          - string
+          - 'null'
+        shop_operations:
+          type: array
+          items:
+            $ref: '#/components/schemas/QuoteOperation'
+        supporting_files:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrderSupportingFile'
+        thumbnail_url:
+          type:
+          - string
+          - 'null'
+        type:
+          type: string
+          enum:
+          - assembled
+          - manufactured
+          - purchased
+    QuoteItem:
+      type: object
+      description: A quote item represents a line item in a quote. Quote items can either be manual or automatic, as indicated by the 'type' property. Automatic quote items are those generated by adding a part to a quote. Pricing data for automatic quote items is automatically populated using the process, material, and operations, if they exist. Manual quote items do not have an associated part, so the pricing information must be inputted manually.
+      properties:
+        id:
+          type: integer
+        type:
+          type: string
+          enum:
+          - automatic
+          - manual
+          description: Indicates whether the quote item is associated with a part (automatic pricing), or not (manual pricing).
+        root_component_id:
+          type: integer
+          description: ID of the root component. A root component houses the pricing information for a quote item. Every quote item has a root component. In the case of an automatic quote item, the root component corresponds to a part; in the case of a manual quote item, which does not have an associated part, the root component stores the manual pricing data. As the name 'root component' implies, it is possible for a quote item to have many components, as in the case of an assembly of nested parts.
+        components:
+          type: array
+          items:
+            $ref: '#/components/schemas/QuoteComponent'
+        position:
+          type: integer
+          description: The position of the quote item in the quote display, indexed from 1.
+        export_controlled:
+          type: boolean
+          description: Whether or not this quote item contains data that is export controlled (ITAR) by the US Government.
+        component_ids:
+          type: array
+          items:
+            type: integer
+        metadata:
+          type:
+          - object
+          - 'null'
+        private_notes:
+          type:
+          - string
+          - 'null'
+        public_notes:
+          type:
+          - string
+          - 'null'
+        workflow_status:
+          type:
+          - string
+          - 'null'
+        root_component:
+          deprecated: true
+          type:
+          - object
+          - 'null'
+    QuoteCostingVariable:
+      type: object
+      description: A CostingVariable is a piece of a Paperless Parts Programming Language (P3L) formula that determines the price and timing for an operation. CostingVariables are essentially Python variables and can represent several data types.
+      properties:
+        label:
+          type: string
+        variable_class:
+          type: string
+          enum:
+          - basic
+          - drop_down
+          - table
+        value_type:
+          type: string
+          enum:
+          - string
+          - number
+          - currency
+          - boolean
+          description: Describes the type of the 'value' key in quantities property
+        quantity_specific:
+          type: boolean
+          description: Flag as to whether or not this costing variable can be manipulated for each quantity break
+        quantities:
+          type: array
+          items:
+            type: object
+            properties:
+              stringQuotedQuantity1:
+                type: object
+                properties:
+                  value:
+                    anyOf:
+                    - type: number
+                    - type: string
+                    - type: boolean
+                  row:
+                    type:
+                    - object
+                    - 'null'
+                  options:
+                    type:
+                    - array
+                    - 'null'
+                    items:
+                      anyOf:
+                      - type: number
+                      - type: string
+              stringQuotedQuantity2:
+                type: object
+                properties:
+                  value:
+                    anyOf:
+                    - type: number
+                    - type: string
+                    - type: boolean
+                  row:
+                    type:
+                    - object
+                    - 'null'
+                  options:
+                    type:
+                    - array
+                    - 'null'
+                    items:
+                      anyOf:
+                      - type: number
+                      - type: string
+          description: 'The value of the costing variable for each quoted quantity. This is an object with keys corresponding to the top level quote quantities in string form e.g. ''1'', ''5'', ''10''. The values for each of these keys take different shape depending on the variable_class. If variable_class==''basic'', the dictionary values will take the shape {''value'': 1.0}. If variable_class==''drop_down'', the dictionary values will take the shape {''value'': ''a'', ''options'': [''a'', ''b'']}. If variable_class==''table'', the dictionary values will take the shape {''value'': ''a'', ''row'': {''column1'': ''a'', ''column2'': ''b''}}. So for quoted quantities 1, 5, 10 for a basic variable_class, the object will look like: {''1'': {''value'': 1.0}, ''5'': {''value'': 2.0}, ''10'': {''value'': 3.0}}'
+        type:
+          type: string
+          description: To Be Deprecated
+          deprecated: false
+        value:
+          anyOf:
+          - type: string
+          - type: number
+          - type: integer
+          - type: boolean
+          description: This will be indicated by the value_type field. To Be Deprecated
+          deprecated: false
+        row:
+          type:
+          - object
+          - 'null'
+          description: The row field will only be non-null when the type field is 'table'. Row represents a row in a lookup table and is an object with arbitrary keys. To Be Deprecated
+          deprecated: false
+    OrderProcess:
+      type: object
+      properties:
+        id:
+          type: integer
+        external_name:
+          type: string
+        name:
+          type: string
+    QuoteAddOnQuantity:
+      type: object
+      properties:
+        price:
+          type: number
+          format: float
+        manual_price:
+          type: number
+          format: float
+        quantity:
+          type: integer
+    PurchasedComponentProperty:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Name of corresponding purchased component column in table display
+        code_name:
+          type: string
+          description: Name used to access property within pricing formulas via 'dot' operator
+        value_type:
+          type: string
+          enum:
+          - string
+          - boolean
+          - numeric
+        value:
+          anyOf:
+          - type: string
+          - type: number
+          - type: boolean
+          description: Value of property, None or of type corresponding to value_type
+    OrderSupportingFile:
+      type: object
+      properties:
+        filename:
+          type: string
+        url:
+          type: string
+          format: url
+    QuoteOperation:
+      type: object
+      properties:
+        id:
+          type: integer
+        category:
+          type: string
+          enum:
+          - material
+          - operation
+        cost:
+          type: number
+          format: float
+        costing_variables:
+          type: array
+          items:
+            $ref: '#/components/schemas/QuoteCostingVariable'
+        quantities:
+          type: array
+          items:
+            $ref: '#/components/schemas/OperationQuantity'
+        is_finish:
+          type: boolean
+        is_outside_service:
+          type: boolean
+        name:
+          type: string
+        erp_code:
+          type: string
+        operation_definition_name:
+          type: string
+        notes:
+          type:
+          - string
+          - 'null'
+        position:
+          type: integer
+          description: The position of the order operation in the order display, indexed from 1. Note that the position applies across both material operations and order operations. TODO - this shows up as 0 if there is only one operation on the order?
+        runtime:
+          type:
+          - number
+          - 'null'
+          format: float
+        setup_time:
+          type:
+          - number
+          - 'null'
+          format: float
+    ComponentChild:
+      type: object
+      properties:
+        child_id:
+          type: integer
+          description: ID of the child component
+        quantity:
+          type: integer
+          description: The number of child component instances belonging to this parent. Note, the total number of instances of this child component in this assembly tree may be larger if this child appears in multiple places in the tree.
+    QuoteExpedite:
+      type: object
+      description: Expedites represent an additional option for pricing where quote recipients can request a shorter lead time, with an additional markup applied to the unit price.
+      properties:
+        id:
+          type: integer
+        lead_time:
+          type: integer
+          description: Days
+        markup:
+          type: number
+          format: float
+          description: Percent
+        unit_price:
+          type: number
+          format: float
+        total_price:
+          type: number
+          format: float
+  securitySchemes:
+    app_id:
+      type: apiKey
+      description: API key to authorize requests.
+      name: Authorization
+      in: header

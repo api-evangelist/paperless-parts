@@ -1,0 +1,1767 @@
+openapi: 3.2.0
+info:
+  title: Paperless Parts API v2 Contacts API
+  description: 'The Paperless Parts API provides access to your data, enabling developers to easily integrate Paperless Parts with third-party systems, such as Customer Relationship Management (CRM) and Enterprise Resource Planning (ERP) tools. The API is designed to support two primary use case. First, reading all information associated with a particular order or quote for import into another system. Second, managing customer data, either for an initial bulk import or for on-going synchronization with an external database.
+
+
+    ## Authorization ##
+
+
+    Requests are authorized via an API key. Administrators of a Paperless Parts account can generate an API Token which grants access to all of the endpoints documented here. The token obtained from the application must be added to the header of all requests using the key `\"Authorization\"` with the value `\"API-Token <api_token>\"`, where `<api_token>` is your Paperless Parts API Token.
+
+
+
+    You can use the \"Execute\" button in an endpoint''s documentation on this page to try out the endpoint. This will send a request to the endpoint on the Paperless Parts server and display the result on this page. Before doing so, however, you''ll need to click on the ''Authorize'' button at the top of the screen, and in the \"Value\" field enter `\"API-Token <api_token>\"`, where `<api_token>` is your API token as described above.
+
+
+
+    ## Overview ##
+
+
+    The API endpoints are organized around REST. API calls should be made to the `https://api.paperlessparts.com` base domain. URLs are designed to clearly describe an entity or collection of entities. HTTP verbs typically describe whether entities are being read, created, modified, or deleted. Where applicable, request and response bodies are in JSON format. Standard HTTP response codes, in addition to error messages, are used to help explain request failures.
+
+
+    ### Associations
+
+
+    Many entities in the API data model are associated with other entities. As a guiding principle, `GET` requests that fetch data nest associated entities in the JSON response. However, when creating or modifying entities, a flat (non-nested) object must be provided, as explained in the documentation for each endpoint. Associations are specified when writing data by using entity IDs in fields ending in `_id`.
+
+
+
+    For example, consider the relationship where a Company has many Customers. When fetching a Customer via a `GET` request, the associated Company will be nested as an object with key `company` in the response. When creating a Customer, the Company is specified via its integer id using the key `company_id`.
+
+
+    ### Events Overview
+
+
+    Events are a way of logging relevant actions that are taken within your account. For instance, when you create a new quote, Paperless Parts logs a `quote.created` event, and once you send that quote, we log another `quote.sent` event.
+
+
+
+    These logs offer you a trail of data that you can use to keep integrations in sync. By polling for new events, you can maintain an up-to-date record of what actions Paperless Parts has initiated that your integration has not. For instance, you could poll for `part.interrogation_succeeded` events and send out a notification upon receiving one.
+
+
+    ### HTTP Methods
+
+
+    The API endpoints support different HTTP methods depending on whether records are being read, created, or updated. To read an entity, use `GET`. To create a new entity, use `POST`. To modifying an entity, use `PATCH`. Note, `PATCH` is used rather than `PUT` to indicate that entities can be partially updated. In other words, in general, if a field is omitted from a `PATCH` request, that field''s value will stay the same (rather than be set to `null`). All fields requiring values are required to be included in `POST` requests.
+
+
+    > Note: Endpoints with a documented `PATCH` method can generally be used with a `PUT` method. The `PUT` is implemented as a partial update (as opposed to a replacement) and is supported for maximum compatibilty.
+
+
+
+    For example, consider the `email` field on the Customer entity, which is required. All Customers must have a non-null `email`. When creating a Customer via `POST`, the request body must contain an `email` key and its value cannot be `null` (other validation applies to that field, as well, including a valid email format and a unique value). When editing a Customer via `PATCH` request, it is not necessary to include an `email` key in the request body. If `email` is omitted, the existing email address will not be changed. If you send a `PATCH` request with `email=null`, then you will receive an error response indicating that a value for `email` is required.'
+  version: '2.0'
+  termsOfService: https://www.paperlessparts.com/web-service-agreement/
+  contact:
+    name: Paperless Parts
+    url: https://www.paperlessparts.com
+    email: support@paperlessparts.com
+servers:
+- url: '{url}/{version}'
+  variables:
+    url:
+      default: https://api.paperlessparts.com
+    version:
+      default: v2
+security:
+- app_id: []
+tags:
+- name: Contacts
+  description: ' Paperless Parts includes Customer Relationship Management (CRM) functionality to make it easy to send quotes to new and existing customers, while keeping data consistent with third-party CRM and ERP systems. Typical use cases for these endpoints are to bulk import customers from an existing customer database and to synchronize new customers or changes from another system.
+
+
+    An account represents a single company or account to which you would send quotes. An account has zero or more Contacts, each of which represents a person at that company and is identified uniquely by their email address. An account also has facilities and billing addresses. Facilities represent destinations to which orders can be shipped and BillingAddresses represent the bill to address for and order.'
+paths:
+  /contacts/public:
+    get:
+      summary: List contacts
+      description: Returns a list of contacts. The contacts are returned 20 results at a time and can be iterated over by using the page parameter.
+      operationId: ListContacts
+      parameters:
+      - in: query
+        name: search
+        schema:
+          type: string
+        required: false
+        description: 'Value used to search against the following fields: email, first name, last name, notes, phone, and account_id. Comparisons are not case sensitive and will match when the field value includes the search value as a substring.'
+      - in: query
+        name: page
+        schema:
+          type: string
+        required: false
+        description: The page of results to return.
+      - in: query
+        name: account_id
+        schema:
+          type: integer
+        required: false
+        description: The id of the account who's contacts to return. Must be an exact match.
+        example: 17
+      - in: query
+        name: metadata
+        schema:
+          type: string
+        required: false
+        description: 'Metadata is a dictionary-like object that allows developers to add arbitrary key/value pairs to an object in Paperless Parts. A classic use case for metadata is storing the ID of the object in an external system. To filter on metadata, supply a query parameter named with the syntax: metadata[metadata_key]. For example, if you wanted to filter on a metadata key/value pair of crm_id/ABC123, you would supply a query parameter called metadata[crm_id] and a value of ABC123.'
+        example: ABC123
+      tags:
+      - Contacts
+      responses:
+        200:
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  count:
+                    type: integer
+                    description: The total number of records matching the supplied query parameters
+                  next:
+                    type:
+                    - string
+                    - 'null'
+                    description: The URL of the next page of results. Null if this is the last page
+                  previous:
+                    type:
+                    - string
+                    - 'null'
+                    description: The URL of the previous page of results. Null if this is the first page
+                  results:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        account_id:
+                          type:
+                          - integer
+                          - 'null'
+                          example: 17
+                          description: the ID of the associated Account
+                        created:
+                          type: string
+                          example: '2020-08-25T18:00:53+00:00'
+                        email:
+                          type: string
+                          example: careers@paperlessparts.com
+                          description: email address (must be non-null, unique across all Contacts, and a valid email format)
+                        first_name:
+                          type: string
+                          example: Gordon
+                          description: Contact first name (must be non-null)
+                        id:
+                          type: integer
+                          example: 137
+                        last_name:
+                          type: string
+                          example: Moore
+                          description: Contact last name (must be non-null)
+                        phone:
+                          type:
+                          - string
+                          - 'null'
+                          example: '6176354500'
+                          description: Contact phone number
+                        phone_ext:
+                          type:
+                          - string
+                          - 'null'
+                          example: null
+                          description: Contact phone number extension
+        404:
+          description: Not found response
+          content:
+            text/plain:
+              schema:
+                title: Contacts not found
+                type: string
+                example: 'Error: Not Found'
+    post:
+      summary: Create new contact
+      description: Creates a new contact.
+      operationId: CreateContact
+      tags:
+      - Contacts
+      responses:
+        201:
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Contact'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                account_id:
+                  type:
+                  - integer
+                  - 'null'
+                  description: the ID of the associated Account
+                  example: 137
+                address:
+                  type:
+                  - object
+                  - 'null'
+                  description: the contact's address
+                  properties:
+                    address1:
+                      type: string
+                      description: The street address
+                      example: 137 Portland St.
+                    address2:
+                      type:
+                      - string
+                      - 'null'
+                      description: Unit
+                      example: Unit 1
+                    city:
+                      type: string
+                      description: The city of the address
+                      example: Boston
+                    country:
+                      type: string
+                      description: The three character country abbreviation
+                      example: USA
+                    postal_code:
+                      type: string
+                      description: The postal code for the address
+                      example: '02114'
+                    state:
+                      type: string
+                      description: The two character state abbreviation
+                      example: MA
+                email:
+                  type: string
+                  description: email address (must be non-null, unique across all Contacts, and a valid email format)
+                  example: careers@paperlessparts.com
+                first_name:
+                  type: string
+                  description: Contact first name (must be non-null)
+                  example: Gordon
+                last_name:
+                  type: string
+                  description: Contact last name (must be non-null)
+                  example: Moore
+                notes:
+                  type:
+                  - string
+                  - 'null'
+                  description: Contact notes
+                phone:
+                  type:
+                  - string
+                  - 'null'
+                  example: '6176354500'
+                  description: Customer phone number
+                phone_ext:
+                  type:
+                  - string
+                  - 'null'
+                  example: null
+                  description: Customer phone number extension
+                salesperson:
+                  type:
+                  - object
+                  - 'null'
+                  description: the contacts salesperson
+                  properties:
+                    email:
+                      type: string
+                      description: The salespersons email address. Must correspond to an active team member in your Paperless Parts account.
+                      example: careers@paperlessparts.com
+  /contacts/public/{contactId}:
+    get:
+      summary: Get details about a Contact
+      description: Get all Contact attributes
+      operationId: ContactDetails
+      parameters:
+      - $ref: '#/components/parameters/contactId'
+      tags:
+      - Contacts
+      responses:
+        200:
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Contact'
+    patch:
+      summary: Update a Contact
+      description: Partially update Contact attributes (not including associated entities)
+      operationId: UpdateCustomer
+      parameters:
+      - $ref: '#/components/parameters/contactId'
+      tags:
+      - Contacts
+      responses:
+        200:
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Contact'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                account_id:
+                  type:
+                  - integer
+                  - 'null'
+                  description: the ID of the associated Account
+                  example: 137
+                address:
+                  type:
+                  - object
+                  - 'null'
+                  description: The contact's address. If an address exists on a customer then individual fields can be patched, otherwise all fields are required
+                  properties:
+                    address1:
+                      type: string
+                      description: The street address
+                      example: 137 Portland St.
+                    address2:
+                      type:
+                      - string
+                      - 'null'
+                      description: Unit
+                      example: Unit 1
+                    city:
+                      type: string
+                      description: The city of the address
+                      example: Boston
+                    country:
+                      type: string
+                      description: The three character country abbreviation
+                      example: USA
+                    postal_code:
+                      type: string
+                      description: The postal code for the address
+                      example: '02114'
+                    state:
+                      type: string
+                      description: The two character state abbreviation
+                      example: MA
+                email:
+                  type: string
+                  description: email address (must be non-null, unique across all Contacts, and a valid email format)
+                  example: careers@paperlessparts.com
+                first_name:
+                  type: string
+                  description: Contact first name (must be non-null)
+                  example: Gordon
+                last_name:
+                  type: string
+                  description: Contact last name (must be non-null)
+                  example: Moore
+                notes:
+                  type:
+                  - string
+                  - 'null'
+                  description: Contact notes
+                phone:
+                  type:
+                  - string
+                  - 'null'
+                  example: '6176354500'
+                  description: Customer phone number
+                phone_ext:
+                  type:
+                  - string
+                  - 'null'
+                  example: null
+                  description: Customer phone number extension
+                salesperson:
+                  type:
+                  - object
+                  - 'null'
+                  description: the contacts salesperson
+                  properties:
+                    email:
+                      type: string
+                      description: The salespersons email address. Must correspond to an active team member in your Paperless Parts account.
+                      example: careers@paperlessparts.com
+            example:
+              phone: '6176354500'
+    delete:
+      summary: Delete contact
+      description: Delete a contact
+      operationId: DeleteContact
+      parameters:
+      - $ref: '#/components/parameters/contactId'
+      tags:
+      - Contacts
+      responses:
+        204:
+          description: Successful Response
+        404:
+          description: Not found response
+          content:
+            text/plain:
+              schema:
+                title: Contact not found
+                type: string
+                example: 'Error: Not Found'
+  /accounts/public:
+    get:
+      summary: List accounts
+      description: Returns a list of accounts. The accounts are returned 20 results at a time and can be iterated over by using the page parameter.
+      operationId: ListAccounts
+      parameters:
+      - in: query
+        name: search
+        schema:
+          type: string
+        required: false
+        description: 'Value used to search against the following fields: account name, erp code, notes, and id. Comparisons are not case sensitive and will match when the field value includes the search value as a substring.'
+      - in: query
+        name: page
+        schema:
+          type: string
+        required: false
+        description: The page of results to return.
+      - in: query
+        name: erp_code
+        schema:
+          type: string
+        required: false
+        description: The erp code of the accounts to return. Must be an exact match.
+        example: PPI
+      - in: query
+        name: null_erp_code
+        schema:
+          type: boolean
+        required: false
+        description: Filters for accounts whose erp code is either null or an empty string.
+        example: true
+      - in: query
+        name: metadata
+        schema:
+          type: string
+        required: false
+        description: 'Metadata is a dictionary-like object that allows developers to add arbitrary key/value pairs to an object in Paperless Parts. A classic use case for metadata is storing the ID of the object in an external system. To filter on metadata, supply a query parameter named with the syntax: metadata[metadata_key]. For example, if you wanted to filter on a metadata key/value pair of crm_id/ABC123, you would supply a query parameter called metadata[crm_id] and a value of ABC123.'
+        example: ABC123
+      tags:
+      - Contacts
+      responses:
+        200:
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  count:
+                    type: integer
+                    description: The total number of records matching the supplied query parameters
+                  next:
+                    type:
+                    - string
+                    - 'null'
+                    description: The URL of the next page of results. Null if this is the last page
+                  previous:
+                    type:
+                    - string
+                    - 'null'
+                    description: The URL of the previous page of results. Null if this is the first page
+                  results:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        name:
+                          type: string
+                          example: Paperless Parts, Inc.
+                          description: The name of the account
+                        erp_code:
+                          type: string
+                          example: PPI
+                          description: The ERP code of the account
+                        id:
+                          type: integer
+                          example: 17
+                          description: the ID of the account
+                        phone:
+                          type: string
+                          example: '6176354500'
+                          description: Account phone number
+                        phone_ext:
+                          type: string
+                          example: null
+                          description: Account phone number extension
+                        type:
+                          type: string
+                          example: customer
+                          description: Account type, either customer or vendor
+        404:
+          description: Not found response
+          content:
+            text/plain:
+              schema:
+                title: Accounts not found
+                type: string
+                example: 'Error: Not Found'
+    post:
+      summary: Create new Account
+      description: Creates a new account.
+      operationId: CreateAccoumt
+      tags:
+      - Contacts
+      responses:
+        201:
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Account'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: (Required) Account Name (must be non-null and non-blank)
+                  example: Paperless Parts, Inc.
+                credit_cards_enabled:
+                  type: boolean
+                  example: true
+                  description: When `true` any contact associated with this account will be allowed to check out with a credit card.
+                credit_line:
+                  type:
+                  - number
+                  - 'null'
+                  description: An account's credit line
+                  example: 10000.0
+                erp_code:
+                  type:
+                  - string
+                  - 'null'
+                  description: Erp code for the account
+                  example: PPI
+                notes:
+                  type:
+                  - string
+                  - 'null'
+                  description: Account notes
+                payment_terms:
+                  type:
+                  - string
+                  - 'null'
+                  description: Payment terms; required if `payment_terms_period` are included
+                  example: Net 30
+                payment_terms_period:
+                  type:
+                  - string
+                  - 'null'
+                  description: Payment terms period in days; required if `payment_terms` are included, but can be `null`
+                  example: 30
+                phone:
+                  type:
+                  - string
+                  - 'null'
+                  example: '6176354500'
+                  description: Account phone number
+                phone_ext:
+                  type:
+                  - string
+                  - 'null'
+                  example: null
+                  description: Account phone number extension
+                purchase_orders_enabled:
+                  type: boolean
+                  example: true
+                  description: When `true` any contact associated with this account will be allowed to check out with a purchase order.
+                salesperson:
+                  type:
+                  - object
+                  - 'null'
+                  description: the accounts salesperson
+                  properties:
+                    email:
+                      type: string
+                      description: The salespersons email address. Must correspond to an active team member in your Paperless Parts account.
+                      example: careers@paperlessparts.com
+                sold_to_address:
+                  type:
+                  - object
+                  - 'null'
+                  description: The address for the account's headquarters.
+                  properties:
+                    address1:
+                      type: string
+                      description: The street address
+                      example: 137 Portland St.
+                    address2:
+                      type:
+                      - string
+                      - 'null'
+                      description: Unit
+                      example: Unit 1
+                    city:
+                      type: string
+                      description: The city of the address
+                      example: Boston
+                    country:
+                      type: string
+                      description: The three character country abbreviation
+                      example: USA
+                    postal_code:
+                      type: string
+                      description: The postal code for the address
+                      example: '02114'
+                    state:
+                      type: string
+                      description: The two character state abbreviation
+                      example: MA
+                    erp_code:
+                      type: string
+                      maxLength: 50
+                      description: The unique identifier for this address record in the ERP
+                      example: B1234
+                tax_exempt:
+                  type: boolean
+                  example: true
+                  description: When `true`, sales tax will not be added to a quote
+                tax_rate:
+                  type:
+                  - number
+                  - 'null'
+                  example: 6.25
+                  description: Sales tax rate for this Account
+                type:
+                  type: string
+                  example: customer
+                  description: Type of this Account, either customer or vendor
+                url:
+                  type:
+                  - string
+                  - 'null'
+                  example: https://paperlessparts.com
+            example:
+              credit_cards_enabled: true
+              credit_line: 100000
+              erp_code: PPI
+              purchase_orders_enabled: true
+              name: Paperless Parts, Inc.
+              notes: This is a test account
+              tax_exempt: true
+              tax_rate: 6.25
+              phone: '6175555555'
+              url: www.paperlessparts.com
+              type: customer
+  /accounts/public/{accountId}:
+    get:
+      summary: Get details about an Account
+      description: Get all Account attributes, including a list of billing addresses.
+      operationId: AccountDetails
+      parameters:
+      - $ref: '#/components/parameters/accountId'
+      tags:
+      - Contacts
+      responses:
+        200:
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Account'
+        404:
+          description: Not found response
+          content:
+            text/plain:
+              schema:
+                title: Account not found
+                type: string
+                example: 'Error: Not Found'
+    patch:
+      summary: Update an Account
+      description: Partially update Account attributes (not including associated entities)
+      operationId: UpdateCompany
+      parameters:
+      - $ref: '#/components/parameters/accountId'
+      tags:
+      - Contacts
+      responses:
+        200:
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Account'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: (Required) Account Name (must be non-null and non-blank)
+                  example: Paperless Parts, Inc.
+                credit_cards_enabled:
+                  type: boolean
+                  example: true
+                  description: When `true` any contact associated with this account will be allowed to check out with a credit card.
+                credit_line:
+                  type:
+                  - number
+                  - 'null'
+                  description: An account's credit line
+                  example: 10000.0
+                erp_code:
+                  type:
+                  - string
+                  - 'null'
+                  description: Erp code for the account
+                  example: PPI
+                notes:
+                  type:
+                  - string
+                  - 'null'
+                  description: Account notes
+                payment_terms:
+                  type:
+                  - string
+                  - 'null'
+                  description: Payment terms; required if `payment_terms_period` are included
+                  example: Net 30
+                payment_terms_period:
+                  type:
+                  - string
+                  - 'null'
+                  description: Payment terms period in days; required if `payment_terms` are included, but can be `null`
+                  example: 30
+                phone:
+                  type:
+                  - string
+                  - 'null'
+                  example: '6176354500'
+                  description: Account phone number
+                phone_ext:
+                  type:
+                  - string
+                  - 'null'
+                  example: null
+                  description: Account phone number extension
+                purchase_orders_enabled:
+                  type: boolean
+                  example: true
+                  description: When `true` any contact associated with this account will be allowed to check out with a purchase order.
+                salesperson:
+                  type:
+                  - object
+                  - 'null'
+                  description: the accounts salesperson
+                  properties:
+                    email:
+                      type: string
+                      description: The salespersons email address. Must correspond to an active team member in your Paperless Parts account.
+                      example: careers@paperlessparts.com
+                sold_to_address:
+                  type:
+                  - object
+                  - 'null'
+                  description: The address for the account's headquarters. If a sold_to_address is present on the account then individual fields can be patched otherwise all fields are required.
+                  properties:
+                    address1:
+                      type: string
+                      description: The street address
+                      example: 137 Portland St.
+                    address2:
+                      type:
+                      - string
+                      - 'null'
+                      description: Unit
+                      example: Unit 1
+                    city:
+                      type: string
+                      description: The city of the address
+                      example: Boston
+                    country:
+                      type: string
+                      description: The three character country abbreviation
+                      example: USA
+                    postal_code:
+                      type: string
+                      description: The postal code for the address
+                      example: '02114'
+                    state:
+                      type: string
+                      description: The two character state abbreviation
+                      example: MA
+                    erp_code:
+                      type: string
+                      maxLength: 50
+                      description: The unique identifier for this address record in the ERP
+                      example: B1234
+                tax_exempt:
+                  type: boolean
+                  example: true
+                  description: When `true`, sales tax will not be added to a quote
+                tax_rate:
+                  type:
+                  - number
+                  - 'null'
+                  example: 6.25
+                  description: Sales tax rate for this Account
+                type:
+                  type: string
+                  example: customer
+                  description: Type of this Account, either customer or vendor
+                url:
+                  type:
+                  - string
+                  - 'null'
+                  example: https://paperlessparts.comA
+            example:
+              erp_code: PPI
+              name: Paperless Parts, Inc.
+              url: www.paperlessparts.com
+    delete:
+      summary: Delete account
+      description: Delete an account
+      operationId: DeleteAccount
+      parameters:
+      - $ref: '#/components/parameters/accountId'
+      tags:
+      - Contacts
+      responses:
+        204:
+          description: Successful Response
+        404:
+          description: Not found response
+          content:
+            text/plain:
+              schema:
+                title: Account not found
+                type: string
+                example: 'Error: Not Found'
+  /accounts/public/{accountId}/billing_addresses:
+    get:
+      summary: List account billing addresses
+      description: List all billing addresses associated with an account
+      operationId: ListBillingAddresses
+      parameters:
+      - $ref: '#/components/parameters/accountId'
+      tags:
+      - Contacts
+      responses:
+        200:
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Address'
+        404:
+          description: Not found response
+          content:
+            text/plain:
+              schema:
+                title: Account not found
+                type: string
+                example: 'Error: Not Found'
+    post:
+      summary: Create a new billing address for an account
+      operationId: CreateBillingAddress
+      parameters:
+      - $ref: '#/components/parameters/accountId'
+      tags:
+      - Contacts
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Address'
+      responses:
+        201:
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AddressInfo'
+  /accounts/public/{accountId}/facilities:
+    get:
+      summary: List account facilites
+      description: List all facilities associated with an account
+      operationId: ListFacilities
+      parameters:
+      - $ref: '#/components/parameters/accountId'
+      tags:
+      - Contacts
+      responses:
+        200:
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Facility'
+        404:
+          description: Not found response
+          content:
+            text/plain:
+              schema:
+                title: Account not found
+                type: string
+                example: 'Error: Not Found'
+    post:
+      summary: Create a new facility for an account
+      operationId: CreateFacility
+      parameters:
+      - $ref: '#/components/parameters/accountId'
+      tags:
+      - Contacts
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type:
+                  - string
+                  - 'null'
+                  description: Name of Facility
+                  example: Boston Office
+                attention:
+                  type:
+                  - string
+                  - 'null'
+                  description: The person or department to ship packages to at the facility
+                address:
+                  type:
+                  - object
+                  - 'null'
+                  description: The address of the facility.
+                  properties:
+                    address1:
+                      type: string
+                      description: The street address
+                      example: 137 Portland St.
+                    address2:
+                      type:
+                      - string
+                      - 'null'
+                      description: Unit
+                      example: Unit 1
+                    city:
+                      type: string
+                      description: The city of the address
+                      example: Boston
+                    country:
+                      type: string
+                      description: The three character country abbreviation
+                      example: USA
+                    postal_code:
+                      type: string
+                      description: The postal code for the address
+                      example: '02114'
+                    state:
+                      type: string
+                      description: The two character state abbreviation
+                      example: MA
+                    erp_code:
+                      type: string
+                      maxLength: 50
+                      description: The unique identifier for this address record in the ERP
+                      example: B1234
+                salesperson:
+                  type:
+                  - object
+                  - 'null'
+                  description: the contacts salesperson
+                  properties:
+                    email:
+                      type: string
+                      description: The salespersons email address. Must correspond to an active team member in your Paperless Parts account.
+                      example: careers@paperlessparts.com
+      responses:
+        201:
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Facility'
+  /billing_addresses/public/{billingAddressId}:
+    get:
+      summary: Get Billing Address
+      description: Get a sepecific billing address
+      operationId: BillingAddress
+      parameters:
+      - $ref: '#/components/parameters/billingAddressId'
+      tags:
+      - Contacts
+      responses:
+        200:
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Address'
+        404:
+          description: Not found response
+          content:
+            text/plain:
+              schema:
+                title: Billing Address not found
+                type: string
+                example: 'Error: Not Found'
+    patch:
+      summary: Update a Billing Address
+      description: Partially update a Billing Address
+      operationId: UpdateBillingAddress
+      parameters:
+      - $ref: '#/components/parameters/billingAddressId'
+      tags:
+      - Contacts
+      responses:
+        200:
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Account'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                address1:
+                  type: string
+                  description: The street address
+                  example: 137 Portland St.
+                address2:
+                  type:
+                  - string
+                  - 'null'
+                  description: Unit
+                  example: Unit 1
+                city:
+                  type: string
+                  description: The city of the address
+                  example: Boston
+                country:
+                  type: string
+                  description: The three character country abbreviation
+                  example: USA
+                postal_code:
+                  type: string
+                  description: The postal code for the address
+                  example: '02114'
+                state:
+                  type: string
+                  description: The two character state abbreviation
+                  example: MA
+                erp_code:
+                  type: string
+                  maxLength: 50
+                  description: The unique identifier for this address record in the ERP
+                  example: B1234
+            example:
+              address2: Basement
+  /facilities/public/{facilityId}:
+    get:
+      summary: Get A Facility
+      description: Get a sepecific facility
+      operationId: Facility
+      parameters:
+      - $ref: '#/components/parameters/facilityId'
+      tags:
+      - Contacts
+      responses:
+        200:
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Facility'
+        404:
+          description: Not found response
+          content:
+            text/plain:
+              schema:
+                title: Facility not found
+                type: string
+                example: 'Error: Not Found'
+    patch:
+      summary: Update a Facility
+      description: Partially update a Facility
+      operationId: UpdateFacility
+      parameters:
+      - $ref: '#/components/parameters/facilityId'
+      tags:
+      - Contacts
+      responses:
+        200:
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Facility'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                address:
+                  type: object
+                  properties:
+                    address1:
+                      type: string
+                      description: The street address
+                      example: 137 Portland St.
+                    address2:
+                      type:
+                      - string
+                      - 'null'
+                      description: Unit
+                      example: Unit 1
+                    city:
+                      type: string
+                      description: The city of the address
+                      example: Boston
+                    country:
+                      type: string
+                      description: The three character country abbreviation
+                      example: USA
+                    postal_code:
+                      type: string
+                      description: The postal code for the address
+                      example: '02114'
+                    state:
+                      type: string
+                      description: The two character state abbreviation
+                      example: MA
+                    erp_code:
+                      type: string
+                      maxLength: 50
+                      description: The unique identifier for this address record in the ERP
+                      example: B1234
+                attention:
+                  type: string
+                  description: The person or department to ship packages to at the facility
+                  example: Gordon Moore
+                name:
+                  type: string
+                  description: The name of the facility
+                  example: Boston HQ
+                salesperson:
+                  type:
+                  - object
+                  - 'null'
+                  description: the contacts salesperson
+                  properties:
+                    email:
+                      type: string
+                      description: The salespersons email address. Must correspond to an active team member in your Paperless Parts account.
+                      example: careers@paperlessparts.com
+            example:
+              address2: Basement
+  /customers/public/payment_terms:
+    get:
+      summary: Returns a list of payment terms
+      description: Returns a list of payment terms available to be used for accounts.
+      operationId: ListPaymentTerms
+      tags:
+      - Contacts
+      responses:
+        200:
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PaymentTerms'
+        404:
+          description: Not found response
+          content:
+            text/plain:
+              schema:
+                title: Payment terms not found
+                type: string
+                example: 'Error: Not Found'
+    post:
+      summary: Create payment terms
+      description: Create payment terms
+      operationId: CreatePaymentTerms
+      tags:
+      - Contacts
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                label:
+                  type: string
+                  description: Label for Payment Terms
+                  example: Net 30 days
+                period:
+                  type: integer
+                  description: Days until payment is due
+      responses:
+        200:
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PaymentTerms'
+  /customers/public/payment_terms/{paymentTermsId}:
+    get:
+      summary: Get details about a payment terms
+      description: Get all payment terms attributes, including a list of billing addresses.
+      operationId: PaymentTermsDetails
+      parameters:
+      - $ref: '#/components/parameters/paymentTermsId'
+      tags:
+      - Contacts
+      responses:
+        200:
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentTerms'
+        404:
+          description: Not found response
+          content:
+            text/plain:
+              schema:
+                title: Payment terms not found
+                type: string
+                example: 'Error: Not Found'
+    patch:
+      summary: Update an Payment terms
+      description: Partially update payment terms attributes
+      operationId: UpdatePaymentTerms
+      parameters:
+      - $ref: '#/components/parameters/paymentTermsId'
+      tags:
+      - Contacts
+      responses:
+        200:
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentTerms'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                label:
+                  type:
+                  - string
+                  - 'null'
+                  description: Label for Payment Terms
+                  example: Net 30 days
+                period:
+                  type:
+                  - integer
+                  - 'null'
+                  description: Days until payment is due
+    delete:
+      summary: Delete payment terms
+      description: Delete a payment terms
+      operationId: DeletePaymentTerms
+      parameters:
+      - $ref: '#/components/parameters/paymentTermsId'
+      tags:
+      - Contacts
+      responses:
+        204:
+          description: Successful Response
+        404:
+          description: Not found response
+          content:
+            text/plain:
+              schema:
+                title: Payment terms not found
+                type: string
+                example: 'Error: Not Found'
+  /users/public:
+    get:
+      summary: Returns a list of users for the user group
+      description: Returns a list of users for the user group
+      operationId: ListUsers
+      tags:
+      - Contacts
+      responses:
+        200:
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+        404:
+          description: Not found response
+          content:
+            text/plain:
+              schema:
+                title: Users not found
+                type: string
+                example: 'Error: Not Found'
+  /users/public/{userUuid}:
+    get:
+      summary: Get details about user
+      description: Get user attributes
+      operationId: UserDetails
+      parameters:
+      - $ref: '#/components/parameters/userUuid'
+      tags:
+      - Contacts
+      responses:
+        200:
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        404:
+          description: Not found response
+          content:
+            text/plain:
+              schema:
+                title: User not found
+                type: string
+                example: 'Error: Not Found'
+    patch:
+      summary: Update a user
+      description: Partially user attributes
+      operationId: UpdateUser
+      parameters:
+      - $ref: '#/components/parameters/userUuid'
+      tags:
+      - Contacts
+      responses:
+        200:
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                erp_code:
+                  type:
+                  - string
+                  - 'null'
+                  description: ERP code for user
+                  example: EMPLOYEE1
+components:
+  schemas:
+    BillingAddressId:
+      type: integer
+      description: The billing address id
+      example: '27'
+    PaymentTerms:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 26198
+          description: the ID of the payment terms
+        label:
+          type: string
+          example: Net 30 days
+          description: the label for the payment terms
+        period:
+          type: integer
+          example: 30
+          description: number of days before payment is due
+    UserUuid:
+      type: string
+      description: The user uuid
+      example: 37d984ea-ec42-4a00-9cd1-a4cc73bb721e
+    Contact:
+      type: object
+      properties:
+        address:
+          $ref: '#/components/schemas/Address'
+        account_id:
+          type:
+          - integer
+          - 'null'
+          example: 17
+          description: The ID of the associated account
+        created:
+          type: string
+          readOnly: true
+          example: '2020-08-25T18:00:53+00:00'
+        email:
+          type: string
+          example: careers@paperlessparts.com
+          description: (Required) email address (must be non-null, unique across all Customers, and a valid email format)
+        first_name:
+          type: string
+          example: Gordon
+          description: (Required) Customer first name (must be non-null)
+        id:
+          type: integer
+          example: 137
+          readOnly: true
+        last_name:
+          type: string
+          example: Moore
+          description: (Required) Customer last name (must be non-null)
+        notes:
+          type:
+          - string
+          - 'null'
+          description: Customer notes
+        phone:
+          type:
+          - string
+          - 'null'
+          example: '6176354500'
+          description: Customer phone number
+        phone_ext:
+          type:
+          - string
+          - 'null'
+          example: null
+          description: Customer phone number extension
+        salesperson:
+          $ref: '#/components/schemas/SalesPerson'
+        metadata:
+          $ref: '#/components/schemas/Metadata'
+    SalesPerson:
+      type: object
+      properties:
+        first_name:
+          type: string
+        last_name:
+          type: string
+        email:
+          type: string
+          format: email
+        erp_code:
+          type: string
+    Metadata:
+      type: object
+      example: '{ crm_id: 1581 }'
+      description: Object that can be used to attach key-value data to an object. Up to 25 keys can be speficied, with key names up to 40 characters long and values up to 500 characters long.
+    CustomerId:
+      type: integer
+      description: The customer id
+      example: '32'
+    AccountId:
+      type: integer
+      description: The account id
+      example: '13'
+    PaymentTermsId:
+      type: integer
+      description: The payment terms id
+      example: '1234'
+    AddressInfo:
+      type:
+      - object
+      - 'null'
+      properties:
+        id:
+          type: integer
+          example: 55123
+        address1:
+          type: string
+          example: 1 City Hall Sq.
+        address2:
+          type:
+          - string
+          - 'null'
+          example: null
+        attention:
+          type: string
+          example: Gordon Moore
+        business_name:
+          type: string
+          example: Paperless Parts, Inc.
+        city:
+          type: string
+          example: Boston
+        country:
+          type: string
+          example: USA
+        facility_name:
+          type:
+          - string
+          - 'null'
+          example: Boston Office
+        phone:
+          type: string
+          example: '6176354500'
+        phone_ext:
+          type:
+          - string
+          - 'null'
+          example: null
+        postal_code:
+          type: string
+          example: 1153
+        state:
+          type: string
+          example: MA
+    Address:
+      type: object
+      properties:
+        address1:
+          type: string
+          maxLength: 250
+          example: 1 City Hall Sq.
+          description: (Required)
+        address2:
+          type:
+          - string
+          - 'null'
+          maxLength: 250
+          example: null
+          description: (Required)
+        city:
+          type: string
+          maxLength: 100
+          example: Boston
+          description: (Required)
+        state:
+          type: string
+          description: (Required) State/Province must be specified as standard postal abbreviation
+          example: MA
+        postal_code:
+          type: string
+          example: '02114'
+          description: (Required) US postal codes may optionally contain 4-digit extension, e.g., `'02114-1234'`
+        country:
+          type: string
+          maxLength: 3
+          description: (Required) Country must be ISO 3166-1 alpha-3 code. Currently allowed values are `'USA'`, `'CAN'`.
+          example: USA
+        erp_code:
+          type: string
+          maxLength: 50
+          description: The unique identifier for this address record in the ERP
+          example: B1234
+    User:
+      type: object
+      properties:
+        uuid:
+          type: string
+          example: 37d984ea-ec42-4a00-9cd1-a4cc73bb721e
+          description: the uuid (unique identifier) for the user
+        email:
+          type: string
+          example: careers@paperlessparts.com
+          description: the email address of the user
+        first_name:
+          type: string
+          example: Gordon
+          description: User first name (must be non-null)
+        last_name:
+          type: string
+          example: Moore
+          description: User last name (must be non-null)
+        erp_code:
+          type: string
+          example: EMPLOYEE1
+          description: ERP code for the user
+    FacilityId:
+      type: integer
+      description: The facility id
+      example: '30'
+    Facility:
+      type:
+      - object
+      - 'null'
+      properties:
+        account_id:
+          type: integer
+          example: 55123
+        address:
+          $ref: '#/components/schemas/Address'
+        attention:
+          type: string
+          example: Gordon Moore
+        id:
+          type: integer
+          example: 12
+        name:
+          type: string
+          example: Boston Office
+        salesperson:
+          $ref: '#/components/schemas/SalesPerson'
+    Account:
+      type: object
+      properties:
+        billing_address:
+          type: array
+          items:
+            $ref: '#/components/schemas/Address'
+        name:
+          type: string
+          example: Paperless Parts, Inc.
+          description: (Required) The name of the account
+        created:
+          type: string
+          readOnly: true
+          example: '2020-08-25T18:00:53+00:00'
+        credit_cards_enabled:
+          type: boolean
+          example: true
+          description: When `true` any contact associated with this account will be allowed to check out with a credit card.
+        credit_line:
+          type:
+          - number
+          - 'null'
+          description: credit line (dollars)
+          example: 10000.0
+        erp_code:
+          type:
+          - string
+          - 'null'
+          example: PPI
+          description: The ERP code of the account
+        id:
+          type: integer
+          readOnly: true
+          example: 17
+          description: the ID of the account
+        notes:
+          type:
+          - string
+          - 'null'
+          description: Account notes
+        payment_terms:
+          type:
+          - string
+          - 'null'
+          example: Net 30
+          description: Payment terms; required if `payment_terms_period` are included
+        payment_terms_period:
+          type:
+          - integer
+          - 'null'
+          example: 30
+          description: Payment terms period in days; required if `payment_terms` are included, but can be `null`
+        phone:
+          type:
+          - string
+          - 'null'
+          example: '6176354500'
+          description: Account phone number
+        phone_ext:
+          type:
+          - string
+          - 'null'
+          example: null
+          description: Account phone number extension
+        purchase_orders_enabled:
+          type: boolean
+          example: true
+          description: When `true` this account can check out with a purchase order
+        salesperson:
+          $ref: '#/components/schemas/SalesPerson'
+        sold_to_address:
+          $ref: '#/components/schemas/Address'
+        tax_exempt:
+          type: boolean
+          example: true
+          description: When `true`, sales tax will not be added to a quote
+        tax_rate:
+          type:
+          - number
+          - 'null'
+          example: 6.25
+          description: Sales tax rate for this account
+        type:
+          type: string
+          example: customer
+          description: Type of account, either customer or vendor
+        url:
+          type:
+          - string
+          - 'null'
+          example: https://www.paperlessparts.com
+        metadata:
+          $ref: '#/components/schemas/Metadata'
+  parameters:
+    billingAddressId:
+      name: billingAddressId
+      in: path
+      required: true
+      example: 27
+      schema:
+        $ref: '#/components/schemas/BillingAddressId'
+    contactId:
+      name: contactId
+      in: path
+      description: The integer idenfier of a Contact, assigned automatically by Paperless Parts
+      required: true
+      schema:
+        $ref: '#/components/schemas/CustomerId'
+    userUuid:
+      name: userUuid
+      in: path
+      required: true
+      example: 37d984ea-ec42-4a00-9cd1-a4cc73bb721e
+      schema:
+        $ref: '#/components/schemas/UserUuid'
+    paymentTermsId:
+      name: paymentTermsId
+      in: path
+      required: true
+      example: 1234
+      schema:
+        $ref: '#/components/schemas/PaymentTermsId'
+    facilityId:
+      name: facilityId
+      in: path
+      required: true
+      example: 30
+      schema:
+        $ref: '#/components/schemas/FacilityId'
+    accountId:
+      name: accountId
+      in: path
+      required: true
+      example: 17
+      schema:
+        $ref: '#/components/schemas/AccountId'
+  securitySchemes:
+    app_id:
+      type: apiKey
+      description: API key to authorize requests.
+      name: Authorization
+      in: header

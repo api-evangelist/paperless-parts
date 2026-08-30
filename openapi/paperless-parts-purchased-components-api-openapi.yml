@@ -1,0 +1,501 @@
+openapi: 3.2.0
+info:
+  title: Paperless Parts Purchased Components API
+  contact:
+    name: Paperless Parts
+    url: https://www.paperlessparts.com
+    email: support@paperlessparts.com
+  termsOfService: https://www.paperlessparts.com/web-service-agreement/
+  version: '1.0'
+  description: 'Operations tagged Purchased Components across 2 of this provider''s published API definitions: paperless-parts-v1-openapi.yml, paperless-parts-v2-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: '{url}/{version}'
+  variables:
+    url:
+      default: https://api.paperlessparts.com
+    version:
+      default: v1
+security:
+- app_id: []
+tags:
+- name: Purchased Components
+  description: Endpoints for managing purchased components and purchased components columns.
+paths:
+  /suppliers/public/purchased_components:
+    get:
+      summary: List purchased components
+      description: List all purchased components
+      operationId: ListPurchasedComponents
+      tags:
+      - Purchased Components
+      parameters:
+      - in: query
+        name: search
+        schema:
+          type: string
+        required: false
+        description: Value used to search against oem_part_number and internal_part_number. Comparisons are not case sensitive and will match when the field value includes the search value as a substring.
+      - in: query
+        name: page
+        schema:
+          type: string
+          default: 1
+        required: false
+        description: The page of results to return.
+      - in: query
+        name: page_size
+        schema:
+          type: string
+          default: 500
+        required: false
+        description: The page size of results to return. Default subject to change.
+      responses:
+        200:
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PurchasedComponent'
+    post:
+      summary: Create purchased component
+      description: Create a purchased component
+      operationId: CreatePurchasedComponent
+      tags:
+      - Purchased Components
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PostPurchasedComponent'
+      responses:
+        200:
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PurchasedComponent'
+    servers:
+    - url: '{url}/{version}'
+      variables:
+        url:
+          default: https://api.paperlessparts.com
+        version:
+          default: v1
+  /suppliers/public/purchased_components/{purchasedComponentId}:
+    patch:
+      summary: Update purchased component
+      description: Update a purchased component
+      operationId: UpdatePurchasedComponent
+      parameters:
+      - $ref: '#/components/parameters/purchasedComponentId'
+      tags:
+      - Purchased Components
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchPurchasedComponent'
+      responses:
+        200:
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PurchasedComponent'
+        404:
+          description: Not found response
+          content:
+            text/plain:
+              schema:
+                title: PurchasedComponent not found
+                type: string
+                example: 'Error: Not Found'
+    delete:
+      summary: Delete purchased component
+      description: Delete a purchased component
+      operationId: DeletePurchasedComponent
+      parameters:
+      - $ref: '#/components/parameters/purchasedComponentId'
+      tags:
+      - Purchased Components
+      responses:
+        204:
+          description: Successful Response
+        404:
+          description: Not found response
+          content:
+            text/plain:
+              schema:
+                title: PurchasedComponent not found
+                type: string
+                example: 'Error: Not Found'
+    servers:
+    - url: '{url}/{version}'
+      variables:
+        url:
+          default: https://api.paperlessparts.com
+        version:
+          default: v1
+  /suppliers/public/purchased_components/batch:
+    put:
+      summary: Bulk upsert purchased components
+      description: Upserts purchased components in bulk. If the purchased component already exists, it will be updated. Otherwise, it will be created.
+      operationId: BulkUpdatePurchasedComponent
+      tags:
+      - Purchased Components
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                purchased_components:
+                  type: array
+                  description: The list of purchased components to create. Max size is 1000 components.
+                  items:
+                    $ref: '#/components/schemas/PostPurchasedComponent'
+      responses:
+        200:
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  successes:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/PurchasedComponent'
+                  failures:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/PurchasedComponent'
+    servers:
+    - url: '{url}/{version}'
+      variables:
+        url:
+          default: https://api.paperlessparts.com
+        version:
+          default: v1
+  /suppliers/public/purchased_component_columns:
+    get:
+      summary: List purchased components columns
+      description: List all custom purchased components columns
+      operationId: ListPurchasedComponentsColumns
+      tags:
+      - Purchased Components
+      responses:
+        200:
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PurchasedComponentsColumn'
+    post:
+      summary: Create purchased components columns
+      description: Creates a new custom purchased components columns
+      operationId: CreatePurchasedComponentsColumn
+      tags:
+      - Purchased Components
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PostPurchasedComponentsColumn'
+      responses:
+        200:
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PurchasedComponentsColumn'
+    servers:
+    - url: '{url}/{version}'
+      variables:
+        url:
+          default: https://api.paperlessparts.com
+        version:
+          default: v1
+  /suppliers/public/purchased_component_columns/{purchasedComponentsColumnId}:
+    patch:
+      summary: Update purchased components columns
+      description: Updates an existing custom purchased components columns
+      operationId: UpdatePurchasedComponentsColumn
+      parameters:
+      - $ref: '#/components/parameters/purchasedComponentsColumnId'
+      tags:
+      - Purchased Components
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchPurchasedComponentsColumn'
+      responses:
+        200:
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PurchasedComponentsColumn'
+        404:
+          description: Not found response
+          content:
+            text/plain:
+              schema:
+                title: PurchasedComponentsColumn not found
+                type: string
+                example: 'Error: Not Found'
+    delete:
+      summary: Delete purchased components columns
+      description: Deletes an existing custom purchased components columns
+      operationId: DeletePurchasedComponentsColumn
+      parameters:
+      - $ref: '#/components/parameters/purchasedComponentsColumnId'
+      tags:
+      - Purchased Components
+      responses:
+        204:
+          description: Successful Response
+        404:
+          description: Not found response
+          content:
+            text/plain:
+              schema:
+                title: PurchasedComponentsColumn not found
+                type: string
+                example: 'Error: Not Found'
+    servers:
+    - url: '{url}/{version}'
+      variables:
+        url:
+          default: https://api.paperlessparts.com
+        version:
+          default: v1
+  /suppliers/public/purchased_components_csv:
+    get:
+      summary: Retrieve purchased components csv
+      description: Retrieve all purchased components for account in csv format
+      operationId: GetPurchasedComponentCSV
+      tags:
+      - Purchased Components
+      responses:
+        200:
+          description: Successful Response
+          content:
+            text/csv:
+              schema:
+                type: string
+    post:
+      summary: Upload purchased components csv
+      description: Replace all purchased components for account based on uploaded csv
+      operationId: PostPurchasedComponentCSV
+      tags:
+      - Purchased Components
+      responses:
+        204:
+          description: Successful Response
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                csv_file:
+                  type: string
+                  format: binary
+    servers:
+    - url: '{url}/{version}'
+      variables:
+        url:
+          default: https://api.paperlessparts.com
+        version:
+          default: v1
+components:
+  schemas:
+    PurchasedComponentsColumnId:
+      type: integer
+    PurchasedComponent:
+      allOf:
+      - $ref: '#/components/schemas/AbstractPurchasedComponent'
+      - type: object
+        properties:
+          id:
+            type: integer
+          properties:
+            type: array
+            items:
+              $ref: '#/components/schemas/PurchasedComponentCustomProperty'
+          thumbnail_url:
+            type:
+            - string
+            - 'null'
+    PostPurchasedComponentsColumn:
+      allOf:
+      - $ref: '#/components/schemas/AbstractPurchasedComponentsColumn'
+      - type: object
+        required:
+        - code_name
+        - name
+        - value_type
+        - default_numeric_value
+        - default_string_value
+        - default_boolean_value
+    AbstractPurchasedComponent:
+      type: object
+      properties:
+        oem_part_number:
+          type: string
+          description: Unique identifier for purchased component within a supplier account
+          example: 064-1235
+        internal_part_number:
+          type:
+          - string
+          - 'null'
+          example: a
+        description:
+          type:
+          - string
+          - 'null'
+          example: any text you want
+        piece_price:
+          type: number
+          format: decimal
+          description: Cost per piece to 4 decimal places
+          example: 2.0
+    PurchasedComponentsColumn:
+      allOf:
+      - $ref: '#/components/schemas/AbstractPurchasedComponentsColumn'
+      - type: object
+        properties:
+          id:
+            type: integer
+            readOnly: true
+            example: 25
+          position:
+            type: integer
+            example: 4
+            description: Position of the column when displayed in the table; starts at 1.
+    PostPurchasedComponent:
+      allOf:
+      - $ref: '#/components/schemas/AbstractPurchasedComponent'
+      - type: object
+        properties:
+          properties:
+            type: array
+            items:
+              $ref: '#/components/schemas/PurchasedComponentCustomProperty'
+        required:
+        - oem_part_number
+        - piece_price
+        - properties
+    PurchasedComponentCustomProperty:
+      type: object
+      properties:
+        key:
+          type: string
+          description: Name of corresponding purchased component column in table display
+          example: property name
+        value:
+          anyOf:
+          - type: string
+          - type: number
+          - type: boolean
+          description: Value of property, None or of type corresponding to value_type
+          example: really cool value
+    PurchasedComponentId:
+      type: integer
+    PatchPurchasedComponent:
+      allOf:
+      - $ref: '#/components/schemas/AbstractPurchasedComponent'
+      - type: object
+        properties:
+          properties:
+            type: array
+            items:
+              $ref: '#/components/schemas/PurchasedComponentCustomProperty'
+    AbstractPurchasedComponentsColumn:
+      type: object
+      properties:
+        code_name:
+          type: string
+          example: James_Bond
+        name:
+          type: string
+          example: James Bond
+        value_type:
+          type: string
+          example: numeric
+        default_numeric_value:
+          type:
+          - integer
+          - 'null'
+          example: 21
+        default_string_value:
+          type:
+          - string
+          - 'null'
+          example: null
+        default_boolean_value:
+          type: boolean
+          example: false
+    PatchPurchasedComponentsColumn:
+      allOf:
+      - $ref: '#/components/schemas/AbstractPurchasedComponentsColumn'
+      - type: object
+        properties:
+          update_existing_defaults:
+            type: boolean
+          position:
+            type: integer
+            example: 4
+    PurchasedComponent_2:
+      allOf:
+      - $ref: '#/components/schemas/AbstractPurchasedComponent'
+      - type: object
+        properties:
+          id:
+            type: integer
+          properties:
+            type: array
+            items:
+              $ref: '#/components/schemas/PurchasedComponentCustomProperty'
+  parameters:
+    purchasedComponentsColumnId:
+      name: purchasedComponentsColumnId
+      in: path
+      required: true
+      schema:
+        $ref: '#/components/schemas/PurchasedComponentsColumnId'
+    purchasedComponentId:
+      name: purchasedComponentId
+      in: path
+      required: true
+      schema:
+        $ref: '#/components/schemas/PurchasedComponentId'
+  securitySchemes:
+    app_id:
+      type: apiKey
+      description: API key to authorize requests.
+      name: Authorization
+      in: header
+x-refined-from:
+- paperless-parts-v1-openapi.yml
+- paperless-parts-v2-openapi.yml

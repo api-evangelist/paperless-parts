@@ -1,0 +1,721 @@
+openapi: 3.2.0
+info:
+  title: Paperless API v2 Parts API
+  description: 'The Paperless Parts API provides access to your data, enabling developers to easily integrate Paperless Parts with third-party systems, such as Customer Relationship Management (CRM) and Enterprise Resource Planning (ERP) tools. The API is designed to support two primary use case. First, reading all information associated with a particular order or quote for import into another system. Second, managing customer data, either for an initial bulk import or for on-going synchronization with an external database.
+
+
+    ## Authorization ##
+
+
+    Requests are authorized via an API key. Administrators of a Paperless Parts account can generate an API Token which grants access to all of the endpoints documented here. The token obtained from the application must be added to the header of all requests using the key `\"Authorization\"` with the value `\"API-Token <api_token>\"`, where `<api_token>` is your Paperless Parts API Token.
+
+
+
+    You can use the \"Execute\" button in an endpoint''s documentation on this page to try out the endpoint. This will send a request to the endpoint on the Paperless Parts server and display the result on this page. Before doing so, however, you''ll need to click on the ''Authorize'' button at the top of the screen, and in the \"Value\" field enter `\"API-Token <api_token>\"`, where `<api_token>` is your API token as described above.
+
+
+
+    ## Overview ##
+
+
+    The API endpoints are organized around REST. API calls should be made to the `https://api.paperlessparts.com` base domain. URLs are designed to clearly describe an entity or collection of entities. HTTP verbs typically describe whether entities are being read, created, modified, or deleted. Where applicable, request and response bodies are in JSON format. Standard HTTP response codes, in addition to error messages, are used to help explain request failures.
+
+
+    ### Associations
+
+
+    Many entities in the API data model are associated with other entities. As a guiding principle, `GET` requests that fetch data nest associated entities in the JSON response. However, when creating or modifying entities, a flat (non-nested) object must be provided, as explained in the documentation for each endpoint. Associations are specified when writing data by using entity IDs in fields ending in `_id`.
+
+
+
+    For example, consider the relationship where a Company has many Customers. When fetching a Customer via a `GET` request, the associated Company will be nested as an object with key `company` in the response. When creating a Customer, the Company is specified via its integer id using the key `company_id`.
+
+
+    ### Events Overview
+
+
+    Events are a way of logging relevant actions that are taken within your account. For instance, when you create a new quote, Paperless Parts logs a `quote.created` event, and once you send that quote, we log another `quote.sent` event.
+
+
+
+    These logs offer you a trail of data that you can use to keep integrations in sync. By polling for new events, you can maintain an up-to-date record of what actions Paperless Parts has initiated that your integration has not. For instance, you could poll for `part.interrogation_succeeded` events and send out a notification upon receiving one.
+
+
+    ### HTTP Methods
+
+
+    The API endpoints support different HTTP methods depending on whether records are being read, created, or updated. To read an entity, use `GET`. To create a new entity, use `POST`. To modifying an entity, use `PATCH`. Note, `PATCH` is used rather than `PUT` to indicate that entities can be partially updated. In other words, in general, if a field is omitted from a `PATCH` request, that field''s value will stay the same (rather than be set to `null`). All fields requiring values are required to be included in `POST` requests.
+
+
+    > Note: Endpoints with a documented `PATCH` method can generally be used with a `PUT` method. The `PUT` is implemented as a partial update (as opposed to a replacement) and is supported for maximum compatibilty.
+
+
+
+    For example, consider the `email` field on the Customer entity, which is required. All Customers must have a non-null `email`. When creating a Customer via `POST`, the request body must contain an `email` key and its value cannot be `null` (other validation applies to that field, as well, including a valid email format and a unique value). When editing a Customer via `PATCH` request, it is not necessary to include an `email` key in the request body. If `email` is omitted, the existing email address will not be changed. If you send a `PATCH` request with `email=null`, then you will receive an error response indicating that a value for `email` is required.'
+  version: '2.0'
+  termsOfService: https://www.paperlessparts.com/web-service-agreement/
+  contact:
+    name: Paperless Parts
+    url: https://www.paperlessparts.com
+    email: support@paperlessparts.com
+servers:
+- url: '{url}/{version}'
+  variables:
+    url:
+      default: https://api.paperlessparts.com
+    version:
+      default: v2
+security:
+- app_id: []
+tags:
+- name: Parts
+  description: Endpoints for managing Parts
+paths:
+  /parts/public/parts:
+    get:
+      summary: 'Get list of parts ATTENTION: Currently only manual parts!'
+      description: Returns a list of parts. The parts are returned 20 results at a time and can be iterated over by using the page parameter.
+      operationId: ListParts
+      parameters:
+      - in: query
+        name: search
+        schema:
+          type: string
+        required: false
+        description: Value used to search against the part name or part number
+      - in: query
+        name: page
+        schema:
+          type: string
+        required: false
+        description: The page of results to return.
+      - in: query
+        name: type
+        schema:
+          type: string
+        required: false
+        description: The type of the part (Assembled, Manufacture, or Purchased).
+      - in: query
+        name: is_root_part
+        schema:
+          type: boolean
+        required: false
+        description: Only return root parts
+      tags:
+      - Parts
+      responses:
+        200:
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    uuid:
+                      type: string
+                      example: 3ec5051e-9d2d-4ea4-b903-abd9b6aa3448
+                      description: The Part's uuid
+                    filename:
+                      type: string
+                      example: arch_b.step
+                      description: The filename for the Part
+                    part_number:
+                      type: string
+                      example: 12515
+                      description: The Part's part number
+                    revision:
+                      type: string
+                      example: B
+                      description: The Part's revision
+                    is_root_part:
+                      type: boolean
+                      example: true
+                      description: Boolean for if the part is the root part
+                    type:
+                      type:
+                      - string
+                      - 'null'
+                      example: Manufactured
+                      description: The type of the Part (Assembled, Manufacture, or Purchased).
+        404:
+          description: Not found response
+          content:
+            text/plain:
+              schema:
+                title: No Parts found
+                type: string
+                example: 'Error: Not Found'
+  /parts/public/geometric_part:
+    post:
+      summary: Upload geometric part
+      operationId: CreateGeometricPart
+      tags:
+      - Parts
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+              - file
+              properties:
+                file:
+                  type: string
+                  format: binary
+                  description: The part file to upload (required).
+                interrogations:
+                  type: array
+                  description: The types of interrogations to perform. Options are additive, mill3, casting, sheet_metal, lathe, and wire_edm
+                  example:
+                  - additive
+                  - mill3
+                  items:
+                    type: string
+                thickness:
+                  type:
+                  - number
+                  - 'null'
+                  example: 4.3656
+                  description: The thickness of the part
+                units:
+                  type:
+                  - string
+                  - 'null'
+                  example: mm
+                  description: The unit for part measurements
+      responses:
+        201:
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Part'
+  /parts/public/get_root_part/{partUuid}:
+    get:
+      summary: Get the details for a part
+      tags:
+      - Parts
+      parameters:
+      - $ref: '#/components/parameters/partUuid'
+      responses:
+        200:
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Part'
+        404:
+          description: Not found response
+          content:
+            text/plain:
+              schema:
+                title: No Parts found
+                type: string
+                example: 'Error: Not Found'
+    patch:
+      summary: Update the details for a part
+      tags:
+      - Parts
+      parameters:
+      - $ref: '#/components/parameters/partUuid'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                units:
+                  type:
+                  - string
+                  - 'null'
+                  example: mm
+                  description: The unit for part measurements
+                custom_attributes:
+                  type: object
+                  description: Custom attributes on this part, as a map from attribute name to attribute data. The object supplied here will be merged into the existing custom attribute values. To remove a custom attribute, supply null for its data rather than an object.
+                  additionalProperties:
+                    type: object
+                    properties:
+                      value:
+                        oneOf:
+                        - type: string
+                        - type: number
+                        - type: boolean
+                        description: The value of the attribute.
+                      type:
+                        type: string
+                        enum:
+                        - string
+                        - number
+                        - boolean
+                        description: The type of the attribute.
+      responses:
+        200:
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Part'
+        404:
+          description: Not found response
+          content:
+            text/plain:
+              schema:
+                title: No Parts found
+                type: string
+                example: 'Error: Not Found'
+  /parts/public/manual_part:
+    post:
+      summary: Create a manual Part
+      operationId: CreateManualPart
+      tags:
+      - Parts
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                area:
+                  type:
+                  - number
+                  - 'null'
+                  example: 26451.058
+                  description: The area of the part
+                filename:
+                  type:
+                  - string
+                  - 'null'
+                  example: arch_b.step
+                  description: The filename or name of the part
+                part_number:
+                  type:
+                  - string
+                  - 'null'
+                  example: 12515
+                  description: The Part's part number
+                part_master_uuid:
+                  type:
+                  - string
+                  - 'null'
+                  example: 3be4436a-f9c9-4a12-8c4f-d3dbc49838e7
+                  description: The uuid of the Part's Part Master
+                purchased_component_id:
+                  type:
+                  - integer
+                  - 'null'
+                  example: 1256
+                  description: The id of the purchased component
+                material_id:
+                  type:
+                  - integer
+                  - 'null'
+                  example: 50
+                  description: The id for the material of the part
+                revision:
+                  type:
+                  - string
+                  - 'null'
+                  example: B
+                  description: The Part's revision
+                size_x:
+                  type:
+                  - number
+                  - 'null'
+                  example: 112.77
+                  description: The size for the x dimension of the part
+                size_y:
+                  type:
+                  - number
+                  - 'null'
+                  example: 88.06
+                  description: The size for the y dimensions of the part
+                size_z:
+                  type:
+                  - number
+                  - 'null'
+                  example: 22.86
+                  description: The size for the z dimension of the part
+                thickness:
+                  type:
+                  - number
+                  - 'null'
+                  example: 4.3656
+                  description: The thicknees of the part
+                type:
+                  type:
+                  - string
+                  - 'null'
+                  example: Manufactured
+                  description: The type of the Part (Assembled, Manufacture, or Purchased).
+                units:
+                  type:
+                  - string
+                  - 'null'
+                  example: mm
+                  description: The unit for part measurements
+      responses:
+        201:
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Part'
+  /parts/public/manual_assembly:
+    post:
+      summary: Create a manual assembly
+      operationId: CreateManualAssembly
+      tags:
+      - Parts
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                type: object
+                properties:
+                  temp_id:
+                    type: number
+                    example: -1
+                    description: A negative number representing a temporary id that is used to build the assembly structure
+                  area:
+                    type:
+                    - number
+                    - 'null'
+                    example: 26451.058
+                    description: The area of the part
+                  filename:
+                    type:
+                    - string
+                    - 'null'
+                    example: arch_b.step
+                    description: The filename or name of the part
+                  purchased_component_id:
+                    type:
+                    - integer
+                    - 'null'
+                    example: 1256
+                    description: The id of the purchased component
+                  part_number:
+                    type:
+                    - string
+                    - 'null'
+                    example: 12515
+                    description: The Part's part number
+                  part_master_uuid:
+                    type:
+                    - string
+                    - 'null'
+                    example: 3be4436a-f9c9-4a12-8c4f-d3dbc49838e7
+                    description: The uuid of the Part's Part Master
+                  material_id:
+                    type:
+                    - integer
+                    - 'null'
+                    example: 50
+                    description: The id for the material of the part
+                  revision:
+                    type:
+                    - string
+                    - 'null'
+                    example: B
+                    description: The Part's revision
+                  size_x:
+                    type:
+                    - number
+                    - 'null'
+                    example: 112.77
+                    description: The size for the x dimension of the part
+                  size_y:
+                    type:
+                    - number
+                    - 'null'
+                    example: 88.06
+                    description: The size for the y dimensions of the part
+                  size_z:
+                    type:
+                    - number
+                    - 'null'
+                    example: 22.86
+                    description: The size for the z dimension of the part
+                  thickness:
+                    type:
+                    - number
+                    - 'null'
+                    example: 4.3656
+                    description: The thicknees of the part
+                  type:
+                    type:
+                    - string
+                    - 'null'
+                    example: Manufactured
+                    description: The type of the Part (Assembled, Manufacture, or Purchased).
+                  units:
+                    type:
+                    - string
+                    - 'null'
+                    example: mm
+                    description: The unit for part measurements
+                  nodes:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        child:
+                          type: number
+                          example: -2
+                          description: The temporary id of the child part
+                        count:
+                          type: number
+                          example: 1
+                          description: The number of times the child occurs
+      responses:
+        201:
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Assembly'
+  /parts/public/{partUuid}/status:
+    get:
+      summary: Get the status of a part
+      parameters:
+      - $ref: '#/components/parameters/partUuid'
+      operationId: GetPartStatus
+      tags:
+      - Parts
+      responses:
+        200:
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PartStatus'
+  /parts/public/part_files/{uuid}/flat_pattern_dxf:
+    get:
+      summary: Get flat pattern DXF download link and warnings
+      description: Returns an authenticated download URL for the flat pattern DXF file along with flat pattern origin information and warning messages. The flat pattern DXF file must be available for the part file.
+      parameters:
+      - name: uuid
+        in: path
+        description: The part file UUID
+        required: true
+        schema:
+          $ref: '#/components/schemas/Uuid'
+      operationId: GetFlatPatternDXFDownload
+      tags:
+      - Parts
+      responses:
+        200:
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  download_url:
+                    type: string
+                    description: The authenticated download URL for the flat pattern DXF file
+                    example: https://api.paperlessparts.com/api/v2/parts/public/part_files/3ec5051e-9d2d-4ea4-b903-abd9b6aa3448/flat_pattern_dxf?token=...
+                  flat_pattern_origin:
+                    type:
+                    - string
+                    - 'null'
+                    description: 'The origin type of the flat pattern. Possible values are: ''3D-unfolded'', ''3D-flat'', ''PDF-vectorized'', ''DXF-edited'', ''DXF-uploaded'', ''DWG-edited'', ''DWG-uploaded'''
+                  warning_message:
+                    type:
+                    - string
+                    - 'null'
+                    description: Warning message about the flat pattern, if applicable
+        404:
+          description: Not found response
+          content:
+            text/plain:
+              schema:
+                title: Flat pattern DXF not available
+                type: string
+                example: Flat pattern DXF file not available for this part.
+components:
+  schemas:
+    PartStatus:
+      type: object
+      properties:
+        processing:
+          type: string
+          example: in_progress
+          description: 'The status of the part''s geometric processing: in_progress, failed, or finished'
+        interrogation:
+          type: string
+          example: in_progress
+          description: 'The status of the part''s interrogation: in_progress, failed, or finished'
+    Assembly:
+      type: object
+      properties:
+        parts:
+          type: array
+          items:
+            $ref: '#/components/schemas/Part'
+        nodes:
+          type: array
+          items:
+            $ref: '#/components/schemas/PartNode'
+    PartNode:
+      type: object
+      properties:
+        parent_uuid:
+          type: string
+          example: 2f0e5724-42fe-47ae-8233-7a902ef70346
+          description: The uuid of the parent part
+        child_uuid:
+          type: string
+          example: 4b4d3e8c-cfe2-4b3c-bd6f-792c3335f1fc
+          description: The uuid of the child part
+        count:
+          type: integer
+          example: 1
+          description: The number of times this node occurs
+    Uuid:
+      type: string
+      description: Unique identifier
+      example: 2f0e5724-42fe-47ae-8233-7a902ef70346
+    Part:
+      type: object
+      properties:
+        area_mm:
+          type:
+          - number
+          - 'null'
+          example: 26451.058
+          description: The area of the part, expressed in mm. Will be null if the part is export controlled.
+        description:
+          type: string
+          description: The part description
+        filename:
+          type: string
+          example: arch_b.step
+          description: The filename or name of the part
+        is_root_part:
+          type: boolean
+          description: Indicates whether this is the root part in an assembly. For non-assembly parts, this will always be true.
+        is_from_external_system:
+          type: boolean
+          description: Indicates whether the part is being mirrored from an external system. If true, this part will not show up in the part library.
+        part_number:
+          type: string
+          example: 12515
+          description: The Part's part number
+        part_master_uuid:
+          type: string
+          example: 3be4436a-f9c9-4a12-8c4f-d3dbc49838e7
+          description: The uuid of the Part's Part Master
+        material_id:
+          type: integer
+          example: 50
+          description: The id for the material of the part
+        revision:
+          type: string
+          example: B
+          description: The Part's revision
+        size_x:
+          type:
+          - number
+          - 'null'
+          example: 112.77
+          description: The size for the x dimension of the part. Will be null if the part is export controlled.
+        size_y:
+          type:
+          - number
+          - 'null'
+          example: 88.06
+          description: The size for the y dimensions of the part. Will be null if the part is export controlled.
+        size_z:
+          type:
+          - number
+          - 'null'
+          example: 22.86
+          description: The size for the z dimension of the part. Will be null if the part is export controlled.
+        size_x_mm:
+          type:
+          - number
+          - 'null'
+          description: The size for the x dimension of the part, expressed in mm. Will be null if the part is export controlled.
+        size_y_mm:
+          type:
+          - number
+          - 'null'
+          description: The size for the y dimension of the part, expressed in mm. Will be null if the part is export controlled.
+        size_z_mm:
+          type:
+          - number
+          - 'null'
+          description: The size for the z dimension of the part, expressed in mm. Will be null if the part is export controlled.
+        thickness:
+          type:
+          - number
+          - 'null'
+          example: 4.3656
+          description: The thicknees of the part. Will be null if the part is export controlled.
+        thumbnail_url:
+          type:
+          - string
+          - 'null'
+          description: The URL from which to download the thumbnail image. Will be null if the part is export controlled.
+        type:
+          type: string
+          example: Manufactured
+          description: The type of the Part
+        uuid:
+          type: string
+          example: 2f0e5724-42fe-47ae-8233-7a902ef70346
+        units:
+          type: string
+          example: mm
+          description: The unit for part measurements
+        thickness_units:
+          type: string
+          example: mm
+        volume_mm:
+          type:
+          - number
+          - 'null'
+          description: The volume of the part, expressed in mm. Will be null if the part is export controlled.
+        custom_attributes:
+          type: object
+          description: Custom attributes on the part, as a map from attribute name to data
+          additionalProperties:
+            type: object
+            properties:
+              type:
+                type: string
+                enum:
+                - string
+                - number
+                - boolean
+                description: The type of the custom attribute
+              value:
+                oneOf:
+                - type: string
+                - type: number
+                - type: boolean
+                description: The value of the custom attribute
+  parameters:
+    partUuid:
+      name: partUuid
+      in: path
+      description: The part UUID
+      required: true
+      schema:
+        $ref: '#/components/schemas/Uuid'
+  securitySchemes:
+    app_id:
+      type: apiKey
+      description: API key to authorize requests.
+      name: Authorization
+      in: header

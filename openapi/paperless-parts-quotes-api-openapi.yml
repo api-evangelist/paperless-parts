@@ -1,0 +1,3188 @@
+openapi: 3.2.0
+info:
+  title: Paperless Parts Quotes API
+  contact:
+    name: Paperless Parts
+    url: https://www.paperlessparts.com
+    email: support@paperlessparts.com
+  termsOfService: https://www.paperlessparts.com/web-service-agreement/
+  version: '1.0'
+  description: 'Operations tagged Quotes across 2 of this provider''s published API definitions: paperless-parts-v1-openapi.yml, paperless-parts-v2-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: '{url}/{version}'
+  variables:
+    url:
+      default: https://api.paperlessparts.com
+    version:
+      default: v1
+security:
+- app_id: []
+tags:
+- name: Quotes
+  description: Endpoints for identifying newly sent quotes, pulling all information related to a particular quote, and updating a quote's status.
+paths:
+  /quotes/public/new:
+    get:
+      summary: List new quote numbers and revisions
+      description: List the numbers and revisions of new quotes that have been sent. If the number and (optional) revision of the last known sent quote is supplied, this endpoint will return a list of the numbers and revisions of the quotes sent after the specified quote. If no number is provided, this endpoint will return a list of the numbers and revisions of all sent quotes. Note that the quote numbers will be returned in the order the quotes were sent, not necessarily in ascending numerical order.
+      operationId: NewQuoteNumbers
+      parameters:
+      - $ref: '#/components/parameters/last_quote'
+      - $ref: '#/components/parameters/revision'
+      tags:
+      - Quotes
+      responses:
+        200:
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QuoteNumberArray'
+        404:
+          description: Not found response
+          content:
+            text/plain:
+              schema:
+                title: Quote not found
+                type: string
+                example: 'Error: Not Found'
+    servers:
+    - url: '{url}/{version}'
+      variables:
+        url:
+          default: https://api.paperlessparts.com
+        version:
+          default: v1
+  /quotes/public/{quoteNumber}:
+    get:
+      summary: Get quote details
+      description: Get the details for a specific quote.
+      operationId: QuoteDetails
+      parameters:
+      - $ref: '#/components/parameters/quoteNumber'
+      - $ref: '#/components/parameters/revisionNumber'
+      tags:
+      - Quotes
+      responses:
+        200:
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Quote'
+        404:
+          description: Not found response
+          content:
+            text/plain:
+              schema:
+                title: Quote not found
+                type: string
+                example: 'Error: Not Found'
+    patch:
+      summary: Update fields on a Quote
+      description: Update fields on a Quote.
+      operationId: UpdateQuote
+      parameters:
+      - $ref: '#/components/parameters/quoteNumber'
+      - $ref: '#/components/parameters/revisionNumber'
+      tags:
+      - Quotes
+      responses:
+        200:
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Quote'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                erp_code:
+                  type:
+                  - string
+                  - 'null'
+                  description: The unique identifier of the corresponding quote record in the ERP system, cast to a string.
+                  example: '1234'
+    servers:
+    - url: '{url}/{version}'
+      variables:
+        url:
+          default: https://api.paperlessparts.com
+        version:
+          default: v1
+  /quotes/public/{quoteNumber}/status_change:
+    patch:
+      summary: Update a quote's status
+      description: Update a specific quote's status.
+      operationId: SetQuoteStatus
+      parameters:
+      - $ref: '#/components/parameters/quoteNumber'
+      - $ref: '#/components/parameters/revisionNumber'
+      tags:
+      - Quotes
+      responses:
+        200:
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Quote'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                status:
+                  type:
+                  - string
+                  - 'null'
+                  description: the status of the quote. Available statuses are "oustanding", "cancelled", "lost", and "trash"
+                  example: outstanding
+    servers:
+    - url: '{url}/{version}'
+      variables:
+        url:
+          default: https://api.paperlessparts.com
+        version:
+          default: v1
+  /quotes/public/{quoteNumber}/files:
+    get:
+      summary: Get a quote's supporting files
+      description: Get a list of supporting files on a quote.
+      operationId: GetQuoteFiles
+      parameters:
+      - $ref: '#/components/parameters/quoteNumber'
+      - $ref: '#/components/parameters/revisionNumber'
+      tags:
+      - Quotes
+      responses:
+        200:
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  count:
+                    type: integer
+                  next:
+                    type:
+                    - string
+                    - 'null'
+                    format: url
+                  previous:
+                    type:
+                    - string
+                    - 'null'
+                    format: url
+                  results:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/QuoteFile'
+    servers:
+    - url: '{url}/{version}'
+      variables:
+        url:
+          default: https://api.paperlessparts.com
+        version:
+          default: v1
+  /quotes/public:
+    post:
+      summary: Create a new quote
+      description: Creates a new quote object
+      operationId: CreateQuote
+      tags:
+      - Quotes
+      responses:
+        201:
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QuoteHeader'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                contact_id:
+                  type:
+                  - integer
+                  - 'null'
+                  description: The ID of the associated Contact
+                metadata:
+                  $ref: '#/components/schemas/Metadata'
+                manual_rfq_received_date:
+                  type: string
+                  format: date-time
+                rfq_number:
+                  type:
+                  - string
+                  - 'null'
+                expired_date:
+                  type: string
+                  format: date-time
+                estimator:
+                  type:
+                  - string
+                  - 'null'
+                  example: 335c5770-8cd4-46d3-98a1-7c0e12251124
+                  description: The uuid for the estimator assigned to this quote
+                salesperson:
+                  type:
+                  - string
+                  - 'null'
+                  example: 335c5770-8cd4-46d3-98a1-7c0e12251124
+                  description: The uuid for the salesperson assigned to this quote
+                due_date:
+                  type:
+                  - string
+                  - 'null'
+                  format: date-time
+                  description: The due date of the quote
+                private_notes:
+                  type:
+                  - string
+                  - 'null'
+                  description: Internal notes regarding the quote
+                quote_notes:
+                  type:
+                  - string
+                  - 'null'
+                  description: Customer-facing notes regarding the quote
+                erp_code:
+                  type:
+                  - string
+                  - 'null'
+                tax_rate:
+                  type: number
+                  format: float
+                priority:
+                  type: integer
+    get:
+      summary: List quote headers
+      operationId: ListQuoteHeaders
+      tags:
+      - Quotes
+      responses:
+        200:
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  count:
+                    type: integer
+                    description: The total number of records matching the supplied query parameters
+                  next:
+                    type:
+                    - string
+                    - 'null'
+                    description: The URL of the next page of results. Null if this is the last page
+                  previous:
+                    type:
+                    - string
+                    - 'null'
+                    description: The URL of the previous page of results. Null if this is the first page
+                  results:
+                    $ref: '#/components/schemas/QuoteHeader'
+    servers:
+    - url: '{url}/{version}'
+      variables:
+        url:
+          default: https://api.paperlessparts.com
+        version:
+          default: v2
+  /quotes/public/header/{quoteUuid}:
+    get:
+      summary: Get the details for a quote header
+      operationId: GetQuoteHeaderDetails
+      tags:
+      - Quotes
+      parameters:
+      - $ref: '#/components/parameters/quoteUuid'
+      responses:
+        200:
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QuoteHeader'
+        404:
+          description: Not found response
+          content:
+            text/plain:
+              schema:
+                title: Order not found
+                type: string
+                example: 'Error: Not Found'
+    patch:
+      summary: Update the details for a quote header
+      operationId: UpdateQuoteHeaderDetails
+      tags:
+      - Quotes
+      parameters:
+      - $ref: '#/components/parameters/quoteUuid'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                erp_code:
+                  type:
+                  - string
+                  - 'null'
+                metadata:
+                  $ref: '#/components/schemas/Metadata'
+                manual_rfq_received_date:
+                  type: string
+                  format: date-time
+                rfq_number:
+                  type:
+                  - string
+                  - 'null'
+                expired_date:
+                  type: string
+                  format: date-time
+                status:
+                  type:
+                  - string
+                  - 'null'
+                  description: the status of the quote. Available statuses are "oustanding", "cancelled", "lost", and "trash"
+                  example: outstanding
+                estimator:
+                  type:
+                  - string
+                  - 'null'
+                  example: 335c5770-8cd4-46d3-98a1-7c0e12251124
+                  description: The uuid for the estimator assigned to this quote
+                salesperson:
+                  type:
+                  - string
+                  - 'null'
+                  example: 335c5770-8cd4-46d3-98a1-7c0e12251124
+                  description: The uuid for the salesperson assigned to this quote
+                due_date:
+                  type:
+                  - string
+                  - 'null'
+                  format: date-time
+                  description: The due date of the quote
+                private_notes:
+                  type:
+                  - string
+                  - 'null'
+                  description: Internal notes regarding the quote
+                quote_notes:
+                  type:
+                  - string
+                  - 'null'
+                  description: Customer-facing notes regarding the quote
+                tax_rate:
+                  type: number
+                  format: float
+                priority:
+                  type: integer
+      responses:
+        200:
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QuoteHeader'
+        404:
+          description: Not found response
+          content:
+            text/plain:
+              schema:
+                title: Order not found
+                type: string
+                example: 'Error: Not Found'
+    servers:
+    - url: '{url}/{version}'
+      variables:
+        url:
+          default: https://api.paperlessparts.com
+        version:
+          default: v2
+  /quotes/public/items:
+    post:
+      summary: Create a new quote item
+      description: Attach a new QuoteItem to a Quote
+      operationId: CreateQuoteItem
+      tags:
+      - Quotes
+      responses:
+        201:
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QuoteLine'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                quote:
+                  type: string
+                  description: The UUID of the quote to tie the quote item to.
+                  example: f0f5bd9d-62a1-4e59-bc0e-4dbaa55d1ef9
+                material:
+                  type: string
+                  description: The UUID of the material to tie the quote item to.
+                  example: f0f5bd9d-62a1-4e59-bc0e-4dbaa55d1ef9
+                part:
+                  type: string
+                  description: The UUID of the part to tie the quote item to.
+                  example: f0f5bd9d-62a1-4e59-bc0e-4dbaa55d1ef9
+                process:
+                  type: string
+                  description: The UUID of the process to tie the quote item to.
+                  example: f0f5bd9d-62a1-4e59-bc0e-4dbaa55d1ef9
+                quantities:
+                  type: array
+                  description: Array of the requested quantities
+                  items:
+                    type: integer
+                  example:
+                  - 1
+                  - 5
+                  - 10
+                public_notes:
+                  type: string
+                private_notes:
+                  type: string
+                metadata:
+                  $ref: '#/components/schemas/Metadata'
+    servers:
+    - url: '{url}/{version}'
+      variables:
+        url:
+          default: https://api.paperlessparts.com
+        version:
+          default: v2
+  /quotes/public/items/{quoteItemUuid}:
+    patch:
+      summary: Update fields on a QuoteItem.
+      description: Update field on a QuoteItem.
+      operationId: updateQuoteItem
+      parameters:
+      - $ref: '#/components/parameters/quoteItemUuid'
+      tags:
+      - Quotes
+      responses:
+        200:
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QuoteLine'
+        404:
+          description: Not found response
+          content:
+            text/plain:
+              schema:
+                title: Quote not found
+                type: string
+                example: 'Error: Not Found'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                material:
+                  type: string
+                  description: The UUID of the material to tie the quote item to.
+                  example: f0f5bd9d-62a1-4e59-bc0e-4dbaa55d1ef9
+                process:
+                  type: string
+                  description: The UUID of the process to tie the quote item to.
+                  example: f0f5bd9d-62a1-4e59-bc0e-4dbaa55d1ef9
+                public_notes:
+                  type: string
+                private_notes:
+                  type: string
+                metadata:
+                  $ref: '#/components/schemas/Metadata'
+                workflow_status:
+                  type: string
+                  enum:
+                  - not_started
+                  - in_progress
+                  - on_hold
+                  - completed
+                  - no_quote
+                  example: in_progress
+    get:
+      summary: Get details for a QuoteItem.
+      description: Get details for a QuoteItem.
+      operationId: getQuoteItem
+      parameters:
+      - $ref: '#/components/parameters/quoteItemUuid'
+      - in: query
+        name: expand
+        schema:
+          type: string
+        required: false
+        description: 'Expand a fields that provides UUID(s) to provide the full object(s) instead. Valid choices are: ''add_ons'', ''discounts'', material'', ''operations'', ''part'', ''pricing_items'', ''process'', ''quantities'''
+      tags:
+      - Quotes
+      responses:
+        200:
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QuoteLine'
+        404:
+          description: Not found response
+          content:
+            text/plain:
+              schema:
+                title: Quote not found
+                type: string
+                example: 'Error: Not Found'
+    delete:
+      summary: Delete a QuoteItem.
+      operationId: deleteQuoteItem
+      parameters:
+      - $ref: '#/components/parameters/quoteItemUuid'
+      tags:
+      - Quotes
+      responses:
+        204:
+          description: Successful response
+    servers:
+    - url: '{url}/{version}'
+      variables:
+        url:
+          default: https://api.paperlessparts.com
+        version:
+          default: v2
+  /quotes/public/items/{quoteItemUuid}/bulk_update_operations:
+    patch:
+      summary: Bulk update a QuoteItem's operations.
+      description: Bulk updates specific operations on a QuoteItem.
+      operationId: bulkUpdateOperations
+      parameters:
+      - $ref: '#/components/parameters/quoteItemUuid'
+      tags:
+      - Quotes
+      responses:
+        200:
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                example: []
+        404:
+          description: Not found response
+          content:
+            text/plain:
+              schema:
+                title: Quote not found
+                type: string
+                example: 'Error: Not Found'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/QuoteLineOperation'
+                type: object
+                properties:
+                  uuid:
+                    type: string
+                    example: f0f5bd9d-62a1-4e59-bc0e-4dbaa55d1ef9
+                    description: The UUID of the operation you want to apply these updates to
+                  name:
+                    type:
+                    - string
+                    - 'null'
+                    example: Name
+                    description: The name of the operation
+                  notes:
+                    type:
+                    - string
+                    - 'null'
+                    example: notes
+                    description: The operation's notes
+                  is_finish:
+                    type:
+                    - boolean
+                    - 'null'
+                    example: false
+                    description: Whether the operation is a finish
+                  is_outside_service:
+                    type:
+                    - boolean
+                    - 'null'
+                    example: true
+                    description: Whether the operation is an outside service
+                  costing_variable_overrides:
+                    $ref: '#/components/schemas/CostingVariableOverrides'
+                  position:
+                    type:
+                    - integer
+                    - 'null'
+                    example: 0
+                    description: The position of the operation
+                  runtime_display_units:
+                    type:
+                    - string
+                    - 'null'
+                    example: hr
+                    description: The runtime display units for the operation
+                  setup_time_display_units:
+                    type:
+                    - string
+                    - 'null'
+                    example: min
+                    description: The setup time display units for the operation
+    servers:
+    - url: '{url}/{version}'
+      variables:
+        url:
+          default: https://api.paperlessparts.com
+        version:
+          default: v2
+  /quotes/public/operations:
+    post:
+      summary: Create a new operation for a quote item
+      description: Attach a new Operation to a QuoteItem
+      operationId: CreateOperation
+      tags:
+      - Quotes
+      responses:
+        201:
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QuoteLineOperation'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                quote_item:
+                  type: string
+                  description: The UUID of the quote item to tie the operation to.
+                  example: f0f5bd9d-62a1-4e59-bc0e-4dbaa55d1ef9
+                operation_definition:
+                  type: string
+                  description: The UUID of the operation definition to generate the operation from.
+                  example: f0f5bd9d-62a1-4e59-bc0e-4dbaa55d1ef9
+                is_finish:
+                  type: boolean
+                  default: false
+                is_outside_service:
+                  type: boolean
+                  default: false
+                name:
+                  type: string
+                notes:
+                  type: string
+    servers:
+    - url: '{url}/{version}'
+      variables:
+        url:
+          default: https://api.paperlessparts.com
+        version:
+          default: v2
+  /quotes/public/operations/{operationUuid}:
+    get:
+      summary: Get details for an Operation.
+      description: Get details for an Operation.
+      operationId: getOperation
+      parameters:
+      - $ref: '#/components/parameters/operationUuid'
+      tags:
+      - Quotes
+      responses:
+        200:
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QuoteLineOperation'
+        404:
+          description: Not found response
+          content:
+            text/plain:
+              schema:
+                title: Quote not found
+                type: string
+                example: 'Error: Not Found'
+    patch:
+      summary: Update fields on an Operation.
+      description: Update field on an Operation.
+      operationId: updateOperation
+      parameters:
+      - $ref: '#/components/parameters/operationUuid'
+      tags:
+      - Quotes
+      responses:
+        200:
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QuoteLineOperation'
+        404:
+          description: Not found response
+          content:
+            text/plain:
+              schema:
+                title: Quote not found
+                type: string
+                example: 'Error: Not Found'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                is_finish:
+                  type: boolean
+                  default: false
+                is_outside_service:
+                  type: boolean
+                  default: false
+                name:
+                  type: string
+                notes:
+                  type: string
+                costing_variable_overrides:
+                  $ref: '#/components/schemas/CostingVariableOverrides'
+    delete:
+      summary: Delete an Operation.
+      operationId: deleteOperation
+      parameters:
+      - $ref: '#/components/parameters/operationUuid'
+      tags:
+      - Quotes
+      responses:
+        204:
+          description: Successful response
+    servers:
+    - url: '{url}/{version}'
+      variables:
+        url:
+          default: https://api.paperlessparts.com
+        version:
+          default: v2
+  /quotes/public/add_ons/{addOnUuid}:
+    get:
+      summary: Get details for an Add-On.
+      description: Get details for an Add-On.
+      operationId: getAddOn
+      parameters:
+      - $ref: '#/components/parameters/addOnUuid'
+      tags:
+      - Quotes
+      responses:
+        200:
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QuoteLineAddOn'
+        404:
+          description: Not found response
+          content:
+            text/plain:
+              schema:
+                title: Quote not found
+                type: string
+                example: 'Error: Not Found'
+    patch:
+      summary: Update details for an Add-On.
+      description: Update details for an Add-On.
+      operationId: updateAddOn
+      parameters:
+      - $ref: '#/components/parameters/addOnUuid'
+      tags:
+      - Quotes
+      responses:
+        200:
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QuoteLineAddOn'
+        404:
+          description: Not found response
+          content:
+            text/plain:
+              schema:
+                title: Quote not found
+                type: string
+                example: 'Error: Not Found'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                is_required:
+                  type: boolean
+                  description: Indicates whether or not this add-on is required.
+                name:
+                  type: string
+                  description: The name of the add-on.
+                notes:
+                  type: string
+                  description: Notes for this add-on.
+    servers:
+    - url: '{url}/{version}'
+      variables:
+        url:
+          default: https://api.paperlessparts.com
+        version:
+          default: v2
+  /quotes/public/discounts:
+    post:
+      summary: Create a new Discount for a quote item
+      description: Attach a new Discount to a QuoteItem
+      operationId: CreateDiscount
+      tags:
+      - Quotes
+      responses:
+        201:
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QuoteLineDiscount'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                quote_item:
+                  type: string
+                  description: (Required) The UUID of the quote item to tie the add-on to.
+                  example: f0f5bd9d-62a1-4e59-bc0e-4dbaa55d1ef9
+                discount_definition:
+                  type: string
+                  description: The UUID of the Discount definition to generate the Discount from.
+                  example: f0f5bd9d-62a1-4e59-bc0e-4dbaa55d1ef9
+                name:
+                  type: string
+                  description: The name of the Discount. Don't provide this value if using a Discount definition.
+                notes:
+                  type: string
+                  description: Notes for this Discount.
+    servers:
+    - url: '{url}/{version}'
+      variables:
+        url:
+          default: https://api.paperlessparts.com
+        version:
+          default: v2
+  /quotes/public/discounts/{discountUuid}:
+    get:
+      summary: Get details for an Discount.
+      description: Get details for a Discount.
+      operationId: getDiscount
+      parameters:
+      - $ref: '#/components/parameters/discountUuid'
+      - in: query
+        name: expand
+        schema:
+          type: string
+        required: false
+        description: 'Expand fields that provides UUID(s) to provide the full object(s) instead. Valid choices are: ''discount_quantities''.'
+      tags:
+      - Quotes
+      responses:
+        200:
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QuoteLineDiscount'
+        404:
+          description: Not found response
+          content:
+            text/plain:
+              schema:
+                title: Discount not found
+                type: string
+                example: 'Error: Not Found'
+    patch:
+      summary: Update fields on a Discount.
+      description: Update field on a Discount.
+      operationId: updateDiscount
+      parameters:
+      - $ref: '#/components/parameters/discountUuid'
+      tags:
+      - Quotes
+      responses:
+        200:
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QuoteLineDiscount'
+        404:
+          description: Not found response
+          content:
+            text/plain:
+              schema:
+                title: Discount not found
+                type: string
+                example: 'Error: Not Found'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: The name of the Discount. The name can only be updated if the Discount was not added via a definiton.
+                notes:
+                  type: string
+                  description: Notes for this Discount.
+                costing_variable_overrides:
+                  $ref: '#/components/schemas/CostingVariableOverrides'
+    delete:
+      summary: Delete a Discount.
+      operationId: deleteDiscount
+      parameters:
+      - $ref: '#/components/parameters/discountUuid'
+      tags:
+      - Quotes
+      responses:
+        204:
+          description: Successful response
+    servers:
+    - url: '{url}/{version}'
+      variables:
+        url:
+          default: https://api.paperlessparts.com
+        version:
+          default: v2
+  /quotes/public/pricing_items/{pricingItemUuid}:
+    get:
+      summary: Get details for a Pricing Item.
+      description: Get details for a Pricing Item.
+      operationId: getPricingItem
+      parameters:
+      - $ref: '#/components/parameters/pricingItemUuid'
+      tags:
+      - Quotes
+      responses:
+        200:
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QuoteLinePricingItem'
+        404:
+          description: Not found response
+          content:
+            text/plain:
+              schema:
+                title: Quote not found
+                type: string
+                example: 'Error: Not Found'
+    servers:
+    - url: '{url}/{version}'
+      variables:
+        url:
+          default: https://api.paperlessparts.com
+        version:
+          default: v2
+  /quotes/public/{quoteUuid}/files:
+    post:
+      summary: Create quote file
+      description: Upload a supporting file to a quote.
+      operationId: createQuoteFile
+      parameters:
+      - $ref: '#/components/parameters/quoteUuid'
+      tags:
+      - Quotes
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+                  description: The file contents to upload.
+                category:
+                  type: string
+                  enum:
+                  - RFQ_FILE
+                  - VENDOR_QUOTE
+                  - SUPPORTING_FILE
+                  description: 'The category of quote-supporting file: "RFQ_FILE", "VENDOR_QUOTE", or "SUPPORTING_FILE". If not specified, this defaults to "SUPPORTING_FILE".'
+                is_export_controlled:
+                  type: boolean
+                  description: Whether this file contains data that is export controlled (ITAR) by the US Government. If not specified, this defaults to false.
+                thickness:
+                  type: number
+                  format: float
+                  description: This can be included to specify the part thickness if the file contains geometric data.
+                units:
+                  type: string
+                  enum:
+                  - in
+                  - mm
+                  description: This can be included to specify the units of measurement ("in" or "mm") if the file contains geometric data.
+      responses:
+        201:
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QuoteFile_2'
+        404:
+          description: Quote file not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: boolean
+                    example: 'true'
+                  code:
+                    type: string
+                    example: not_found
+                  message:
+                    type: string
+                    example: Not found.
+                  extra:
+                    type:
+                    - object
+                    - 'null'
+                    example: null
+    servers:
+    - url: '{url}/{version}'
+      variables:
+        url:
+          default: https://api.paperlessparts.com
+        version:
+          default: v2
+  /quotes/public/{quoteUuid}/files/{fileUuid}:
+    get:
+      summary: Get quote file details
+      description: Get the details of a quote-supporting file.
+      operationId: getQuoteFile
+      parameters:
+      - $ref: '#/components/parameters/quoteUuid'
+      - in: path
+        name: fileUuid
+        required: true
+        schema:
+          $ref: '#/components/schemas/Uuid'
+      tags:
+      - Quotes
+      responses:
+        200:
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QuoteFile_2'
+        404:
+          description: Quote file not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: boolean
+                    example: 'true'
+                  code:
+                    type: string
+                    example: not_found
+                  message:
+                    type: string
+                    example: Not found.
+                  extra:
+                    type:
+                    - object
+                    - 'null'
+                    example: null
+    delete:
+      summary: Delete quote file
+      description: Delete a supporting file from a quote.
+      operationId: deleteQuoteFile
+      parameters:
+      - $ref: '#/components/parameters/quoteUuid'
+      - in: path
+        name: fileUuid
+        required: true
+        schema:
+          $ref: '#/components/schemas/Uuid'
+      tags:
+      - Quotes
+      responses:
+        204:
+          description: Successful response
+        404:
+          description: Quote file not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: boolean
+                    example: 'true'
+                  code:
+                    type: string
+                    example: not_found
+                  message:
+                    type: string
+                    example: Not found.
+                  extra:
+                    type:
+                    - object
+                    - 'null'
+                    example: null
+    servers:
+    - url: '{url}/{version}'
+      variables:
+        url:
+          default: https://api.paperlessparts.com
+        version:
+          default: v2
+  /quotes/public/pricing_item_quantities/{uuid}:
+    get:
+      summary: Get a pricing item quantity
+      description: Get details of a single pricing item quantity.
+      operationId: GetPricingItemQuantity
+      parameters:
+      - in: path
+        required: true
+        name: uuid
+        schema:
+          type: string
+          description: A unique identifier for a pricing item quantity
+      tags:
+      - Quotes
+      responses:
+        200:
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProfitItemCell'
+    patch:
+      summary: Update a pricing item quantity
+      description: Update the manual profit or manual percentage of a pricing item quantity.
+      operationId: UpdatePricingItemQuantity
+      parameters:
+      - in: path
+        required: true
+        name: uuid
+        schema:
+          type: string
+          description: A unique identifier for a pricing item quantity
+      tags:
+      - Quotes
+      responses:
+        200:
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProfitItemCell'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                manual_profit:
+                  type: number
+                  format: float
+                  description: The profit value to update the pricing item quantity. Do not include manual_percentage in the request body if this is set.
+                manual_percentage:
+                  type: number
+                  format: float
+                  description: The profit percentage to update the pricing item quantity. Do not include manual_profit in the request body if this is set.
+    servers:
+    - url: '{url}/{version}'
+      variables:
+        url:
+          default: https://api.paperlessparts.com
+        version:
+          default: v2
+components:
+  parameters:
+    last_quote:
+      name: last_quote
+      in: query
+      description: '**Last known sent quote number**. You may supply the number of the last known quote.'
+      schema:
+        $ref: '#/components/schemas/QuoteNumber'
+    revisionNumber:
+      name: revision
+      in: query
+      description: The (optional) quote revision number
+      required: false
+      schema:
+        $ref: '#/components/schemas/RevisionNumber'
+    quoteNumber:
+      name: quoteNumber
+      in: path
+      description: The quote number
+      required: true
+      schema:
+        $ref: '#/components/schemas/QuoteNumber'
+    revision:
+      name: revision
+      in: query
+      description: '**Last known sent quote revision number**. You may supply the revision number of the last known quote.'
+      schema:
+        $ref: '#/components/schemas/RevisionNumber'
+    discountUuid:
+      name: discountUuid
+      in: path
+      description: The Discount UUID
+      required: true
+      schema:
+        $ref: '#/components/schemas/Uuid'
+    operationUuid:
+      name: operationUuid
+      in: path
+      description: The Operation UUID
+      required: true
+      schema:
+        $ref: '#/components/schemas/Uuid'
+    pricingItemUuid:
+      name: pricingItemUuid
+      in: path
+      description: The Pricing Item UUID
+      required: true
+      schema:
+        $ref: '#/components/schemas/Uuid'
+    quoteItemUuid:
+      name: quoteItemUuid
+      in: path
+      description: The QuoteItem UUID
+      required: true
+      schema:
+        $ref: '#/components/schemas/Uuid'
+    addOnUuid:
+      name: addOnUuid
+      in: path
+      description: The Add-On UUID
+      required: true
+      schema:
+        $ref: '#/components/schemas/Uuid'
+    quoteUuid:
+      name: quoteUuid
+      in: path
+      description: The quote UUID
+      required: true
+      schema:
+        $ref: '#/components/schemas/Uuid'
+  schemas:
+    QuoteQuantity:
+      type: object
+      description: A quantity object represents a unit price and a numerical quantity associated with a component. A component can have many quantities, and the set of quantities represents the pricing options available to the recipient of a quote.
+      properties:
+        id:
+          type: integer
+        quantity:
+          type: integer
+        markup_1_price:
+          type:
+          - number
+          - 'null'
+          format: float
+          description: Users of Paperless Parts can specify up to two distinct markup values on a component.
+        markup_1_name:
+          type:
+          - string
+          - 'null'
+        markup_2_price:
+          type:
+          - number
+          - 'null'
+          format: float
+          description: Users of Paperless Parts can specify up to two distinct markup values on a component.
+        markup_2_name:
+          type:
+          - string
+          - 'null'
+        unit_price:
+          type: number
+          format: float
+        total_price:
+          type: number
+          format: float
+        total_price_with_required_add_ons:
+          type: number
+          format: float
+        lead_time:
+          type: integer
+          description: Days
+        expedites:
+          type: array
+          items:
+            $ref: '#/components/schemas/QuoteExpedite'
+        is_most_likely_won_quantity:
+          type: boolean
+          description: Whether or not this quantity is the most likely quantity to be won.
+        most_likely_won_quantity_percent:
+          type: integer
+        deliver_quantity:
+          type: integer
+        make_quantity:
+          type: integer
+        manual_total_unit_price:
+          type:
+          - number
+          - 'null'
+          format: float
+        total_component_overrides_cost:
+          type:
+          - number
+          - 'null'
+          format: float
+        total_discount:
+          type:
+          - number
+          - 'null'
+          format: float
+        total_discount_percentage:
+          type:
+          - number
+          - 'null'
+          format: float
+        total_inside_processing_cost:
+          type:
+          - number
+          - 'null'
+          format: float
+        total_outside_processing_cost:
+          type:
+          - number
+          - 'null'
+          format: float
+        total_price_before_discounts:
+          type:
+          - number
+          - 'null'
+          format: float
+        total_purchased_component_cost:
+          type:
+          - number
+          - 'null'
+          format: float
+        total_raw_material_cost:
+          type:
+          - number
+          - 'null'
+          format: float
+        unit_price_before_discounts:
+          type:
+          - number
+          - 'null'
+          format: float
+        yield_pct:
+          type:
+          - number
+          - 'null'
+          format: float
+    PurchasedComponentProperty:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Name of corresponding purchased component column in table display
+        code_name:
+          type: string
+          description: Name used to access property within pricing formulas via 'dot' operator
+        value_type:
+          type: string
+          enum:
+          - string
+          - boolean
+          - numeric
+        value:
+          anyOf:
+          - type: string
+          - type: number
+          - type: boolean
+          description: Value of property, None or of type corresponding to value_type
+    QuoteCostingVariable:
+      type: object
+      description: A CostingVariable is a piece of a Paperless Parts Programming Language (P3L) formula that determines the price and timing for an operation. CostingVariables are essentially Python variables and can represent several data types.
+      properties:
+        label:
+          type: string
+        variable_class:
+          type: string
+          enum:
+          - basic
+          - drop_down
+          - table
+        value_type:
+          type: string
+          enum:
+          - string
+          - number
+          - currency
+          - boolean
+          description: Describes the type of the 'value' key in quantities property
+        quantity_specific:
+          type: boolean
+          description: Flag as to whether or not this costing variable can be manipulated for each quantity break
+        quantities:
+          type: array
+          items:
+            type: object
+            properties:
+              stringQuotedQuantity1:
+                type: object
+                properties:
+                  value:
+                    anyOf:
+                    - type: number
+                    - type: string
+                    - type: boolean
+                  row:
+                    type:
+                    - object
+                    - 'null'
+                  options:
+                    type:
+                    - array
+                    - 'null'
+                    items:
+                      anyOf:
+                      - type: number
+                      - type: string
+              stringQuotedQuantity2:
+                type: object
+                properties:
+                  value:
+                    anyOf:
+                    - type: number
+                    - type: string
+                    - type: boolean
+                  row:
+                    type:
+                    - object
+                    - 'null'
+                  options:
+                    type:
+                    - array
+                    - 'null'
+                    items:
+                      anyOf:
+                      - type: number
+                      - type: string
+          description: 'The value of the costing variable for each quoted quantity. This is an object with keys corresponding to the top level quote quantities in string form e.g. ''1'', ''5'', ''10''. The values for each of these keys take different shape depending on the variable_class. If variable_class==''basic'', the dictionary values will take the shape {''value'': 1.0}. If variable_class==''drop_down'', the dictionary values will take the shape {''value'': ''a'', ''options'': [''a'', ''b'']}. If variable_class==''table'', the dictionary values will take the shape {''value'': ''a'', ''row'': {''column1'': ''a'', ''column2'': ''b''}}. So for quoted quantities 1, 5, 10 for a basic variable_class, the object will look like: {''1'': {''value'': 1.0}, ''5'': {''value'': 2.0}, ''10'': {''value'': 3.0}}'
+        type:
+          type: string
+          description: To Be Deprecated
+          deprecated: false
+        value:
+          anyOf:
+          - type: string
+          - type: number
+          - type: integer
+          - type: boolean
+          description: This will be indicated by the value_type field. To Be Deprecated
+          deprecated: false
+        row:
+          type:
+          - object
+          - 'null'
+          description: The row field will only be non-null when the type field is 'table'. Row represents a row in a lookup table and is an object with arbitrary keys. To Be Deprecated
+          deprecated: false
+    SalesPerson:
+      type: object
+      properties:
+        uuid:
+          type: string
+          format: uuid
+        first_name:
+          type: string
+        last_name:
+          type: string
+        email:
+          type: string
+          format: email
+        erp_code:
+          type: string
+    QuoteItem:
+      type: object
+      description: A quote item represents a line item in a quote. Quote items can either be manual or automatic, as indicated by the 'type' property. Automatic quote items are those generated by adding a part to a quote. Pricing data for automatic quote items is automatically populated using the process, material, and operations, if they exist. Manual quote items do not have an associated part, so the pricing information must be inputted manually.
+      properties:
+        id:
+          type: integer
+        type:
+          type: string
+          enum:
+          - automatic
+          - manual
+          description: Indicates whether the quote item is associated with a part (automatic pricing), or not (manual pricing).
+        root_component_id:
+          type: integer
+          description: ID of the root component. A root component houses the pricing information for a quote item. Every quote item has a root component. In the case of an automatic quote item, the root component corresponds to a part; in the case of a manual quote item, which does not have an associated part, the root component stores the manual pricing data. As the name 'root component' implies, it is possible for a quote item to have many components, as in the case of an assembly of nested parts.
+        components:
+          type: array
+          items:
+            $ref: '#/components/schemas/QuoteComponent'
+        position:
+          type: integer
+          description: The position of the quote item in the quote display, indexed from 1.
+        export_controlled:
+          type: boolean
+          description: Whether or not this quote item contains data that is export controlled (ITAR) by the US Government.
+        component_ids:
+          type: array
+          items:
+            type: integer
+        metadata:
+          type:
+          - object
+          - 'null'
+        private_notes:
+          type:
+          - string
+          - 'null'
+        public_notes:
+          type:
+          - string
+          - 'null'
+        workflow_status:
+          type:
+          - string
+          - 'null'
+        root_component:
+          deprecated: true
+          type:
+          - object
+          - 'null'
+    OrderNumberArray:
+      type: array
+      items:
+        $ref: '#/components/schemas/OrderNumber'
+      description: An array of Order numbers
+      example:
+      - 38
+      - 39
+      - 40
+    ComponentChild:
+      type: object
+      properties:
+        child_id:
+          type: integer
+          description: ID of the child component
+        quantity:
+          type: integer
+          description: The number of child component instances belonging to this parent. Note, the total number of instances of this child component in this assembly tree may be larger if this child appears in multiple places in the tree.
+    QuotePurchasedComponent:
+      allOf:
+      - $ref: '#/components/schemas/AbstractPurchasedComponent'
+      - type: object
+        properties:
+          id:
+            type: string
+          properties:
+            type: array
+            items:
+              $ref: '#/components/schemas/PurchasedComponentProperty'
+    QuoteAddOn:
+      type: object
+      properties:
+        is_required:
+          type: boolean
+        name:
+          type: string
+        erp_code:
+          type: string
+        notes:
+          type: string
+        quantities:
+          type: array
+          items:
+            $ref: '#/components/schemas/QuoteAddOnQuantity'
+        costing_variables:
+          type: array
+          items:
+            $ref: '#/components/schemas/QuoteCostingVariable'
+    AbstractPurchasedComponent:
+      type: object
+      properties:
+        oem_part_number:
+          type: string
+          description: Unique identifier for purchased component within a supplier account
+          example: 064-1235
+        internal_part_number:
+          type:
+          - string
+          - 'null'
+          example: a
+        description:
+          type:
+          - string
+          - 'null'
+          example: any text you want
+        piece_price:
+          type: number
+          format: decimal
+          description: Cost per piece to 4 decimal places
+          example: 2.0
+    OrderNumber:
+      type: integer
+      description: A unique identifier for an Order
+      example: 47
+    QuoteNumberArray:
+      type: array
+      items:
+        $ref: '#/components/schemas/QuoteRevisionPair'
+    QuoteComponent:
+      type: object
+      description: Represents a component in the quote item. In the simplest case, there is a single root component. If the quote item is an assembly, the array will contain each component in the assembly. Components can be manufactured (i.e., parts), assemblies (i.e., top-level or sub-assembly), or purchased (e.g., hardware). Exactly one component in the array will be the root component, but it might not be the first element in the array.
+      properties:
+        id:
+          type: string
+        add_ons:
+          type: array
+          items:
+            $ref: '#/components/schemas/QuoteAddOn'
+        discounts:
+          type: array
+          items:
+            type: object
+        is_assembly:
+          type: boolean
+        obtain_method:
+          type:
+          - string
+          - 'null'
+        part_custom_attrs:
+          type: array
+          items:
+            type: object
+        pricing_items:
+          type: array
+          items:
+            type: object
+        quantities:
+          type: array
+          items:
+            $ref: '#/components/schemas/QuoteQuantity'
+        child_ids:
+          type: array
+          items:
+            type: integer
+        children:
+          type: array
+          items:
+            $ref: '#/components/schemas/ComponentChild'
+        description:
+          type:
+          - string
+          - 'null'
+        export_controlled:
+          type: boolean
+          description: Whether or not this component contains data that is export controlled (ITAR) by the US Government.
+        finishes:
+          type: array
+          items:
+            type: string
+          description: 'Note: this field is deprecated. Finishes now show up as Operations.'
+        innate_quantity:
+          type: integer
+          description: The quantity of this subcomponent that must be produced to make one top-level component.
+        is_root_component:
+          type: boolean
+        material:
+          $ref: '#/components/schemas/OrderMaterial'
+        material_operations:
+          type: array
+          items:
+            $ref: '#/components/schemas/QuoteOperation'
+        parent_ids:
+          type: array
+          items:
+            type: integer
+        part_name:
+          type: string
+        part_number:
+          type:
+          - string
+          - 'null'
+        part_url:
+          type: string
+          format: url
+        part_uuid:
+          type: string
+        process:
+          $ref: '#/components/schemas/OrderProcess'
+        purchased_component:
+          description: Reference to a purchased component object within the supplier account. Will be not null when type == 'purchased'
+          $ref: '#/components/schemas/QuotePurchasedComponent'
+        revision:
+          type:
+          - string
+          - 'null'
+        shop_operations:
+          type: array
+          items:
+            $ref: '#/components/schemas/QuoteOperation'
+        supporting_files:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrderSupportingFile'
+        thumbnail_url:
+          type:
+          - string
+          - 'null'
+        type:
+          type: string
+          enum:
+          - assembled
+          - manufactured
+          - purchased
+    Quote:
+      type: object
+      description: Data representing a Quote
+      properties:
+        uuid:
+          type: string
+          format: uuid
+        authenticated_pdf_quote_url:
+          type:
+          - string
+          - 'null'
+          format: url
+        contact:
+          $ref: '#/components/schemas/QuoteContact'
+        created:
+          type: string
+          format: date-time
+        customer:
+          $ref: '#/components/schemas/QuoteCustomer'
+        digital_last_viewed_on:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: The last time the quote recipient viewed the quote
+        due_date:
+          type:
+          - string
+          - 'null'
+          format: date-time
+        erp_code:
+          type:
+          - string
+          - 'null'
+        estimator:
+          $ref: '#/components/schemas/SalesPerson'
+        metadata:
+          type:
+          - object
+          - 'null'
+        ordered_date:
+          type:
+          - string
+          - 'null'
+          format: date-time
+        priority:
+          type:
+          - integer
+          - 'null'
+        rfq_number:
+          type:
+          - string
+          - 'null'
+        send_from_facility:
+          $ref: '#/components/schemas/Facility'
+        expired:
+          type: boolean
+        expired_date:
+          type: string
+          format: date-time
+        export_controlled:
+          type: boolean
+          description: Whether or not this quote contains data that is export controlled (ITAR) by the US Government.
+        id:
+          type: integer
+        is_unviewed_drafted_rfq:
+          type: boolean
+          description: Quotes can be automatically generated by a supplier's RFQ form. If this quote was drafted via an RFQ and has not been viewed, this will be true.
+        number:
+          $ref: '#/components/schemas/QuoteNumber'
+        order_numbers:
+          $ref: '#/components/schemas/OrderNumberArray'
+        parent_quote:
+          $ref: '#/components/schemas/ParentQuote'
+        parent_supplier_order:
+          $ref: '#/components/schemas/ParentSupplierOrder'
+        private_notes:
+          type:
+          - string
+          - 'null'
+        quote_items:
+          type: array
+          items:
+            $ref: '#/components/schemas/QuoteItem'
+        quote_notes:
+          type:
+          - string
+          - 'null'
+        request_for_quote:
+          $ref: '#/components/schemas/RequestForQuote'
+        revision_number:
+          $ref: '#/components/schemas/RevisionNumber'
+        sales_person:
+          deprecated: true
+          $ref: '#/components/schemas/SalesPerson'
+        salesperson:
+          $ref: '#/components/schemas/SalesPerson'
+        sent_date:
+          type:
+          - string
+          - 'null'
+          format: date-time
+        status:
+          type: string
+          enum:
+          - draft
+          - outstanding
+          - expired
+          - cancelled
+          - partially_accepted
+          - accepted
+          - trash
+          - lost
+        tax_cost:
+          type: number
+          format: float
+        tax_rate:
+          type: number
+          format: float
+    QuoteNumber:
+      type: integer
+      description: A unique identifier for a Quote
+      example: 37
+    RequestForQuote:
+      type: object
+      description: Data representing a RequestForQuote object
+      properties:
+        id:
+          type: integer
+          example: '12334'
+        email:
+          type: string
+          example: careers@paperlessparts.com
+        first_name:
+          type: string
+          example: John
+        last_name:
+          type: string
+          example: Smith
+        business_name:
+          type: string
+          example: ACME
+        phone:
+          type: string
+          example: '5555555555'
+        phone_ext:
+          type: string
+          example: '555'
+        requested_delivery_date:
+          type: string
+          example: '2020-08-25'
+        contact_info_conflict:
+          type: boolean
+          example: false
+        marketing_source:
+          type: string
+          example: google
+    QuoteFile:
+      type: object
+      properties:
+        authenticated_download_url:
+          type:
+          - string
+          - 'null'
+          format: url
+          example: https://api.paperlessparts.com/parts/files/b2145332-75dc-4be4-a092-fb97bdb5815a/download/wire-mount.step?token=token
+        category:
+          type: string
+          enum:
+          - RFQ_FILE
+          - VENDOR_QUOTE
+          - SUPPORTING_FILE
+          example: SUPPORTING_FILE
+        is_export_controlled:
+          type: boolean
+          example: 'false'
+        filename:
+          type: string
+          example: wire_mount.step
+        file_size:
+          type: integer
+          example: 395516
+        file_type:
+          type: string
+          example: step
+        status:
+          type: object
+        uploaded_by:
+          type:
+          - string
+          - 'null'
+          example: John Smith
+        uuid:
+          type: string
+          example: b2145332-75dc-4be4-a092-fb97bdb5815a
+    QuoteRevisionPair:
+      type: object
+      properties:
+        quote:
+          $ref: '#/components/schemas/QuoteNumber'
+        revision_number:
+          $ref: '#/components/schemas/RevisionNumber'
+    ParentSupplierOrder:
+      type: object
+      description: Basic information about the order this was copied from, if any. This field may be NULL.
+      properties:
+        id:
+          type: integer
+        number:
+          type: integer
+        status:
+          type: string
+    QuoteExpedite:
+      type: object
+      description: Expedites represent an additional option for pricing where quote recipients can request a shorter lead time, with an additional markup applied to the unit price.
+      properties:
+        id:
+          type: integer
+        lead_time:
+          type: integer
+          description: Days
+        markup:
+          type: number
+          format: float
+          description: Percent
+        unit_price:
+          type: number
+          format: float
+        total_price:
+          type: number
+          format: float
+    RevisionNumber:
+      type: integer
+      description: A unique revision number for a Quote. May be null.
+      example: 1
+    OperationQuantity:
+      type: object
+      properties:
+        price:
+          type: number
+          format: float
+        manual_price:
+          type:
+          - number
+          - 'null'
+          format: float
+        lead_time:
+          type:
+          - integer
+          - 'null'
+        manual_lead_time:
+          type:
+          - integer
+          - 'null'
+        quantity:
+          type: integer
+    QuoteContact:
+      type: object
+      properties:
+        account:
+          type: object
+          properties:
+            erp_code:
+              type:
+              - string
+              - 'null'
+            id:
+              type: number
+              format: int
+            notes:
+              type:
+              - string
+              - 'null'
+            name:
+              type: string
+        email:
+          type: string
+          format: email
+        first_name:
+          type: string
+        id:
+          type: number
+          format: int
+        last_name:
+          type: string
+        notes:
+          type:
+          - string
+          - 'null'
+        phone:
+          type:
+          - string
+          - 'null'
+        phone_ext:
+          type:
+          - string
+          - 'null'
+    Address:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        address1:
+          type: string
+          maxLength: 250
+          example: 1 City Hall Sq.
+          description: (Required)
+        address2:
+          type:
+          - string
+          - 'null'
+          maxLength: 250
+          example: null
+          description: (Required)
+        city:
+          type: string
+          maxLength: 100
+          example: Boston
+          description: (Required)
+        state:
+          type: string
+          description: (Required) State/Province must be specified as standard postal abbreviation
+          example: MA
+        postal_code:
+          type: string
+          example: '02114'
+          description: (Required) US postal codes may optionally contain 4-digit extension, e.g., `'02114-1234'`
+        country:
+          type: string
+          maxLength: 3
+          description: (Required) Country must be ISO 3166-1 alpha-3 code. Currently allowed values are `'USA'`, `'CAN'`.
+          example: USA
+        erp_code:
+          type: string
+          maxLength: 50
+          description: The unique identifier for this address record in the ERP
+          example: B1234
+    Facility:
+      type:
+      - object
+      - 'null'
+      properties:
+        account_id:
+          type: integer
+          example: 55123
+        address:
+          $ref: '#/components/schemas/Address'
+        attention:
+          type: string
+          example: Gordon Moore
+        id:
+          type: integer
+          example: 12
+        name:
+          type: string
+          example: Boston Office
+        salesperson:
+          $ref: '#/components/schemas/SalesPerson'
+    OrderMaterial:
+      type: object
+      description: This can also be null
+      properties:
+        id:
+          type: integer
+        display_name:
+          type: string
+        family:
+          type: string
+        material_class:
+          type: string
+        name:
+          type: string
+    OrderProcess:
+      type: object
+      properties:
+        id:
+          type: integer
+        external_name:
+          type: string
+        name:
+          type: string
+    QuoteAddOnQuantity:
+      type: object
+      properties:
+        price:
+          type: number
+          format: float
+        manual_price:
+          type: number
+          format: float
+        quantity:
+          type: integer
+    QuoteCustomer:
+      type: object
+      description: Deprecated! Will be removed soon
+      properties:
+        first_name:
+          type: string
+        last_name:
+          type: string
+        email:
+          type: string
+          format: email
+        notes:
+          type:
+          - string
+          - 'null'
+        company:
+          type: object
+          properties:
+            notes:
+              type:
+              - string
+              - 'null'
+            metrics:
+              type: object
+              properties:
+                order_revenue_all_time:
+                  type: number
+                  format: float
+                order_revenue_last_thirty_days:
+                  type: number
+                  format: float
+                quotes_sent_all_time:
+                  type: integer
+                quotes_sent_last_thirty_days:
+                  type: integer
+            business_name:
+              type: string
+            erp_code:
+              type: string
+    OrderSupportingFile:
+      type: object
+      properties:
+        filename:
+          type: string
+        url:
+          type: string
+          format: url
+    QuoteOperation:
+      type: object
+      properties:
+        id:
+          type: integer
+        category:
+          type: string
+          enum:
+          - material
+          - operation
+        cost:
+          type: number
+          format: float
+        costing_variables:
+          type: array
+          items:
+            $ref: '#/components/schemas/QuoteCostingVariable'
+        quantities:
+          type: array
+          items:
+            $ref: '#/components/schemas/OperationQuantity'
+        is_finish:
+          type: boolean
+        is_outside_service:
+          type: boolean
+        name:
+          type: string
+        erp_code:
+          type: string
+        operation_definition_name:
+          type: string
+        notes:
+          type:
+          - string
+          - 'null'
+        position:
+          type: integer
+          description: The position of the order operation in the order display, indexed from 1. Note that the position applies across both material operations and order operations. TODO - this shows up as 0 if there is only one operation on the order?
+        runtime:
+          type:
+          - number
+          - 'null'
+          format: float
+        setup_time:
+          type:
+          - number
+          - 'null'
+          format: float
+    ParentQuote:
+      type: object
+      description: Basic information about the quote this was copied from, if any. This field may be NULL.
+      properties:
+        id:
+          type: integer
+        number:
+          type: integer
+        status:
+          type: string
+    QuoteLineOperation:
+      type: object
+      description: An operation on the root component of a QuoteLine.
+      properties:
+        uuid:
+          type: string
+          description: The UUID of the operation.
+          example: f0f5bd9d-62a1-4e59-bc0e-4dbaa55d1ef9
+        name:
+          type: string
+          description: The name of the operation.
+        is_finish:
+          type: boolean
+          description: Indicates whether or not this operation represents a finish.
+        is_outside_service:
+          type: boolean
+          description: Indicates whether or not this operation represents an outside service.
+        notes:
+          type: string
+          description: Notes regarding the operation.
+        quote_item:
+          type: string
+          description: The UUID of the quote item the operation is tied to.
+          example: f0f5bd9d-62a1-4e59-bc0e-4dbaa55d1ef9
+        costing_variables:
+          type: array
+          items:
+            $ref: '#/components/schemas/QuoteCostingVariable'
+        costing_variable_overrides:
+          $ref: '#/components/schemas/CostingVariableOverrides'
+    QuoteHeader:
+      type: object
+      description: Data representing high level quote object
+      properties:
+        authenticated_pdf_quote_url:
+          type:
+          - string
+          - 'null'
+          format: url
+        contact_id:
+          type: integer
+          example: 1581
+        created:
+          type: string
+          format: date-time
+        digital_last_viewed_on:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: The last time the quote recipient viewed the quote
+        erp_code:
+          type:
+          - string
+          - 'null'
+        estimator:
+          type: string
+          example: 335c5770-8cd4-46d3-98a1-7c0e12251124
+          description: The uuid for the estimator assigned to this quote
+        expired:
+          type: boolean
+        expired_date:
+          type: string
+          format: date-time
+        export_controlled:
+          type: boolean
+          description: Whether or not this quote contains data that is export controlled (ITAR) by the US Government.
+        manual_rfq_received_date:
+          type: string
+          format: date-time
+        number:
+          $ref: '#/components/schemas/QuoteNumber_2'
+        private_notes:
+          type:
+          - string
+          - 'null'
+        quote_items:
+          type: array
+          items:
+            type: string
+          description: An array of QuoteItem UUIDs
+          example:
+          - 335c5770-8cd4-46d3-98a1-7c0e12251124
+          - 414277a8-4144-49f6-9bc9-1bdcbc9f0749
+        quote_notes:
+          type:
+          - string
+          - 'null'
+        rfq_number:
+          type:
+          - string
+          - 'null'
+        revision_number:
+          $ref: '#/components/schemas/RevisionNumber'
+        salesperson:
+          type: string
+          example: 335c5770-8cd4-46d3-98a1-7c0e12251124
+          description: The uuid for the salesperson assigned to this quote
+        sent_date:
+          type:
+          - string
+          - 'null'
+          format: date-time
+        status:
+          type: string
+          enum:
+          - draft
+          - outstanding
+          - expired
+          - cancelled
+          - partially_accepted
+          - accepted
+          - trash
+          - lost
+        tax_rate:
+          type: number
+          format: float
+        metadata:
+          $ref: '#/components/schemas/Metadata'
+    QuoteDiscount:
+      type: object
+      properties:
+        uuid:
+          type: string
+          description: The UUID of the discount.
+          example: f0f5bd9d-62a1-4e59-bc0e-4dbaa55d1ef9
+        name:
+          type: string
+          description: The name of the discount.
+        notes:
+          type:
+          - string
+          - 'null'
+        quote_item_uuid:
+          type: string
+          description: The UUID of the quote item the discount is tied to.
+        discount_definition:
+          type:
+          - string
+          - 'null'
+          description: The UUID of the Discount Definition the Discount was generated from. If the Discount is a manual Discount the value will be 'null'.
+          example: f0f5bd9d-62a1-4e59-bc0e-4dbaa55d1ef9
+        costing_variables:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrderCostingVariable'
+        discount_quantities:
+          type: array
+          items:
+            $ref: '#/components/schemas/QuoteDiscountQuantity'
+    QuoteQuantity_2:
+      type: object
+      description: A quantity object represents a unit price and a numerical quantity associated with a component. A component can have many quantities, and the set of quantities represents the pricing options available to the recipient of a quote.
+      properties:
+        id:
+          type: integer
+        quantity:
+          type: integer
+        markup_1_price:
+          type:
+          - number
+          - 'null'
+          format: float
+          description: Users of Paperless Parts can specify up to two distinct markup values on a component.
+        markup_1_name:
+          type:
+          - string
+          - 'null'
+        markup_2_price:
+          type:
+          - number
+          - 'null'
+          format: float
+          description: Users of Paperless Parts can specify up to two distinct markup values on a component.
+        markup_2_name:
+          type:
+          - string
+          - 'null'
+        unit_price_before_discounts:
+          type: number
+          format: float
+        total_price_before_discounts:
+          type: number
+          format: float
+        total_discount:
+          type: number
+          format: float
+        total_discount_percentage:
+          type: number
+          format: float
+        unit_price:
+          type: number
+          format: float
+        total_price:
+          type: number
+          format: float
+        total_price_with_required_add_ons:
+          type: number
+          format: float
+        lead_time:
+          type: integer
+          description: Days
+        expedites:
+          type: array
+          items:
+            $ref: '#/components/schemas/QuoteExpedite'
+        is_most_likely_won_quantity:
+          type: boolean
+          description: Whether or not this quantity is the most likely quantity to be won.
+        most_likely_won_quantity_percent:
+          type: integer
+    SalesPerson_2:
+      type: object
+      properties:
+        first_name:
+          type: string
+        last_name:
+          type: string
+        email:
+          type: string
+          format: email
+        erp_code:
+          type: string
+    QuoteItem_2:
+      type: object
+      description: A quote item represents a line item in a quote. Quote items can either be manual or automatic, as indicated by the 'type' property. Automatic quote items are those generated by adding a part to a quote. Pricing data for automatic quote items is automatically populated using the process, material, and operations, if they exist. Manual quote items do not have an associated part, so the pricing information must be inputted manually.
+      properties:
+        id:
+          type: integer
+        type:
+          type: string
+          enum:
+          - automatic
+          - manual
+          description: Indicates whether the quote item is associated with a part (automatic pricing), or not (manual pricing).
+        root_component_id:
+          type: integer
+          description: ID of the root component. A root component houses the pricing information for a quote item. Every quote item has a root component. In the case of an automatic quote item, the root component corresponds to a part; in the case of a manual quote item, which does not have an associated part, the root component stores the manual pricing data. As the name 'root component' implies, it is possible for a quote item to have many components, as in the case of an assembly of nested parts.
+        components:
+          type: array
+          items:
+            $ref: '#/components/schemas/QuoteComponent_2'
+        position:
+          type: integer
+          description: The position of the quote item in the quote display, indexed from 1.
+        export_controlled:
+          type: boolean
+          description: Whether or not this quote item contains data that is export controlled (ITAR) by the US Government.
+        component_ids:
+          type: array
+          items:
+            type: integer
+        private_notes:
+          type:
+          - string
+          - 'null'
+        public_notes:
+          type:
+          - string
+          - 'null'
+        workflow_status:
+          type: string
+          enum:
+          - not_started
+          - not_applicable
+          - in_progress
+          - no_quote
+          - completed
+          - on_hold
+          description: The status of the quote item.
+        pricing_items:
+          type: array
+          items:
+            $ref: '#/components/schemas/QuotePricingItem'
+    Metadata:
+      type: object
+      example: '{ crm_id: 1581 }'
+      description: Object that can be used to attach key-value data to an object. Up to 25 keys can be speficied, with key names up to 40 characters long and values up to 500 characters long.
+    Uuid:
+      type: string
+      description: Unique identifier
+      example: 2f0e5724-42fe-47ae-8233-7a902ef70346
+    QuoteLineAddOn:
+      type: object
+      description: An add-on on the root component of a QuoteLine
+      properties:
+        uuid:
+          type: string
+          description: The UUID of the add-on.
+          example: f0f5bd9d-62a1-4e59-bc0e-4dbaa55d1ef9
+        is_required:
+          type: boolean
+          description: Indicates whether or not this add-on is required.
+        name:
+          type: string
+          description: The name of the add-on.
+        quote_item_uuid:
+          type: string
+          description: The UUID of the quote item the add-on is tied to.
+          example: f0f5bd9d-62a1-4e59-bc0e-4dbaa55d1ef9
+        add_on_quantities:
+          type: array
+          description: Array of add-on quantity UUIDs
+          items:
+            type: string
+          example:
+          - f0f5bd9d-62a1-4e59-bc0e-4dbaa55d1ef9
+          - 414277a8-4144-49f6-9bc9-1bdcbc9f0749
+    QuotePricingItemQuantity:
+      type: object
+      properties:
+        uuid:
+          type: string
+          description: The UUID of the pricing item cell
+          example: f0f5bd9d-62a1-4e59-bc0e-4dbaa55d1ef9
+        quantity:
+          type: integer
+          description: The quantity of the pricing item cell
+        profit_item:
+          type: string
+          description: The UUID of the pricing item
+          example: f0f5bd9d-62a1-4e59-bc0e-4dbaa55d1ef9
+        calculated_profit:
+          type: number
+          format: float
+        calculated_percentage:
+          type: number
+        manual_profit:
+          type: number
+          format: float
+        manual_percentage:
+          type: number
+    OrderCostingVariable:
+      type: object
+      description: A CostingVariable is a piece of a Paperless Parts Programming Language (P3L) formula that determines the price and timing for an operation. CostingVariables are essentially Python variables and can represent several data types. An OrderCostingVariable represents the value a variable holds for the ordered quantity.
+      properties:
+        label:
+          type: string
+        variable_class:
+          type: string
+          enum:
+          - basic
+          - drop_down
+          - table
+        value_type:
+          type: string
+          enum:
+          - string
+          - number
+          - currency
+          - boolean
+        value:
+          anyOf:
+          - type: string
+          - type: number
+          - type: integer
+          - type: boolean
+          description: This will be indicated by the value_type field.
+        row:
+          type:
+          - object
+          - 'null'
+          description: An object representing a row from a custom table. This object will have arbitrary key-value pairs based on custom table schema it was pulled from. The row field will only be non-null when the variable_class field is 'table'.
+        options:
+          type:
+          - array
+          - 'null'
+          items:
+            anyOf:
+            - type: number
+            - type: string
+          description: A list of the options for a drop down variable. Can be strings, floats, or integers indicated by value_type. The options field will only be non-null when the variable_class field is 'drop_down'.
+        type:
+          type: string
+          description: To Be Deprecated
+          deprecated: false
+    CostingVariableOverride:
+      type: object
+      description: Costing variable value override. May be quantity-specific.
+      oneOf:
+      - description: Value that should override the calculated value for all quantities.
+        oneOf:
+        - type: string
+        - type: number
+        - type: boolean
+      - type: object
+        description: Variable value overrides, as a map from quantity to value. Only applicable to quantity-specific variables.
+        additionalProperties:
+          description: Value that should override the calculated value for a particular quantity.
+          oneOf:
+          - type: string
+          - type: number
+          - type: boolean
+      example: '{''1'': 2, ''5'': 1.5, ''10'': 1}'
+    QuoteLinePricingItem:
+      type: object
+      description: A pricing item on the root component of a QuoteLine
+      properties:
+        uuid:
+          type: string
+          description: The UUID of the pricing item.
+          example: f0f5bd9d-62a1-4e59-bc0e-4dbaa55d1ef9
+        category:
+          type: string
+          enum:
+          - general
+          - purchased_component
+          - material
+          - outside
+          - inside
+        calculation_type:
+          type: string
+          enum:
+          - markup
+          - margin
+        name:
+          type: string
+          description: The name of the pricing item.
+        notes:
+          type:
+          - string
+          - 'null'
+        costing_variables:
+          type: array
+          items:
+            $ref: '#/components/schemas/QuoteCostingVariable'
+        custom_category_name:
+          type:
+          - string
+          - 'null'
+          example: CUSTOM MARKUP
+        custom_category_color:
+          type:
+          - string
+          - 'null'
+          example: '#A51A54'
+    QuoteComponent_2:
+      type: object
+      description: Represents a component in the quote item. In the simplest case, there is a single root component. If the quote item is an assembly, the array will contain each component in the assembly. Components can be manufactured (i.e., parts), assemblies (i.e., top-level or sub-assembly), or purchased (e.g., hardware). Exactly one component in the array will be the root component, but it might not be the first element in the array.
+      properties:
+        id:
+          type: string
+        add-ons:
+          type: array
+          items:
+            $ref: '#/components/schemas/QuoteAddOn'
+        quantities:
+          type: array
+          items:
+            $ref: '#/components/schemas/QuoteQuantity_2'
+        child_ids:
+          type: array
+          items:
+            type: integer
+        children:
+          type: array
+          items:
+            $ref: '#/components/schemas/ComponentChild'
+        description:
+          type:
+          - string
+          - 'null'
+        discounts:
+          type: array
+          items:
+            $ref: '#/components/schemas/QuoteDiscount'
+        export_controlled:
+          type: boolean
+          description: Whether or not this component contains data that is export controlled (ITAR) by the US Government.
+        finishes:
+          type: array
+          items:
+            type: string
+          description: 'Note: this field is deprecated. Finishes now show up as Operations.'
+        innate_quantity:
+          type: integer
+          description: The quantity of this subcomponent that must be produced to make one top-level component.
+        is_assembly:
+          type: boolean
+          description: Indicates if the component is an assembly or not. Mirrors the assembly tag seen in the UI.
+        is_root_component:
+          type: boolean
+        material:
+          $ref: '#/components/schemas/OrderMaterial'
+        material_operations:
+          type: array
+          items:
+            $ref: '#/components/schemas/QuoteOperation'
+        obtain_method:
+          type: string
+          enum:
+          - manufactured
+          - purchased
+          description: 'Whether the component will be manufactured in house or purchased externally. Note: all assemblies are currently considered manufactured components.'
+        parent_ids:
+          type: array
+          items:
+            type: integer
+        part_name:
+          type: string
+        part_number:
+          type:
+          - string
+          - 'null'
+        part_url:
+          type: string
+          format: url
+        part_uuid:
+          type: string
+        pricing_items:
+          type: array
+          items:
+            $ref: '#/components/schemas/QuoteLinePricingItem'
+        process:
+          $ref: '#/components/schemas/OrderProcess'
+        purchased_component:
+          description: Reference to a purchased component object within the supplier account. Will be not null when type == 'purchased'
+          $ref: '#/components/schemas/QuotePurchasedComponent'
+        revision:
+          type:
+          - string
+          - 'null'
+        shop_operations:
+          type: array
+          items:
+            $ref: '#/components/schemas/QuoteOperation'
+        supporting_files:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrderSupportingFile'
+        thumbnail_url:
+          type:
+          - string
+          - 'null'
+        type:
+          type: string
+          enum:
+          - assembled
+          - manufactured
+          - purchased
+          description: 'Note: this field is deprecated. Use obtain_method and is_assembly instead.'
+    QuoteLine:
+      type: object
+      description: A quote item represents a line item in a quote.
+      properties:
+        uuid:
+          type: string
+          description: The UUID of the quote item.
+          example: f0f5bd9d-62a1-4e59-bc0e-4dbaa55d1ef9
+        position:
+          type: integer
+          description: The position of the quote item in the quote display, indexed from 1.
+        is_export_controlled:
+          type: boolean
+          description: Whether or not this quote item contains data that is export controlled (ITAR) by the US Government.
+          example: 'false'
+        part:
+          type: string
+          description: The UUID of the part the quote item is tied to.
+          example: f0f5bd9d-62a1-4e59-bc0e-4dbaa55d1ef9
+        material:
+          type: string
+          description: The UUID of the material the quote item is tied to.
+          example: f0f5bd9d-62a1-4e59-bc0e-4dbaa55d1ef9
+        process:
+          type: string
+          description: The UUID of the process the quote item is tied to.
+          example: f0f5bd9d-62a1-4e59-bc0e-4dbaa55d1ef9
+        quote:
+          type: string
+          description: The UUID of the quote the quote item is tied to.
+          example: f0f5bd9d-62a1-4e59-bc0e-4dbaa55d1ef9
+        quantities:
+          type: array
+          description: Array of quantity UUIDs
+          items:
+            type: string
+          example:
+          - f0f5bd9d-62a1-4e59-bc0e-4dbaa55d1ef9
+          - 414277a8-4144-49f6-9bc9-1bdcbc9f0749
+        add_ons:
+          type: array
+          description: Array of add-on UUIDs
+          items:
+            type: string
+          example:
+          - f0f5bd9d-62a1-4e59-bc0e-4dbaa55d1ef9
+          - 414277a8-4144-49f6-9bc9-1bdcbc9f0749
+        discounts:
+          type: array
+          description: Array of discount UUIDs
+          items:
+            type: string
+          example:
+          - f0f5bd9d-62a1-4e59-bc0e-4dbaa55d1ef9
+          - 414277a8-4144-49f6-9bc9-1bdcbc9f0749
+        pricing_items:
+          type: array
+          description: Array of pricing item UUIDs
+          items:
+            type: string
+          example:
+          - f0f5bd9d-62a1-4e59-bc0e-4dbaa55d1ef9
+          - 414277a8-4144-49f6-9bc9-1bdcbc9f0749
+        operations:
+          type: array
+          description: Array of operation UUIDs
+          items:
+            type: string
+          example:
+          - f0f5bd9d-62a1-4e59-bc0e-4dbaa55d1ef9
+          - 414277a8-4144-49f6-9bc9-1bdcbc9f0749
+        metadata:
+          $ref: '#/components/schemas/Metadata'
+        workflow_status:
+          type: string
+          enum:
+          - not_started
+          - in_progress
+          - on_hold
+          - completed
+          - no_quote
+          example: in_progress
+    Quote_2:
+      type: object
+      description: Data representing a Quote
+      properties:
+        authenticated_pdf_quote_url:
+          type:
+          - string
+          - 'null'
+          format: url
+        contact:
+          $ref: '#/components/schemas/QuoteContact'
+        created:
+          type: string
+          format: date-time
+        customer:
+          $ref: '#/components/schemas/QuoteCustomer'
+        digital_last_viewed_on:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: The last time the quote recipient viewed the quote
+        erp_code:
+          type:
+          - string
+          - 'null'
+        estimator:
+          $ref: '#/components/schemas/SalesPerson_2'
+        expired:
+          type: boolean
+        expired_date:
+          type: string
+          format: date-time
+        export_controlled:
+          type: boolean
+          description: Whether or not this quote contains data that is export controlled (ITAR) by the US Government.
+        id:
+          type: integer
+        is_unviewed_drafted_rfq:
+          type: boolean
+          description: Quotes can be automatically generated by a supplier's RFQ form. If this quote was drafted via an RFQ and has not been viewed, this will be true.
+        number:
+          $ref: '#/components/schemas/QuoteNumber_2'
+        order_numbers:
+          $ref: '#/components/schemas/OrderNumberArray'
+        parent_quote:
+          $ref: '#/components/schemas/ParentQuote'
+        parent_supplier_order:
+          $ref: '#/components/schemas/ParentSupplierOrder'
+        private_notes:
+          type:
+          - string
+          - 'null'
+        quote_items:
+          type: array
+          items:
+            $ref: '#/components/schemas/QuoteItem_2'
+        quote_notes:
+          type:
+          - string
+          - 'null'
+        request_for_quote:
+          $ref: '#/components/schemas/RequestForQuote'
+        revision_number:
+          $ref: '#/components/schemas/RevisionNumber'
+        salesperson:
+          $ref: '#/components/schemas/SalesPerson_2'
+        sent_date:
+          type:
+          - string
+          - 'null'
+          format: date-time
+        status:
+          type: string
+          enum:
+          - draft
+          - outstanding
+          - expired
+          - cancelled
+          - partially_accepted
+          - accepted
+          - trash
+          - lost
+        tax_cost:
+          type: number
+          format: float
+        tax_rate:
+          type: number
+          format: float
+    QuoteNumber_2:
+      type: integer
+      description: In conjunction with the revision number, forms a unique identifier for a Quote
+      example: 37
+    QuoteLineDiscount:
+      type: object
+      description: A Discount on the root component of a QuoteLine
+      properties:
+        uuid:
+          type: string
+          description: The UUID of the Discount.
+          example: f0f5bd9d-62a1-4e59-bc0e-4dbaa55d1ef9
+        name:
+          type: string
+          description: The name of the Discount.
+          example: Good customer discount.
+        notes:
+          type: string
+          description: Notes for this Discount.
+          example: Use this discount when working with really good customers.
+        quote_item_uuid:
+          type: string
+          description: The UUID of the quote item the Discount is tied to.
+          example: f0f5bd9d-62a1-4e59-bc0e-4dbaa55d1ef9
+        discount_definition:
+          type:
+          - string
+          - 'null'
+          description: The UUID of the Discount Definition the Discount was generated from. If the Discount is a manual Discount the value will be 'null'.
+          example: f0f5bd9d-62a1-4e59-bc0e-4dbaa55d1ef9
+        discount_quantities:
+          type: array
+          description: Array of Discount quantity UUIDs
+          items:
+            type: string
+          example:
+          - f0f5bd9d-62a1-4e59-bc0e-4dbaa55d1ef9
+          - 414277a8-4144-49f6-9bc9-1bdcbc9f0749
+        costing_variables:
+          type: array
+          items:
+            $ref: '#/components/schemas/QuoteCostingVariable'
+        costing_variable_overrides:
+          $ref: '#/components/schemas/CostingVariableOverrides'
+    QuoteFile_2:
+      type: object
+      properties:
+        authenticated_download_url:
+          type:
+          - string
+          - 'null'
+          format: url
+          example: https://api.paperlessparts.com/parts/files/b2145332-75dc-4be4-a092-fb97bdb5815a/download/wire-mount.step?token=token
+        category:
+          type: string
+          enum:
+          - RFQ_FILE
+          - VENDOR_QUOTE
+          - SUPPORTING_FILE
+          example: SUPPORTING_FILE
+        is_export_controlled:
+          type: boolean
+          example: 'false'
+        filename:
+          type: string
+          example: wire_mount.step
+        file_size:
+          type: integer
+          example: 395516
+        file_type:
+          type: string
+          example: step
+        status:
+          type: object
+        uuid:
+          type: string
+          example: b2145332-75dc-4be4-a092-fb97bdb5815a
+    CostingVariableOverrides:
+      type: object
+      description: Costing variable value overrides, as a JSON-formatted map from variable name to override value. Variable values may be overridden on a quantity-specific basis. To remove an override, supply a value of "null" for a variable. To remove all overrides, supply a value of "null" for this field.
+      additionalProperties:
+        $ref: '#/components/schemas/CostingVariableOverride'
+      example: '{''work_center_id'': 34, ''markup'': {''1'': 2, ''5'': 1.5, ''10'': 1}}'
+    QuotePricingItem:
+      type: object
+      properties:
+        uuid:
+          type: string
+          description: The UUID of the pricing item.
+          example: f0f5bd9d-62a1-4e59-bc0e-4dbaa55d1ef9
+        category:
+          type: string
+          enum:
+          - general
+          - purchased_component
+          - material
+          - outside
+          - inside
+        calculation_type:
+          type: string
+          enum:
+          - markup
+          - margin
+        name:
+          type: string
+          description: The name of the pricing item.
+        notes:
+          type:
+          - string
+          - 'null'
+        costing_variables:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrderCostingVariable'
+        pricing_item_quantities:
+          type: array
+          items:
+            $ref: '#/components/schemas/QuotePricingItemQuantity'
+    QuoteDiscountQuantity:
+      type: object
+      properties:
+        uuid:
+          type: string
+          description: The UUID of the discount cell
+          example: f0f5bd9d-62a1-4e59-bc0e-4dbaa55d1ef9
+        quantity:
+          type: integer
+          description: The quantity of the discount cell
+        discount:
+          type: string
+          description: The UUID of the discount
+          example: f0f5bd9d-62a1-4e59-bc0e-4dbaa55d1ef9
+        calculated_discount:
+          type: number
+          format: float
+        calculated_percentage:
+          type: number
+        manual_percentage:
+          type:
+          - number
+          - 'null'
+          format: float
+    ProfitItemCell:
+      type: object
+      properties:
+        uuid:
+          type: string
+          example: 64abb125-26c5-4bed-8672-42ee85c24793
+        quantity:
+          type: integer
+          example: 3200
+        profit_item:
+          type: string
+          example: 16110d43-8665-4f7c-a3eb-a2c397a8c13e
+        calculated_profit:
+          type: string
+          example: '1538.536222'
+        calculated_percentage:
+          type: number
+          format: float
+          example: 20.0
+        manual_profit:
+          type: string
+          example: '1384.682600'
+        manual_percentage:
+          type: number
+          format: float
+          example: 18.0
+        custom_cost_category:
+          type: object
+          example: '{ "cost": 20.0, "name": "CUSTOM MARKUP", "color": "#A51A54" }'
+          properties:
+            cost:
+              type: number
+              format: float
+              example: 20.0
+            name:
+              type:
+              - string
+              - 'null'
+              example: CUSTOM MARKUP
+            color:
+              type:
+              - string
+              - 'null'
+              example: '#A51A54'
+  securitySchemes:
+    app_id:
+      type: apiKey
+      description: API key to authorize requests.
+      name: Authorization
+      in: header
+x-refined-from:
+- paperless-parts-v1-openapi.yml
+- paperless-parts-v2-openapi.yml

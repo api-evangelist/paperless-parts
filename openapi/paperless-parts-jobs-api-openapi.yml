@@ -1,0 +1,1083 @@
+openapi: 3.2.0
+info:
+  title: Paperless Parts API v2 Jobs API
+  description: 'The Paperless Parts API provides access to your data, enabling developers to easily integrate Paperless Parts with third-party systems, such as Customer Relationship Management (CRM) and Enterprise Resource Planning (ERP) tools. The API is designed to support two primary use case. First, reading all information associated with a particular order or quote for import into another system. Second, managing customer data, either for an initial bulk import or for on-going synchronization with an external database.
+
+
+    ## Authorization ##
+
+
+    Requests are authorized via an API key. Administrators of a Paperless Parts account can generate an API Token which grants access to all of the endpoints documented here. The token obtained from the application must be added to the header of all requests using the key `\"Authorization\"` with the value `\"API-Token <api_token>\"`, where `<api_token>` is your Paperless Parts API Token.
+
+
+
+    You can use the \"Execute\" button in an endpoint''s documentation on this page to try out the endpoint. This will send a request to the endpoint on the Paperless Parts server and display the result on this page. Before doing so, however, you''ll need to click on the ''Authorize'' button at the top of the screen, and in the \"Value\" field enter `\"API-Token <api_token>\"`, where `<api_token>` is your API token as described above.
+
+
+
+    ## Overview ##
+
+
+    The API endpoints are organized around REST. API calls should be made to the `https://api.paperlessparts.com` base domain. URLs are designed to clearly describe an entity or collection of entities. HTTP verbs typically describe whether entities are being read, created, modified, or deleted. Where applicable, request and response bodies are in JSON format. Standard HTTP response codes, in addition to error messages, are used to help explain request failures.
+
+
+    ### Associations
+
+
+    Many entities in the API data model are associated with other entities. As a guiding principle, `GET` requests that fetch data nest associated entities in the JSON response. However, when creating or modifying entities, a flat (non-nested) object must be provided, as explained in the documentation for each endpoint. Associations are specified when writing data by using entity IDs in fields ending in `_id`.
+
+
+
+    For example, consider the relationship where a Company has many Customers. When fetching a Customer via a `GET` request, the associated Company will be nested as an object with key `company` in the response. When creating a Customer, the Company is specified via its integer id using the key `company_id`.
+
+
+    ### Events Overview
+
+
+    Events are a way of logging relevant actions that are taken within your account. For instance, when you create a new quote, Paperless Parts logs a `quote.created` event, and once you send that quote, we log another `quote.sent` event.
+
+
+
+    These logs offer you a trail of data that you can use to keep integrations in sync. By polling for new events, you can maintain an up-to-date record of what actions Paperless Parts has initiated that your integration has not. For instance, you could poll for `part.interrogation_succeeded` events and send out a notification upon receiving one.
+
+
+    ### HTTP Methods
+
+
+    The API endpoints support different HTTP methods depending on whether records are being read, created, or updated. To read an entity, use `GET`. To create a new entity, use `POST`. To modifying an entity, use `PATCH`. Note, `PATCH` is used rather than `PUT` to indicate that entities can be partially updated. In other words, in general, if a field is omitted from a `PATCH` request, that field''s value will stay the same (rather than be set to `null`). All fields requiring values are required to be included in `POST` requests.
+
+
+    > Note: Endpoints with a documented `PATCH` method can generally be used with a `PUT` method. The `PUT` is implemented as a partial update (as opposed to a replacement) and is supported for maximum compatibilty.
+
+
+
+    For example, consider the `email` field on the Customer entity, which is required. All Customers must have a non-null `email`. When creating a Customer via `POST`, the request body must contain an `email` key and its value cannot be `null` (other validation applies to that field, as well, including a valid email format and a unique value). When editing a Customer via `PATCH` request, it is not necessary to include an `email` key in the request body. If `email` is omitted, the existing email address will not be changed. If you send a `PATCH` request with `email=null`, then you will receive an error response indicating that a value for `email` is required.'
+  version: '2.0'
+  termsOfService: https://www.paperlessparts.com/web-service-agreement/
+  contact:
+    name: Paperless Parts
+    url: https://www.paperlessparts.com
+    email: support@paperlessparts.com
+servers:
+- url: '{url}/{version}'
+  variables:
+    url:
+      default: https://api.paperlessparts.com
+    version:
+      default: v2
+security:
+- app_id: []
+tags:
+- name: Jobs
+  description: Endpoints for managing Jobs
+paths:
+  /orders/public/jobs:
+    get:
+      summary: List jobs
+      description: Returns a list of jobs. The jobs are returned 20 results at a time and can be iterated over by using the page parameter.
+      operationId: ListJobs
+      parameters:
+      - in: query
+        name: page
+        schema:
+          type: string
+        required: false
+        description: The page of results to return.
+      - in: query
+        name: account_id
+        schema:
+          type: integer
+        required: false
+        description: The id of the account who's jobs to return
+        example: 17
+      - in: query
+        name: contact_id
+        schema:
+          type: integer
+        required: false
+        description: The id of the contact who's jobs to return
+        example: 37
+      - in: query
+        name: erp_code
+        schema:
+          type: string
+        required: false
+        description: The erp code of the job to return. Must be an exact match.
+        example: PPI
+      - in: query
+        name: is_engineering_master
+        schema:
+          type: boolean
+        required: false
+        description: Boolean used to filter for jobs that are engineering master
+        example: true
+      - in: query
+        name: parent_job
+        schema:
+          type: integer
+        required: false
+        description: The id of the parent job who's children to return
+        example: 27
+      - in: query
+        name: part_number
+        schema:
+          type: string
+        required: false
+        description: The part number of the part who's jobs to return
+        example: A-23213B
+      - in: query
+        name: part_revision
+        schema:
+          type: integer
+        required: false
+        description: The revisison to filter jobs down by
+        example: 1
+      - in: query
+        name: part_uuid
+        schema:
+          type: string
+        required: false
+        description: The uuid of the parts who's jobs to return
+        example: 335c5770-8cd4-46d3-98a1-7c0e12251124
+      - in: query
+        name: root_job
+        schema:
+          type: integer
+        required: false
+        description: The id of the root part who's children to return
+      tags:
+      - Jobs
+      responses:
+        200:
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                      example: 17
+                      description: The ID of the job
+                    account_id:
+                      type: integer
+                      example: 32
+                      description: The ID of the account associated with the job
+                    contact_id:
+                      type: integer
+                      example: 24
+                      description: The ID of the contact associated with the job
+                    erp_code:
+                      type: string
+                      example: PPI
+                      description: The ERP code of the job
+                    is_engineering_master:
+                      type: boolean
+                      example: true
+                      description: Indicates whether a job is the engineering master
+                    parent_job_id:
+                      type: integer
+                      example: 23
+                      description: The id of the parent job
+                    part_number:
+                      type: string
+                      example: A-23213B
+                      description: The part number for the part associated with the job
+                    part_revision:
+                      type: integer
+                      example: 1
+                      description: The revision of the part associated with the job
+                    part_uuid:
+                      type: string
+                      example: 335c5770-8cd4-46d3-98a1-7c0e12251124
+                      description: The UUID of the part associated with the job
+                    top_level_job:
+                      type: integer
+                      example: 57
+                      description: The ID of the top level job
+        404:
+          description: Not found response
+          content:
+            text/plain:
+              schema:
+                title: Jobs not found
+                type: string
+                example: 'Error: Not Found'
+    post:
+      summary: Create a new job
+      operationId: CreateJob
+      tags:
+      - Jobs
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                erp_code:
+                  type:
+                  - string
+                  - 'null'
+                  maxLength: 12
+                  example: PPI
+                  description: The ERP code for the job
+                account_id:
+                  type:
+                  - integer
+                  - 'null'
+                  example: 17
+                  description: The ID of the account associated with the job
+                contact_id:
+                  type:
+                  - integer
+                  - 'null'
+                  example: 17
+                  description: The ID of the contact associated with the job
+                description:
+                  type:
+                  - string
+                  - 'null'
+                  example: Job description
+                  description: A description of the job component
+                finish_ids:
+                  type: array
+                  example:
+                  - 43
+                  - 55
+                  - 67
+                  description: A list of the ids for the finish operations on a job
+                  items:
+                    type: integer
+                lead_time:
+                  type: integer
+                  example: 30
+                  description: Leadtime for the job in days
+                quantity:
+                  type: integer
+                  example: 100
+                  description: The quantity of the component manufactured for the job
+                is_engineering_master:
+                  type: boolean
+                  example: true
+                  description: Indicates if a job is the engineering master
+                oritentation:
+                  type:
+                  - string
+                  - 'null'
+                  maxLength: 2
+                  example: Auto
+                  description: The orientation of the job component (''(auto), 'x', '-x', 'y', '-y', 'z', '-z').
+                price:
+                  type:
+                  - number
+                  - 'null'
+                  format: float
+                  example: 100000.0
+                  description: The unit price for a job
+                cost:
+                  type:
+                  - number
+                  - 'null'
+                  format: float
+                  example: 25000
+                  description: The unit cost for a job
+                profit:
+                  type:
+                  - number
+                  - 'null'
+                  format: float
+                  example: 75000
+                  description: The unit profit on a job
+                quote_item_id:
+                  type:
+                  - integer
+                  - 'null'
+                  example: 22
+                  description: The id of the quote item this job is associated with
+                order_item_id:
+                  type:
+                  - integer
+                  - 'null'
+                  example: 21
+                  description: The id of the order item this job is associated with
+                part_uuid:
+                  type:
+                  - string
+                  - 'null'
+                  example: 335c5770-8cd4-46d3-98a1-7c0e12251124
+                  description: The uuid for the part associated with this job
+                process_id:
+                  type:
+                  - integer
+                  - 'null'
+                  example: 1529
+                  description: The id of the process for this job
+                material_id:
+                  type:
+                  - integer
+                  - 'null'
+                  example: 1143
+                  description: The id of the material for this job
+                material_notes:
+                  type:
+                  - string
+                  - 'null'
+                  example: Special material notes
+                  description: Material notes for the job
+                parent_id:
+                  type:
+                  - integer
+                  - 'null'
+                  example: 124
+                  description: The id of the parent job
+                root_job_id:
+                  type:
+                  - integer
+                  - 'null'
+                  example: 132
+                  description: The id of the root job
+      responses:
+        201:
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Job'
+  /orders/public/jobs/{jobId}:
+    get:
+      summary: Get details about a Job
+      description: Get all Job attributes.
+      parameters:
+      - $ref: '#/components/parameters/jobId'
+      operationId: JobDetails
+      tags:
+      - Jobs
+      responses:
+        200:
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Job'
+    patch:
+      summary: Update a job
+      description: Update job attributes
+      parameters:
+      - $ref: '#/components/parameters/jobId'
+      operationId: UpdateJob
+      tags:
+      - Jobs
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                erp_code:
+                  type:
+                  - string
+                  - 'null'
+                  maxLength: 12
+                  example: PPI
+                  description: The ERP code for the job
+                account_id:
+                  type:
+                  - integer
+                  - 'null'
+                  example: 17
+                  description: The ID of the account associated with the job
+                contact_id:
+                  type:
+                  - integer
+                  - 'null'
+                  example: 17
+                  description: The ID of the contact associated with the job
+                description:
+                  type:
+                  - string
+                  - 'null'
+                  example: Job description
+                  description: A description of the job component
+                finish_ids:
+                  type: array
+                  example:
+                  - 43
+                  - 55
+                  - 67
+                  description: A list of the ids for the finish operations on a job
+                  items:
+                    type: integer
+                lead_time:
+                  type: integer
+                  example: 30
+                  description: Leadtime for the job in days
+                quantity:
+                  type: integer
+                  example: 100
+                  description: The quantity of the component manufactured for the job
+                is_engineering_master:
+                  type: boolean
+                  example: true
+                  description: Indicates if a job is the engineering master
+                oritentation:
+                  type:
+                  - string
+                  - 'null'
+                  maxLength: 2
+                  example: Auto
+                  description: The orientation of the job component (''(auto), 'x', '-x', 'y', '-y', 'z', '-z').
+                price:
+                  type:
+                  - number
+                  - 'null'
+                  format: float
+                  example: 100000.0
+                  description: The unit price for a job
+                cost:
+                  type:
+                  - number
+                  - 'null'
+                  format: float
+                  example: 25000
+                  description: The unit cost for a job
+                profit:
+                  type:
+                  - number
+                  - 'null'
+                  format: float
+                  example: 75000
+                  description: The unit profit on a job
+                quote_item_id:
+                  type:
+                  - integer
+                  - 'null'
+                  example: 22
+                  description: The id of the quote item this job is associated with
+                order_item_id:
+                  type:
+                  - integer
+                  - 'null'
+                  example: 21
+                  description: The id of the order item this job is associated with
+                part_uuid:
+                  type:
+                  - string
+                  - 'null'
+                  example: 335c5770-8cd4-46d3-98a1-7c0e12251124
+                  description: The uuid for the part associated with this job
+                process_id:
+                  type:
+                  - integer
+                  - 'null'
+                  example: 1529
+                  description: The id of the process for this job
+                material_id:
+                  type:
+                  - integer
+                  - 'null'
+                  example: 1143
+                  description: The id of the material for this job
+                material_notes:
+                  type:
+                  - string
+                  - 'null'
+                  example: Special material notes
+                  description: Material notes for the job
+                parent_id:
+                  type:
+                  - integer
+                  - 'null'
+                  example: 124
+                  description: The id of the parent job
+                root_job_id:
+                  type:
+                  - integer
+                  - 'null'
+                  example: 132
+                  description: The id of the root job
+      responses:
+        200:
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Job'
+    delete:
+      summary: Delete Job
+      description: Delete a Job
+      operationId: DeleteJob
+      parameters:
+      - $ref: '#/components/parameters/jobId'
+      tags:
+      - Jobs
+      responses:
+        204:
+          description: Successful Response
+        404:
+          description: Not found response
+          content:
+            text/plain:
+              schema:
+                title: Job not found
+                type: string
+                example: 'Error: Not Found'
+  /orders/public/jobs/{jobId}/operations:
+    get:
+      summary: Get a list of operations for a job.
+      description: A complete list of operations on a job.
+      operationId: JobsOperationsList
+      parameters:
+      - $ref: '#/components/parameters/jobId'
+      tags:
+      - Jobs
+      responses:
+        200:
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    position:
+                      type: integer
+                      example: 4
+                      description: The operation's position
+                    op_def_id:
+                      type: integer
+                      example: 53
+                      description: The ID of the operation definition from which the operation was derived
+                    name:
+                      type: string
+                      example: admin
+                      description: The name of the operation
+                    notes:
+                      type: string
+                      example: Example notes
+                      description: Operation notes
+                    overrides:
+                      type: object
+                      example: '{ ''unit_price'': 27, ''setup_time'': 12, }'
+                      description: A json object containing variable overrides
+                    actuals:
+                      type: object
+                      example: '{ ''unit_price'': 27, ''setup_time'': 12, }'
+                      description: A json object containing the actuals values
+        404:
+          description: Not found response
+          content:
+            text/plain:
+              schema:
+                title: Job or operations not found
+                type: string
+                example: 'Error: Not Found'
+    post:
+      summary: Create a new operation
+      operationId: CreateJobOp
+      parameters:
+      - $ref: '#/components/parameters/jobId'
+      tags:
+      - Jobs
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                op_def_id:
+                  type: integer
+                  example: 52
+                  description: The id of the operation defintion for the operation
+                notes:
+                  type:
+                  - string
+                  - 'null'
+                  example: Operation notes
+                  description: Notes for the operation
+                is_finish:
+                  type: boolean
+                  example: false
+                  description: Inidicates if an operation is a finish
+                is_outside_service:
+                  type: boolean
+                  example: false
+                  description: Indicates if an operation is an outside service
+                overrides:
+                  type: object
+                  example: '{ ''unit_price'': 25, }'
+                  description: A json object containing variable overrides for an operation
+                actuals:
+                  type: object
+                  description: A json object containing actuals values for an Add On
+                  example: '{ ''unit_price'': 22.5, }'
+      responses:
+        201:
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JobOperation'
+  /orders/public/jobs/{jobId}/operations/{position}:
+    get:
+      summary: Get details about an Operation
+      description: Get all Operation attributes.
+      parameters:
+      - $ref: '#/components/parameters/jobId'
+      - $ref: '#/components/parameters/position'
+      operationId: JobOpDetails
+      tags:
+      - Jobs
+      responses:
+        200:
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JobOperation'
+    post:
+      summary: Update an Operation
+      operationId: UpdateJobOp
+      parameters:
+      - $ref: '#/components/parameters/jobId'
+      - $ref: '#/components/parameters/position'
+      tags:
+      - Jobs
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                position:
+                  type: integer
+                  example: 2
+                  description: The position of the operation in the op list
+                notes:
+                  type:
+                  - string
+                  - 'null'
+                  example: Operation notes
+                  description: Notes for the operation
+                is_finish:
+                  type: boolean
+                  example: false
+                  description: Inidicates if an operation is a finish
+                is_outside_service:
+                  type: boolean
+                  example: false
+                  description: Indicates if an operation is an outside service
+                overrides:
+                  type: object
+                  example: '{ ''unit_price'': 25, }'
+                  description: A json object containing variable overrides for an operation
+                actuals:
+                  type: object
+                  description: A json object containing actuals values for an operation
+                  example: '{ ''unit_price'': 22.5, }'
+      responses:
+        201:
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JobOperation'
+    delete:
+      summary: Delete Operation
+      description: Delete an Operation
+      operationId: DeleteJobOp
+      parameters:
+      - $ref: '#/components/parameters/jobId'
+      - $ref: '#/components/parameters/position'
+      tags:
+      - Jobs
+      responses:
+        204:
+          description: Successful Response
+        404:
+          description: Not found response
+          content:
+            text/plain:
+              schema:
+                title: Job or Operation not found
+                type: string
+                example: 'Error: Not Found'
+  /orders/public/jobs/{jobId}/add_ons:
+    get:
+      summary: Get a list of add ons for a Job.
+      description: A complete list of Add Ons on a Job.
+      operationId: JobsAddOnsList
+      parameters:
+      - $ref: '#/components/parameters/jobId'
+      tags:
+      - Jobs
+      responses:
+        200:
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    position:
+                      type: integer
+                      example: 4
+                      description: The add on's position
+                    add_on_def_id:
+                      type: integer
+                      example: 53
+                      description: The ID of the add on definition from which the add on was derived
+                    name:
+                      type: string
+                      example: admin
+                      description: The name of the add on
+        404:
+          description: Not found response
+          content:
+            text/plain:
+              schema:
+                title: Job or add ons not found
+                type: string
+                example: 'Error: Not Found'
+    post:
+      summary: Create a new Add On
+      operationId: CreateJobAddOn
+      parameters:
+      - $ref: '#/components/parameters/jobId'
+      tags:
+      - Jobs
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                add_on_def_id:
+                  type: integer
+                  example: 52
+                  description: The id of the Add On Defintion for the Add On
+                notes:
+                  type:
+                  - string
+                  - 'null'
+                  example: Add On notes
+                  description: Notes for the Add On
+                overrides:
+                  type: object
+                  example: '{ ''unit_price'': 75.00, }'
+                  description: A json object containing variable overrides for an Add On
+                actuals:
+                  type: object
+                  description: A json object for holding actuals values
+                  example: '{ ''unit_price'': 55.00, }'
+      responses:
+        201:
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JobAddOn'
+  /orders/public/jobs/{jobId}/add_ons/{position}:
+    get:
+      summary: Get details about an Add On
+      description: Get all Add On attributes.
+      parameters:
+      - $ref: '#/components/parameters/jobId'
+      - $ref: '#/components/parameters/position'
+      operationId: JobAddOnDetails
+      tags:
+      - Jobs
+      responses:
+        200:
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JobAddOn'
+    post:
+      summary: Update an Add On
+      operationId: UpdateJobAddOn
+      parameters:
+      - $ref: '#/components/parameters/jobId'
+      - $ref: '#/components/parameters/position'
+      tags:
+      - Jobs
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                position:
+                  type: integer
+                  example: 2
+                  description: The position of the Add On in the Add On list
+                notes:
+                  type:
+                  - string
+                  - 'null'
+                  example: Add On notes
+                  description: Notes for the Add On
+                is_required:
+                  type: boolean
+                  example: false
+                  description: Inidicates if an Add On is required
+                overrides:
+                  type: object
+                  example: '{ ''unit_price'': 75.00, }'
+                  description: A json object containing variable overrides for an Add On
+                actuals:
+                  type: object
+                  description: A json object containing actuals values for an Add On
+                  example: '{ ''unit_price'': 55.00, }'
+      responses:
+        201:
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JobAddOn'
+    delete:
+      summary: Delete Add On
+      description: Delete an Add On
+      operationId: DeleteJobAddOn
+      parameters:
+      - $ref: '#/components/parameters/jobId'
+      - $ref: '#/components/parameters/position'
+      tags:
+      - Jobs
+      responses:
+        204:
+          description: Successful Response
+        404:
+          description: Not found response
+          content:
+            text/plain:
+              schema:
+                title: Job or Add On not found
+                type: string
+                example: 'Error: Not Found'
+components:
+  parameters:
+    position:
+      name: position
+      in: path
+      required: true
+      example: 3
+      schema:
+        $ref: '#/components/schemas/Position'
+    jobId:
+      name: jobId
+      in: path
+      required: true
+      example: 37
+      schema:
+        $ref: '#/components/schemas/JobId'
+  schemas:
+    JobOperation:
+      type: object
+      properties:
+        position:
+          type: integer
+          example: 4
+          description: The operation's position
+        op_def_id:
+          type: integer
+          example: 53
+          description: The ID of the operation definition from which the operation was derived
+        name:
+          type: string
+          example: admin
+          description: The name of the operation
+        notes:
+          type: string
+          example: Example notes
+          description: Operation notes
+        overrides:
+          type: object
+          example: '{ ''unit_price'': 27, ''setup_time'': 12, }'
+          description: A json object containing variable overrides
+        actuals:
+          type: object
+          example: '{ ''unit_price'': 27, ''setup_time'': 12, }'
+          description: A json object containing the actuals values
+        category:
+          type: string
+          example: operation
+          description: The operation category. (operation, material)
+        is_finish:
+          type: boolean
+          example: false
+          description: Indicates if an operation is a finish
+        is_outside_service:
+          type: boolean
+          example: false
+          description: Indicates if an operation is an outside service
+        runtime_display_untis:
+          type: string
+          example: hr
+          description: The unit for runtime. (hr, min, sec)
+        setup_time_display_units:
+          type: string
+          example: hr
+          description: The unit for setup time. (hr, min, sec)
+    JobId:
+      type: integer
+      description: The job id
+      example: 37
+    Position:
+      type: integer
+      description: Position in list
+      example: 3
+    Job:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 15
+          description: the ID of the job
+        erp_code:
+          type:
+          - string
+          - 'null'
+          maxLength: 12
+          example: PPI
+          description: The ERP code for the job
+        account_id:
+          type: integer
+          example: 17
+          description: The ID of the account associated with the job
+        contact_id:
+          type: integer
+          example: 17
+          description: The ID of the contact associated with the job
+        description:
+          type: string
+          example: Job description
+          description: A description of the job component
+        finish_ids:
+          type: array
+          example:
+          - 43
+          - 55
+          - 67
+          description: A list of the ids for the finish operations on a job
+          items:
+            type: integer
+        lead_time:
+          type: integer
+          example: 30
+          description: Leadtime for the job in days
+        quantity:
+          type: integer
+          example: 100
+          description: The quantity of the component manufactured for the job
+        is_engineering_master:
+          type: boolean
+          example: true
+          description: Indicates whether or a not a is the engineering master
+        price:
+          type: number
+          format: float
+          example: 100000.0
+          description: The unit price for a job
+        cost:
+          type: number
+          format: float
+          example: 25000
+          description: The unit cost for a job
+        profit:
+          type: number
+          format: float
+          example: 75000
+          description: The unit profit on a job
+        quote_component_id:
+          type: integer
+          example: 35
+          description: The id of the component this job is associated with
+        quote_item_id:
+          type: integer
+          example: 22
+          description: The id of the quote item this job is associated with
+        order_item_id:
+          type: integer
+          example: 21
+          description: The id of the order item this job is associated with
+        oritentation:
+          type:
+          - string
+          - 'null'
+          maxLength: 2
+          example: Auto
+          description: The orientation of the job component (''(auto), 'x', '-x', 'y', '-y', 'z', '-z').
+        part_uuid:
+          type: string
+          example: 335c5770-8cd4-46d3-98a1-7c0e12251124
+          description: The uuid for the part associated with this job
+        process_id:
+          type: integer
+          example: 1529
+          description: The id of the process for this job
+        material_id:
+          type: integer
+          example: 1143
+          description: The id of the material for this job
+        material_notes:
+          type: string
+          example: Special material notes
+          description: Material notes for the job
+        parent_id:
+          type: integer
+          example: 124
+          description: The id of the parent job
+        root_job_id:
+          type: integer
+          example: 132
+          description: The id of the root job
+    JobAddOn:
+      type: object
+      properties:
+        position:
+          type: integer
+          example: 4
+          description: The AddOn's position
+        add_on_def_id:
+          type: integer
+          example: 53
+          description: The ID of the Add On definition from which the Add On was derived
+        name:
+          type: string
+          example: admin
+          description: The name of the Add On
+        notes:
+          type: string
+          example: Example notes
+          description: Add On notes
+        overrides:
+          type: object
+          example: '{ ''unit_price'': 27, ''setup_time'': 12, }'
+          description: A json object containing variable overrides
+        actuals:
+          type: object
+          example: '{ ''unit_price'': 27, ''setup_time'': 12, }'
+          description: A json object containing the actuals values
+        is_required:
+          type: boolean
+          example: false
+          description: Indicates if an Add On is require
+  securitySchemes:
+    app_id:
+      type: apiKey
+      description: API key to authorize requests.
+      name: Authorization
+      in: header
