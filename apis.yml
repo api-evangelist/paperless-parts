@@ -243,6 +243,9 @@ apis:
   - type: Documentation
     url: https://docs.paperlessparts.com/
 common:
+- type: CapabilityMap
+  url: capabilities/paperless-parts-capability-edges.yml
+  name: Paperless Parts Business Capability Map
 - type: Overlay
   url: overlays/paperless-parts-v2-overlay.yaml
 - type: Overlay
