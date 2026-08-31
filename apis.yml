@@ -118,6 +118,8 @@ apis:
   humanURL: https://docs.paperlessparts.com/v2
   baseURL: https://api.paperlessparts.com/v2
   tags:
+  - Event
+  tags_raw:
   - Events
   properties:
   - type: OpenAPI
@@ -146,6 +148,8 @@ apis:
   humanURL: https://docs.paperlessparts.com/v2
   baseURL: https://api.paperlessparts.com/v2
   tags:
+  - Job
+  tags_raw:
   - Jobs
   properties:
   - type: OpenAPI
@@ -162,6 +166,8 @@ apis:
   humanURL: https://docs.paperlessparts.com/v2
   baseURL: https://api.paperlessparts.com/v2
   tags:
+  - Order
+  tags_raw:
   - Orders
   properties:
   - type: OpenAPI
