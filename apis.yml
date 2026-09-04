@@ -24,6 +24,20 @@ deliveryModel:
   - repository-unlicensed
   generated: '2026-08-28'
   method: derived
+accessModel:
+  pricing: unknown
+  onboarding: unknown
+  trial: false
+  try_now: false
+  public: false
+  label: Unknown
+  confidence: low
+  source:
+  - authentication
+  - rate-limits
+  - security
+  generated: '2026-09-03'
+  method: derived
 image: https://paperlessparts.com/wp-content/uploads/paperless-parts-full-logo-2022.svg
 url: https://raw.githubusercontent.com/api-evangelist/paperless-parts/refs/heads/main/apis.yml
 x-type: company
