@@ -1,16 +1,14 @@
 aid: paperless-parts
 name: Paperless Parts
-description: >-
-  Paperless Parts, Inc. is a Boston-based manufacturing software company founded in 2017 that
-  builds a secure, ITAR-compliant cloud quoting and sales platform for custom part manufacturers —
-  job shops, contract manufacturers and rapid-prototype businesses working in CNC machining, sheet
-  metal fabrication, Swiss screw machining, wire EDM, waterjet and additive manufacturing. A
-  patented geometry engine analyses uploaded CAD to automate costing, and the P3L pricing language
-  lets a shop encode its own pricing logic. The company publishes a public REST API in two live
-  versions (v1 and v2) at api.paperlessparts.com, covering quotes, quote items, orders, jobs, parts,
-  processes, contacts and accounts, custom pricing tables, purchased components, and a managed
-  integrations framework with a poll-based Streaming API for reacting to platform events. A
-  first-party Python SDK is published on GitHub under the part-os organization.
+description: Paperless Parts, Inc. is a Boston-based manufacturing software company founded in 2017 that
+  builds a secure, ITAR-compliant cloud quoting and sales platform for custom part manufacturers — job
+  shops, contract manufacturers and rapid-prototype businesses working in CNC machining, sheet metal fabrication,
+  Swiss screw machining, wire EDM, waterjet and additive manufacturing. A patented geometry engine analyses
+  uploaded CAD to automate costing, and the P3L pricing language lets a shop encode its own pricing logic.
+  The company publishes a public REST API in two live versions (v1 and v2) at api.paperlessparts.com,
+  covering quotes, quote items, orders, jobs, parts, processes, contacts and accounts, custom pricing
+  tables, purchased components, and a managed integrations framework with a poll-based Streaming API for
+  reacting to platform events. A first-party Python SDK is published on GitHub under the part-os organization.
 deliveryModel:
   model: unknown
   open_source: unknown
@@ -44,7 +42,7 @@ x-type: company
 x-source: harvest:secondary-market
 specificationVersion: '0.20'
 created: '2026-08-26'
-modified: '2026-08-26'
+modified: '2026-09-16'
 tags:
 - Company
 - Manufacturing
@@ -66,17 +64,16 @@ maintainers:
 apis:
 - aid: paperless-parts:paperless-parts-contacts-api
   name: Paperless Parts Contacts API
-  description: >-
-    Paperless Parts includes Customer Relationship Management (CRM) functionality to make it easy to send
-    quotes to new and existing customers, while keeping data consistent with third-party CRM and ERP systems.
-    Typical use cases for these endpoints are to bulk import customers from an existing customer database
-    and to synchronize new customers or changes from another system.
+  description: 'Paperless Parts includes Customer Relationship Management (CRM) functionality to make
+    it easy to send quotes to new and existing customers, while keeping data consistent with third-party
+    CRM and ERP systems. Typical use cases for these endpoints are to bulk import customers from an existing
+    customer database and to synchronize new customers or changes from another system.
 
 
     An account represents a single company or account to which you would send quotes. An account has zero
     or more Contacts, each of which represents a person at that company and is identified uniquely by
     their email address. An account also has facilities and billing addresses. Facilities represent destinations
-    to which orders can be shipped and BillingAddresses represent the bill to address for and order.
+    to which orders can be shipped and BillingAddresses represent the bill to address for and order.'
   humanURL: https://docs.paperlessparts.com/v2
   baseURL: https://api.paperlessparts.com/v2
   tags:
@@ -104,17 +101,16 @@ apis:
     url: https://docs.paperlessparts.com/
 - aid: paperless-parts:paperless-parts-customers-api
   name: Paperless Parts Customers API
-  description: >-
-    Paperless Parts includes Customer Relationship Management (CRM) functionality to make it easy to send
-    quotes to new and existing customers, while keeping data consistent with third-party CRM and ERP systems.
-    Typical use cases for these endpoints are to bulk import customers from an existing customer database
-    and to synchronize new customers or changes from another system.
+  description: 'Paperless Parts includes Customer Relationship Management (CRM) functionality to make
+    it easy to send quotes to new and existing customers, while keeping data consistent with third-party
+    CRM and ERP systems. Typical use cases for these endpoints are to bulk import customers from an existing
+    customer database and to synchronize new customers or changes from another system.
 
 
     An account represents a single company or account to which you would send quotes. An account has zero
     or more Contacts, each of which represents a person at that company and is identified uniquely by
     their email address. An account also has facilities and billing addresses. Facilities represent destinations
-    to which orders can be shipped and BillingAddresses represent the bill to address for and order.
+    to which orders can be shipped and BillingAddresses represent the bill to address for and order.'
   humanURL: https://docs.paperlessparts.com/v2
   baseURL: https://api.paperlessparts.com/v2
   tags:
@@ -174,9 +170,8 @@ apis:
     url: https://docs.paperlessparts.com/
 - aid: paperless-parts:paperless-parts-orders-api
   name: Paperless Parts Orders API
-  description: >-
-    Endpoints for identifying newly placed orders and pulling all information related to a particular
-    order. Also, a new order can be created via open API to turn an existing quote into order.
+  description: Endpoints for identifying newly placed orders and pulling all information related to a
+    particular order. Also, a new order can be created via open API to turn an existing quote into order.
   humanURL: https://docs.paperlessparts.com/v2
   baseURL: https://api.paperlessparts.com/v2
   tags:
@@ -191,7 +186,7 @@ apis:
   - type: Documentation
     url: https://docs.paperlessparts.com/
 - aid: paperless-parts:paperless-parts-parts-api
-  name: Paperless Parts Parts API
+  name: Paperless Parts API
   description: Endpoints for managing Parts
   humanURL: https://docs.paperlessparts.com/v2
   baseURL: https://api.paperlessparts.com/v2
@@ -248,9 +243,8 @@ apis:
     url: https://docs.paperlessparts.com/
 - aid: paperless-parts:paperless-parts-quotes-api
   name: Paperless Parts Quotes API
-  description: >-
-    Endpoints for identifying newly sent quotes, pulling all information related to a particular quote,
-    and updating a quote's status.
+  description: Endpoints for identifying newly sent quotes, pulling all information related to a particular
+    quote, and updating a quote's status.
   humanURL: https://docs.paperlessparts.com/v2
   baseURL: https://api.paperlessparts.com/v2
   tags:
