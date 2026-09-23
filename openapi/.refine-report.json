@@ -1,0 +1,51 @@
+{
+  "provider": "paperless-parts",
+  "sources": [
+    "_original/paperless-parts-v1-openapi-original.yml",
+    "_original/paperless-parts-v2-openapi-original.yml"
+  ],
+  "outputs": [
+    "paperless-parts-custom-tables-api-openapi.yml",
+    "paperless-parts-customers-api-openapi.yml",
+    "paperless-parts-events-api-openapi.yml",
+    "paperless-parts-integration-actions-api-openapi.yml",
+    "paperless-parts-orders-api-openapi.yml",
+    "paperless-parts-purchased-components-api-openapi.yml",
+    "paperless-parts-quote-items-api-openapi.yml",
+    "paperless-parts-quotes-api-openapi.yml",
+    "paperless-parts-contacts-api-openapi.yml",
+    "paperless-parts-jobs-api-openapi.yml",
+    "paperless-parts-parts-api-openapi.yml",
+    "paperless-parts-processes-api-openapi.yml"
+  ],
+  "archived": [],
+  "errors": [],
+  "warnings": [],
+  "notes": [
+    "2 archived document(s) dropped as subsets of other archived documents",
+    "sourced from openapi/_original/ (2 archived document(s)); previously refined output at the top level was skipped rather than re-split",
+    "paperless-parts-v1-openapi-original.yml: upgraded openapi 3.0.2 -> OpenAPI 3.2.0",
+    "paperless-parts-v2-openapi-original.yml: upgraded openapi 3.0.2 -> OpenAPI 3.2.0",
+    "tag 'Custom Tables' spans 2 source specs (paperless-parts-v1-openapi-original.yml, paperless-parts-v2-openapi-original.yml): per-path servers applied",
+    "tag 'Orders' spans 2 source specs (paperless-parts-v1-openapi-original.yml, paperless-parts-v2-openapi-original.yml): per-path servers applied",
+    "tag 'Purchased Components' spans 2 source specs (paperless-parts-v1-openapi-original.yml, paperless-parts-v2-openapi-original.yml): per-path servers applied",
+    "tag 'Quotes' spans 2 source specs (paperless-parts-v1-openapi-original.yml, paperless-parts-v2-openapi-original.yml): per-path servers applied",
+    "apis.yml register: already-registered"
+  ],
+  "skipped": [
+    "_original/paperless-parts-v2-openapi.yml: archived document superseded by a larger archived document",
+    "_original/paperless-parts-v1-openapi.yml: archived document superseded by a larger archived document",
+    "paperless-parts-contacts-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "paperless-parts-custom-tables-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "paperless-parts-customers-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "paperless-parts-events-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "paperless-parts-integration-actions-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "paperless-parts-jobs-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "paperless-parts-orders-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "paperless-parts-parts-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "paperless-parts-processes-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "paperless-parts-purchased-components-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "paperless-parts-quote-items-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "paperless-parts-quotes-api-openapi.yml: previously refined output, superseded by openapi/_original/"
+  ]
+}

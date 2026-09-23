@@ -1,0 +1,27 @@
+# Front Door AI Index — paperless-parts — 2026-09-17
+# AI vocabulary counted on the provider's root page. Generated; do not edit.
+# `score` is null unless ownership is `own` — see front_door_ai.py.
+front_door_ai:
+  slug: paperless-parts
+  lexicon_version: '1.0'
+  probed_at: '2026-09-17'
+  host: www.paperlessparts.com
+  final_host: www.paperlessparts.com
+  ownership: own
+  owner: paperless-parts
+  shares_host_with: null
+  inherited_from: null
+  verdict: scored
+  score: 3
+  host_score: 3
+  density: 3.23
+  words: 930
+  tiers:
+    agentic: 0
+    core: 3
+    model: 0
+  ambiguous: 6
+  top_terms:
+    automation: 4
+    AI: 3
+    intelligence: 2

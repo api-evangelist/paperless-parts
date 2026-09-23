@@ -7,7 +7,7 @@ info:
     email: support@paperlessparts.com
   termsOfService: https://www.paperlessparts.com/web-service-agreement/
   version: '1.0'
-  description: 'Operations tagged Purchased Components across 2 of this provider''s published API definitions: paperless-parts-v1-openapi.yml, paperless-parts-v2-openapi.yml. Each path carries the servers of the definition it was published in.'
+  description: 'Operations tagged Purchased Components across 2 of this provider''s published API definitions: paperless-parts-v1-openapi-original.yml, paperless-parts-v2-openapi-original.yml. Each path carries the servers of the definition it was published in.'
 servers:
 - url: '{url}/{version}'
   variables:
@@ -330,34 +330,45 @@ paths:
           default: v1
 components:
   schemas:
-    PurchasedComponentsColumnId:
-      type: integer
-    PurchasedComponent:
-      allOf:
-      - $ref: '#/components/schemas/AbstractPurchasedComponent'
-      - type: object
-        properties:
-          id:
-            type: integer
-          properties:
-            type: array
-            items:
-              $ref: '#/components/schemas/PurchasedComponentCustomProperty'
-          thumbnail_url:
-            type:
-            - string
-            - 'null'
-    PostPurchasedComponentsColumn:
-      allOf:
-      - $ref: '#/components/schemas/AbstractPurchasedComponentsColumn'
-      - type: object
-        required:
-        - code_name
-        - name
-        - value_type
-        - default_numeric_value
-        - default_string_value
-        - default_boolean_value
+    AbstractPurchasedComponentsColumn:
+      type: object
+      properties:
+        code_name:
+          type: string
+          example: James_Bond
+        name:
+          type: string
+          example: James Bond
+        value_type:
+          type: string
+          example: numeric
+        default_numeric_value:
+          type:
+          - integer
+          - 'null'
+          example: 21
+        default_string_value:
+          type:
+          - string
+          - 'null'
+          example: null
+        default_boolean_value:
+          type: boolean
+          example: false
+    PurchasedComponentCustomProperty:
+      type: object
+      properties:
+        key:
+          type: string
+          description: Name of corresponding purchased component column in table display
+          example: property name
+        value:
+          anyOf:
+          - type: string
+          - type: number
+          - type: boolean
+          description: Value of property, None or of type corresponding to value_type
+          example: really cool value
     AbstractPurchasedComponent:
       type: object
       properties:
@@ -380,6 +391,15 @@ components:
           format: decimal
           description: Cost per piece to 4 decimal places
           example: 2.0
+    PatchPurchasedComponent:
+      allOf:
+      - $ref: '#/components/schemas/AbstractPurchasedComponent'
+      - type: object
+        properties:
+          properties:
+            type: array
+            items:
+              $ref: '#/components/schemas/PurchasedComponentCustomProperty'
     PurchasedComponentsColumn:
       allOf:
       - $ref: '#/components/schemas/AbstractPurchasedComponentsColumn'
@@ -406,56 +426,25 @@ components:
         - oem_part_number
         - piece_price
         - properties
-    PurchasedComponentCustomProperty:
-      type: object
-      properties:
-        key:
-          type: string
-          description: Name of corresponding purchased component column in table display
-          example: property name
-        value:
-          anyOf:
-          - type: string
-          - type: number
-          - type: boolean
-          description: Value of property, None or of type corresponding to value_type
-          example: really cool value
-    PurchasedComponentId:
-      type: integer
-    PatchPurchasedComponent:
+    PurchasedComponent:
       allOf:
       - $ref: '#/components/schemas/AbstractPurchasedComponent'
       - type: object
         properties:
+          id:
+            type: integer
           properties:
             type: array
             items:
               $ref: '#/components/schemas/PurchasedComponentCustomProperty'
-    AbstractPurchasedComponentsColumn:
-      type: object
-      properties:
-        code_name:
-          type: string
-          example: James_Bond
-        name:
-          type: string
-          example: James Bond
-        value_type:
-          type: string
-          example: numeric
-        default_numeric_value:
-          type:
-          - integer
-          - 'null'
-          example: 21
-        default_string_value:
-          type:
-          - string
-          - 'null'
-          example: null
-        default_boolean_value:
-          type: boolean
-          example: false
+          thumbnail_url:
+            type:
+            - string
+            - 'null'
+    PurchasedComponentsColumnId:
+      type: integer
+    PurchasedComponentId:
+      type: integer
     PatchPurchasedComponentsColumn:
       allOf:
       - $ref: '#/components/schemas/AbstractPurchasedComponentsColumn'
@@ -466,6 +455,17 @@ components:
           position:
             type: integer
             example: 4
+    PostPurchasedComponentsColumn:
+      allOf:
+      - $ref: '#/components/schemas/AbstractPurchasedComponentsColumn'
+      - type: object
+        required:
+        - code_name
+        - name
+        - value_type
+        - default_numeric_value
+        - default_string_value
+        - default_boolean_value
     PurchasedComponent_2:
       allOf:
       - $ref: '#/components/schemas/AbstractPurchasedComponent'
@@ -497,5 +497,5 @@ components:
       name: Authorization
       in: header
 x-refined-from:
-- paperless-parts-v1-openapi.yml
-- paperless-parts-v2-openapi.yml
+- paperless-parts-v1-openapi-original.yml
+- paperless-parts-v2-openapi-original.yml
