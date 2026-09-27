@@ -185,23 +185,37 @@ paths:
           default: v1
 components:
   schemas:
-    TableName:
-      type: string
-      description: The name of the table
-      example: sample_table
-    CustomTableRelatedEntity:
+    CustomTableName:
       type: object
       properties:
-        entity_type:
-          type: string
-          enum:
-          - operation
-          - process
         name:
           type: string
     CustomTableRowData:
       type: object
       description: The keys in this object must match the column names in the config property above, and the corresponding values must be castable to the specified types in the config property.
+    CustomTableRows:
+      type: object
+      properties:
+        rows:
+          type: array
+          description: A list of table rows.
+          items:
+            $ref: '#/components/schemas/CustomTableRowData'
+    CustomTableColumnConfig:
+      type: object
+      properties:
+        column_name:
+          type: string
+        value_type:
+          type: string
+          enum:
+          - numeric
+          - string
+          - boolean
+    TableName:
+      type: string
+      description: The name of the table
+      example: sample_table
     CustomTableDetails:
       type: object
       properties:
@@ -220,22 +234,6 @@ components:
           items:
             type: object
             description: The keys in this object will match the column names in the columns property above.
-    CustomTableColumnConfig:
-      type: object
-      properties:
-        column_name:
-          type: string
-        value_type:
-          type: string
-          enum:
-          - numeric
-          - string
-          - boolean
-    CustomTableName:
-      type: object
-      properties:
-        name:
-          type: string
     CustomTableListResults:
       type: array
       items:
@@ -259,14 +257,16 @@ components:
           - 'null'
           items:
             $ref: '#/components/schemas/CustomTableRowData'
-    CustomTableRows:
+    CustomTableRelatedEntity:
       type: object
       properties:
-        rows:
-          type: array
-          description: A list of table rows.
-          items:
-            $ref: '#/components/schemas/CustomTableRowData'
+        entity_type:
+          type: string
+          enum:
+          - operation
+          - process
+        name:
+          type: string
   parameters:
     tableName:
       name: tableName

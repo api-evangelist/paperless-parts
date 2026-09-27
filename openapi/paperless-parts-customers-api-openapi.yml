@@ -1079,6 +1079,13 @@ components:
       example: 30
       schema:
         $ref: '#/components/schemas/FacilityId'
+    billingAddressId:
+      name: billingAddressId
+      in: path
+      required: true
+      example: 27
+      schema:
+        $ref: '#/components/schemas/BillingAddressId'
     contactId:
       name: contactId
       in: path
@@ -1093,50 +1100,7 @@ components:
       example: 17
       schema:
         $ref: '#/components/schemas/AccountId'
-    billingAddressId:
-      name: billingAddressId
-      in: path
-      required: true
-      example: 27
-      schema:
-        $ref: '#/components/schemas/BillingAddressId'
   schemas:
-    Facility:
-      type:
-      - object
-      - 'null'
-      properties:
-        account_id:
-          type: integer
-          example: 55123
-        address:
-          $ref: '#/components/schemas/Address'
-        attention:
-          type: string
-          example: Gordon Moore
-        id:
-          type: integer
-          example: 12
-        name:
-          type: string
-          example: Boston Office
-        salesperson:
-          $ref: '#/components/schemas/SalesPerson'
-    CustomerId:
-      type: integer
-      description: The customer id
-      example: '32'
-    FacilityId:
-      type: integer
-      description: The facility id
-      example: '30'
-    BillingAddress:
-      allOf:
-      - $ref: '#/components/schemas/Address'
-      - type: object
-        properties:
-          id:
-            type: integer
     SalesPerson:
       type: object
       properties:
@@ -1152,68 +1116,6 @@ components:
           format: email
         erp_code:
           type: string
-    Contact:
-      type: object
-      properties:
-        address:
-          $ref: '#/components/schemas/Address'
-        account_id:
-          type:
-          - integer
-          - 'null'
-          example: 17
-          description: The ID of the associated account
-        created:
-          type: string
-          readOnly: true
-          example: '2020-08-25T18:00:53+00:00'
-        email:
-          type: string
-          example: careers@paperlessparts.com
-          description: (Required) email address (must be non-null, unique across all Customers, and a valid email format)
-        first_name:
-          type: string
-          example: Gordon
-          description: (Required) Customer first name (must be non-null)
-        id:
-          type: integer
-          example: 137
-          readOnly: true
-        last_name:
-          type: string
-          example: Moore
-          description: (Required) Customer last name (must be non-null)
-        notes:
-          type:
-          - string
-          - 'null'
-          description: Customer notes
-        phone:
-          type:
-          - string
-          - 'null'
-          example: '6176354500'
-          description: Customer phone number
-        phone_ext:
-          type:
-          - string
-          - 'null'
-          example: null
-          description: Customer phone number extension
-        country_code:
-          type:
-          - string
-          - 'null'
-        metadata:
-          type:
-          - object
-          - 'null'
-        salesperson:
-          $ref: '#/components/schemas/SalesPerson'
-    BillingAddressId:
-      type: integer
-      description: The billing address id
-      example: '27'
     Account:
       type: object
       properties:
@@ -1312,10 +1214,6 @@ components:
           - string
           - 'null'
           example: https://www.paperlessparts.com
-    AccountId:
-      type: integer
-      description: The account id
-      example: '13'
     Address:
       type: object
       properties:
@@ -1357,6 +1255,108 @@ components:
           maxLength: 50
           description: The unique identifier for this address record in the ERP
           example: B1234
+    CustomerId:
+      type: integer
+      description: The customer id
+      example: '32'
+    Contact:
+      type: object
+      properties:
+        address:
+          $ref: '#/components/schemas/Address'
+        account_id:
+          type:
+          - integer
+          - 'null'
+          example: 17
+          description: The ID of the associated account
+        created:
+          type: string
+          readOnly: true
+          example: '2020-08-25T18:00:53+00:00'
+        email:
+          type: string
+          example: careers@paperlessparts.com
+          description: (Required) email address (must be non-null, unique across all Customers, and a valid email format)
+        first_name:
+          type: string
+          example: Gordon
+          description: (Required) Customer first name (must be non-null)
+        id:
+          type: integer
+          example: 137
+          readOnly: true
+        last_name:
+          type: string
+          example: Moore
+          description: (Required) Customer last name (must be non-null)
+        notes:
+          type:
+          - string
+          - 'null'
+          description: Customer notes
+        phone:
+          type:
+          - string
+          - 'null'
+          example: '6176354500'
+          description: Customer phone number
+        phone_ext:
+          type:
+          - string
+          - 'null'
+          example: null
+          description: Customer phone number extension
+        country_code:
+          type:
+          - string
+          - 'null'
+        metadata:
+          type:
+          - object
+          - 'null'
+        salesperson:
+          $ref: '#/components/schemas/SalesPerson'
+    BillingAddress:
+      allOf:
+      - $ref: '#/components/schemas/Address'
+      - type: object
+        properties:
+          id:
+            type: integer
+    BillingAddressId:
+      type: integer
+      description: The billing address id
+      example: '27'
+    AccountId:
+      type: integer
+      description: The account id
+      example: '13'
+    Facility:
+      type:
+      - object
+      - 'null'
+      properties:
+        account_id:
+          type: integer
+          example: 55123
+        address:
+          $ref: '#/components/schemas/Address'
+        attention:
+          type: string
+          example: Gordon Moore
+        id:
+          type: integer
+          example: 12
+        name:
+          type: string
+          example: Boston Office
+        salesperson:
+          $ref: '#/components/schemas/SalesPerson'
+    FacilityId:
+      type: integer
+      description: The facility id
+      example: '30'
   securitySchemes:
     app_id:
       type: apiKey

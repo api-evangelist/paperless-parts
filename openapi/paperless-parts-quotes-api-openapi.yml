@@ -1248,75 +1248,204 @@ paths:
           default: v2
 components:
   schemas:
-    AbstractPurchasedComponent:
+    QuoteAddOnQuantity:
       type: object
       properties:
-        oem_part_number:
-          type: string
-          description: Unique identifier for purchased component within a supplier account
-          example: 064-1235
-        internal_part_number:
-          type:
-          - string
-          - 'null'
-          example: a
-        description:
-          type:
-          - string
-          - 'null'
-          example: any text you want
-        piece_price:
+        price:
           type: number
-          format: decimal
-          description: Cost per piece to 4 decimal places
-          example: 2.0
-    OrderNumberArray:
-      type: array
-      items:
-        $ref: '#/components/schemas/OrderNumber'
-      description: An array of Order numbers
-      example:
-      - 38
-      - 39
-      - 40
-    OrderNumber:
-      type: integer
-      description: A unique identifier for an Order
-      example: 47
-    QuoteAddOn:
+          format: float
+        manual_price:
+          type: number
+          format: float
+        quantity:
+          type: integer
+    Address:
       type: object
       properties:
-        is_required:
-          type: boolean
-        name:
+        id:
+          type: integer
+          readOnly: true
+        address1:
           type: string
+          maxLength: 250
+          example: 1 City Hall Sq.
+          description: (Required)
+        address2:
+          type:
+          - string
+          - 'null'
+          maxLength: 250
+          example: null
+          description: (Required)
+        city:
+          type: string
+          maxLength: 100
+          example: Boston
+          description: (Required)
+        state:
+          type: string
+          description: (Required) State/Province must be specified as standard postal abbreviation
+          example: MA
+        postal_code:
+          type: string
+          example: '02114'
+          description: (Required) US postal codes may optionally contain 4-digit extension, e.g., `'02114-1234'`
+        country:
+          type: string
+          maxLength: 3
+          description: (Required) Country must be ISO 3166-1 alpha-3 code. Currently allowed values are `'USA'`, `'CAN'`.
+          example: USA
         erp_code:
           type: string
-        notes:
+          maxLength: 50
+          description: The unique identifier for this address record in the ERP
+          example: B1234
+    ComponentChild:
+      type: object
+      properties:
+        child_id:
+          type: integer
+          description: ID of the child component
+        quantity:
+          type: integer
+          description: The number of child component instances belonging to this parent. Note, the total number of instances of this child component in this assembly tree may be larger if this child appears in multiple places in the tree.
+    QuoteCostingVariable:
+      type: object
+      description: A CostingVariable is a piece of a Paperless Parts Programming Language (P3L) formula that determines the price and timing for an operation. CostingVariables are essentially Python variables and can represent several data types.
+      properties:
+        label:
           type: string
+        variable_class:
+          type: string
+          enum:
+          - basic
+          - drop_down
+          - table
+        value_type:
+          type: string
+          enum:
+          - string
+          - number
+          - currency
+          - boolean
+          description: Describes the type of the 'value' key in quantities property
+        quantity_specific:
+          type: boolean
+          description: Flag as to whether or not this costing variable can be manipulated for each quantity break
         quantities:
           type: array
           items:
-            $ref: '#/components/schemas/QuoteAddOnQuantity'
-        costing_variables:
+            type: object
+            properties:
+              stringQuotedQuantity1:
+                type: object
+                properties:
+                  value:
+                    anyOf:
+                    - type: number
+                    - type: string
+                    - type: boolean
+                  row:
+                    type:
+                    - object
+                    - 'null'
+                  options:
+                    type:
+                    - array
+                    - 'null'
+                    items:
+                      anyOf:
+                      - type: number
+                      - type: string
+              stringQuotedQuantity2:
+                type: object
+                properties:
+                  value:
+                    anyOf:
+                    - type: number
+                    - type: string
+                    - type: boolean
+                  row:
+                    type:
+                    - object
+                    - 'null'
+                  options:
+                    type:
+                    - array
+                    - 'null'
+                    items:
+                      anyOf:
+                      - type: number
+                      - type: string
+          description: 'The value of the costing variable for each quoted quantity. This is an object with keys corresponding to the top level quote quantities in string form e.g. ''1'', ''5'', ''10''. The values for each of these keys take different shape depending on the variable_class. If variable_class==''basic'', the dictionary values will take the shape {''value'': 1.0}. If variable_class==''drop_down'', the dictionary values will take the shape {''value'': ''a'', ''options'': [''a'', ''b'']}. If variable_class==''table'', the dictionary values will take the shape {''value'': ''a'', ''row'': {''column1'': ''a'', ''column2'': ''b''}}. So for quoted quantities 1, 5, 10 for a basic variable_class, the object will look like: {''1'': {''value'': 1.0}, ''5'': {''value'': 2.0}, ''10'': {''value'': 3.0}}'
+        type:
+          type: string
+          description: To Be Deprecated
+          deprecated: false
+        value:
+          anyOf:
+          - type: string
+          - type: number
+          - type: integer
+          - type: boolean
+          description: This will be indicated by the value_type field. To Be Deprecated
+          deprecated: false
+        row:
+          type:
+          - object
+          - 'null'
+          description: The row field will only be non-null when the type field is 'table'. Row represents a row in a lookup table and is an object with arbitrary keys. To Be Deprecated
+          deprecated: false
+    QuoteItem:
+      type: object
+      description: A quote item represents a line item in a quote. Quote items can either be manual or automatic, as indicated by the 'type' property. Automatic quote items are those generated by adding a part to a quote. Pricing data for automatic quote items is automatically populated using the process, material, and operations, if they exist. Manual quote items do not have an associated part, so the pricing information must be inputted manually.
+      properties:
+        id:
+          type: integer
+        type:
+          type: string
+          enum:
+          - automatic
+          - manual
+          description: Indicates whether the quote item is associated with a part (automatic pricing), or not (manual pricing).
+        root_component_id:
+          type: integer
+          description: ID of the root component. A root component houses the pricing information for a quote item. Every quote item has a root component. In the case of an automatic quote item, the root component corresponds to a part; in the case of a manual quote item, which does not have an associated part, the root component stores the manual pricing data. As the name 'root component' implies, it is possible for a quote item to have many components, as in the case of an assembly of nested parts.
+        components:
           type: array
           items:
-            $ref: '#/components/schemas/QuoteCostingVariable'
-    QuoteRevisionPair:
-      type: object
-      properties:
-        quote:
-          $ref: '#/components/schemas/QuoteNumber'
-        revision_number:
-          $ref: '#/components/schemas/RevisionNumber'
-    OrderSupportingFile:
-      type: object
-      properties:
-        filename:
-          type: string
-        url:
-          type: string
-          format: url
+            $ref: '#/components/schemas/QuoteComponent'
+        position:
+          type: integer
+          description: The position of the quote item in the quote display, indexed from 1.
+        export_controlled:
+          type: boolean
+          description: Whether or not this quote item contains data that is export controlled (ITAR) by the US Government.
+        component_ids:
+          type: array
+          items:
+            type: integer
+        metadata:
+          type:
+          - object
+          - 'null'
+        private_notes:
+          type:
+          - string
+          - 'null'
+        public_notes:
+          type:
+          - string
+          - 'null'
+        workflow_status:
+          type:
+          - string
+          - 'null'
+        root_component:
+          deprecated: true
+          type:
+          - object
+          - 'null'
     QuoteFile:
       type: object
       properties:
@@ -1355,31 +1484,263 @@ components:
         uuid:
           type: string
           example: b2145332-75dc-4be4-a092-fb97bdb5815a
+    ParentQuote:
+      type: object
+      description: Basic information about the quote this was copied from, if any. This field may be NULL.
+      properties:
+        id:
+          type: integer
+        number:
+          type: integer
+        status:
+          type: string
+    AbstractPurchasedComponent:
+      type: object
+      properties:
+        oem_part_number:
+          type: string
+          description: Unique identifier for purchased component within a supplier account
+          example: 064-1235
+        internal_part_number:
+          type:
+          - string
+          - 'null'
+          example: a
+        description:
+          type:
+          - string
+          - 'null'
+          example: any text you want
+        piece_price:
+          type: number
+          format: decimal
+          description: Cost per piece to 4 decimal places
+          example: 2.0
+    QuoteCustomer:
+      type: object
+      description: Deprecated! Will be removed soon
+      properties:
+        first_name:
+          type: string
+        last_name:
+          type: string
+        email:
+          type: string
+          format: email
+        notes:
+          type:
+          - string
+          - 'null'
+        company:
+          type: object
+          properties:
+            notes:
+              type:
+              - string
+              - 'null'
+            metrics:
+              type: object
+              properties:
+                order_revenue_all_time:
+                  type: number
+                  format: float
+                order_revenue_last_thirty_days:
+                  type: number
+                  format: float
+                quotes_sent_all_time:
+                  type: integer
+                quotes_sent_last_thirty_days:
+                  type: integer
+            business_name:
+              type: string
+            erp_code:
+              type: string
+    SalesPerson:
+      type: object
+      properties:
+        uuid:
+          type: string
+          format: uuid
+        first_name:
+          type: string
+        last_name:
+          type: string
+        email:
+          type: string
+          format: email
+        erp_code:
+          type: string
+    ParentSupplierOrder:
+      type: object
+      description: Basic information about the order this was copied from, if any. This field may be NULL.
+      properties:
+        id:
+          type: integer
+        number:
+          type: integer
+        status:
+          type: string
+    QuoteComponent:
+      type: object
+      description: Represents a component in the quote item. In the simplest case, there is a single root component. If the quote item is an assembly, the array will contain each component in the assembly. Components can be manufactured (i.e., parts), assemblies (i.e., top-level or sub-assembly), or purchased (e.g., hardware). Exactly one component in the array will be the root component, but it might not be the first element in the array.
+      properties:
+        id:
+          type: string
+        add_ons:
+          type: array
+          items:
+            $ref: '#/components/schemas/QuoteAddOn'
+        discounts:
+          type: array
+          items:
+            type: object
+        is_assembly:
+          type: boolean
+        obtain_method:
+          type:
+          - string
+          - 'null'
+        part_custom_attrs:
+          type: array
+          items:
+            type: object
+        pricing_items:
+          type: array
+          items:
+            type: object
+        quantities:
+          type: array
+          items:
+            $ref: '#/components/schemas/QuoteQuantity'
+        child_ids:
+          type: array
+          items:
+            type: integer
+        children:
+          type: array
+          items:
+            $ref: '#/components/schemas/ComponentChild'
+        description:
+          type:
+          - string
+          - 'null'
+        export_controlled:
+          type: boolean
+          description: Whether or not this component contains data that is export controlled (ITAR) by the US Government.
+        finishes:
+          type: array
+          items:
+            type: string
+          description: 'Note: this field is deprecated. Finishes now show up as Operations.'
+        innate_quantity:
+          type: integer
+          description: The quantity of this subcomponent that must be produced to make one top-level component.
+        is_root_component:
+          type: boolean
+        material:
+          $ref: '#/components/schemas/OrderMaterial'
+        material_operations:
+          type: array
+          items:
+            $ref: '#/components/schemas/QuoteOperation'
+        parent_ids:
+          type: array
+          items:
+            type: integer
+        part_name:
+          type: string
+        part_number:
+          type:
+          - string
+          - 'null'
+        part_url:
+          type: string
+          format: url
+        part_uuid:
+          type: string
+        process:
+          $ref: '#/components/schemas/OrderProcess'
+        purchased_component:
+          description: Reference to a purchased component object within the supplier account. Will be not null when type == 'purchased'
+          $ref: '#/components/schemas/QuotePurchasedComponent'
+        revision:
+          type:
+          - string
+          - 'null'
+        shop_operations:
+          type: array
+          items:
+            $ref: '#/components/schemas/QuoteOperation'
+        supporting_files:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrderSupportingFile'
+        thumbnail_url:
+          type:
+          - string
+          - 'null'
+        type:
+          type: string
+          enum:
+          - assembled
+          - manufactured
+          - purchased
+    QuoteContact:
+      type: object
+      properties:
+        account:
+          type: object
+          properties:
+            erp_code:
+              type:
+              - string
+              - 'null'
+            id:
+              type: number
+              format: int
+            notes:
+              type:
+              - string
+              - 'null'
+            name:
+              type: string
+        email:
+          type: string
+          format: email
+        first_name:
+          type: string
+        id:
+          type: number
+          format: int
+        last_name:
+          type: string
+        notes:
+          type:
+          - string
+          - 'null'
+        phone:
+          type:
+          - string
+          - 'null'
+        phone_ext:
+          type:
+          - string
+          - 'null'
     RevisionNumber:
       type: integer
       description: A unique revision number for a Quote. May be null.
       example: 1
-    Facility:
-      type:
-      - object
-      - 'null'
-      properties:
-        account_id:
-          type: integer
-          example: 55123
-        address:
-          $ref: '#/components/schemas/Address'
-        attention:
-          type: string
-          example: Gordon Moore
-        id:
-          type: integer
-          example: 12
-        name:
-          type: string
-          example: Boston Office
-        salesperson:
-          $ref: '#/components/schemas/SalesPerson'
+    QuotePurchasedComponent:
+      allOf:
+      - $ref: '#/components/schemas/AbstractPurchasedComponent'
+      - type: object
+        properties:
+          id:
+            type: string
+          properties:
+            type: array
+            items:
+              $ref: '#/components/schemas/PurchasedComponentProperty'
     Quote:
       type: object
       description: Data representing a Quote
@@ -1503,302 +1864,25 @@ components:
       type: integer
       description: A unique identifier for a Quote
       example: 37
-    ParentQuote:
-      type: object
-      description: Basic information about the quote this was copied from, if any. This field may be NULL.
-      properties:
-        id:
-          type: integer
-        number:
-          type: integer
-        status:
-          type: string
-    PurchasedComponentProperty:
+    QuoteAddOn:
       type: object
       properties:
+        is_required:
+          type: boolean
         name:
           type: string
-          description: Name of corresponding purchased component column in table display
-        code_name:
+        erp_code:
           type: string
-          description: Name used to access property within pricing formulas via 'dot' operator
-        value_type:
-          type: string
-          enum:
-          - string
-          - boolean
-          - numeric
-        value:
-          anyOf:
-          - type: string
-          - type: number
-          - type: boolean
-          description: Value of property, None or of type corresponding to value_type
-    QuoteCustomer:
-      type: object
-      description: Deprecated! Will be removed soon
-      properties:
-        first_name:
-          type: string
-        last_name:
-          type: string
-        email:
-          type: string
-          format: email
         notes:
-          type:
-          - string
-          - 'null'
-        company:
-          type: object
-          properties:
-            notes:
-              type:
-              - string
-              - 'null'
-            metrics:
-              type: object
-              properties:
-                order_revenue_all_time:
-                  type: number
-                  format: float
-                order_revenue_last_thirty_days:
-                  type: number
-                  format: float
-                quotes_sent_all_time:
-                  type: integer
-                quotes_sent_last_thirty_days:
-                  type: integer
-            business_name:
-              type: string
-            erp_code:
-              type: string
-    QuoteCostingVariable:
-      type: object
-      description: A CostingVariable is a piece of a Paperless Parts Programming Language (P3L) formula that determines the price and timing for an operation. CostingVariables are essentially Python variables and can represent several data types.
-      properties:
-        label:
           type: string
-        variable_class:
-          type: string
-          enum:
-          - basic
-          - drop_down
-          - table
-        value_type:
-          type: string
-          enum:
-          - string
-          - number
-          - currency
-          - boolean
-          description: Describes the type of the 'value' key in quantities property
-        quantity_specific:
-          type: boolean
-          description: Flag as to whether or not this costing variable can be manipulated for each quantity break
         quantities:
           type: array
           items:
-            type: object
-            properties:
-              stringQuotedQuantity1:
-                type: object
-                properties:
-                  value:
-                    anyOf:
-                    - type: number
-                    - type: string
-                    - type: boolean
-                  row:
-                    type:
-                    - object
-                    - 'null'
-                  options:
-                    type:
-                    - array
-                    - 'null'
-                    items:
-                      anyOf:
-                      - type: number
-                      - type: string
-              stringQuotedQuantity2:
-                type: object
-                properties:
-                  value:
-                    anyOf:
-                    - type: number
-                    - type: string
-                    - type: boolean
-                  row:
-                    type:
-                    - object
-                    - 'null'
-                  options:
-                    type:
-                    - array
-                    - 'null'
-                    items:
-                      anyOf:
-                      - type: number
-                      - type: string
-          description: 'The value of the costing variable for each quoted quantity. This is an object with keys corresponding to the top level quote quantities in string form e.g. ''1'', ''5'', ''10''. The values for each of these keys take different shape depending on the variable_class. If variable_class==''basic'', the dictionary values will take the shape {''value'': 1.0}. If variable_class==''drop_down'', the dictionary values will take the shape {''value'': ''a'', ''options'': [''a'', ''b'']}. If variable_class==''table'', the dictionary values will take the shape {''value'': ''a'', ''row'': {''column1'': ''a'', ''column2'': ''b''}}. So for quoted quantities 1, 5, 10 for a basic variable_class, the object will look like: {''1'': {''value'': 1.0}, ''5'': {''value'': 2.0}, ''10'': {''value'': 3.0}}'
-        type:
-          type: string
-          description: To Be Deprecated
-          deprecated: false
-        value:
-          anyOf:
-          - type: string
-          - type: number
-          - type: integer
-          - type: boolean
-          description: This will be indicated by the value_type field. To Be Deprecated
-          deprecated: false
-        row:
-          type:
-          - object
-          - 'null'
-          description: The row field will only be non-null when the type field is 'table'. Row represents a row in a lookup table and is an object with arbitrary keys. To Be Deprecated
-          deprecated: false
-    QuoteNumberArray:
-      type: array
-      items:
-        $ref: '#/components/schemas/QuoteRevisionPair'
-    QuoteComponent:
-      type: object
-      description: Represents a component in the quote item. In the simplest case, there is a single root component. If the quote item is an assembly, the array will contain each component in the assembly. Components can be manufactured (i.e., parts), assemblies (i.e., top-level or sub-assembly), or purchased (e.g., hardware). Exactly one component in the array will be the root component, but it might not be the first element in the array.
-      properties:
-        id:
-          type: string
-        add_ons:
+            $ref: '#/components/schemas/QuoteAddOnQuantity'
+        costing_variables:
           type: array
           items:
-            $ref: '#/components/schemas/QuoteAddOn'
-        discounts:
-          type: array
-          items:
-            type: object
-        is_assembly:
-          type: boolean
-        obtain_method:
-          type:
-          - string
-          - 'null'
-        part_custom_attrs:
-          type: array
-          items:
-            type: object
-        pricing_items:
-          type: array
-          items:
-            type: object
-        quantities:
-          type: array
-          items:
-            $ref: '#/components/schemas/QuoteQuantity'
-        child_ids:
-          type: array
-          items:
-            type: integer
-        children:
-          type: array
-          items:
-            $ref: '#/components/schemas/ComponentChild'
-        description:
-          type:
-          - string
-          - 'null'
-        export_controlled:
-          type: boolean
-          description: Whether or not this component contains data that is export controlled (ITAR) by the US Government.
-        finishes:
-          type: array
-          items:
-            type: string
-          description: 'Note: this field is deprecated. Finishes now show up as Operations.'
-        innate_quantity:
-          type: integer
-          description: The quantity of this subcomponent that must be produced to make one top-level component.
-        is_root_component:
-          type: boolean
-        material:
-          $ref: '#/components/schemas/OrderMaterial'
-        material_operations:
-          type: array
-          items:
-            $ref: '#/components/schemas/QuoteOperation'
-        parent_ids:
-          type: array
-          items:
-            type: integer
-        part_name:
-          type: string
-        part_number:
-          type:
-          - string
-          - 'null'
-        part_url:
-          type: string
-          format: url
-        part_uuid:
-          type: string
-        process:
-          $ref: '#/components/schemas/OrderProcess'
-        purchased_component:
-          description: Reference to a purchased component object within the supplier account. Will be not null when type == 'purchased'
-          $ref: '#/components/schemas/QuotePurchasedComponent'
-        revision:
-          type:
-          - string
-          - 'null'
-        shop_operations:
-          type: array
-          items:
-            $ref: '#/components/schemas/QuoteOperation'
-        supporting_files:
-          type: array
-          items:
-            $ref: '#/components/schemas/OrderSupportingFile'
-        thumbnail_url:
-          type:
-          - string
-          - 'null'
-        type:
-          type: string
-          enum:
-          - assembled
-          - manufactured
-          - purchased
-    QuotePurchasedComponent:
-      allOf:
-      - $ref: '#/components/schemas/AbstractPurchasedComponent'
-      - type: object
-        properties:
-          id:
-            type: string
-          properties:
-            type: array
-            items:
-              $ref: '#/components/schemas/PurchasedComponentProperty'
-    QuoteExpedite:
-      type: object
-      description: Expedites represent an additional option for pricing where quote recipients can request a shorter lead time, with an additional markup applied to the unit price.
-      properties:
-        id:
-          type: integer
-        lead_time:
-          type: integer
-          description: Days
-        markup:
-          type: number
-          format: float
-          description: Percent
-        unit_price:
-          type: number
-          format: float
-        total_price:
-          type: number
-          format: float
+            $ref: '#/components/schemas/QuoteCostingVariable'
     OperationQuantity:
       type: object
       properties:
@@ -1820,32 +1904,69 @@ components:
           - 'null'
         quantity:
           type: integer
-    SalesPerson:
+    OrderSupportingFile:
       type: object
       properties:
-        uuid:
+        filename:
           type: string
-          format: uuid
-        first_name:
+        url:
           type: string
-        last_name:
-          type: string
-        email:
-          type: string
-          format: email
-        erp_code:
-          type: string
-    QuoteAddOnQuantity:
+          format: url
+    OrderNumberArray:
+      type: array
+      items:
+        $ref: '#/components/schemas/OrderNumber'
+      description: An array of Order numbers
+      example:
+      - 38
+      - 39
+      - 40
+    QuoteExpedite:
       type: object
+      description: Expedites represent an additional option for pricing where quote recipients can request a shorter lead time, with an additional markup applied to the unit price.
       properties:
-        price:
-          type: number
-          format: float
-        manual_price:
-          type: number
-          format: float
-        quantity:
+        id:
           type: integer
+        lead_time:
+          type: integer
+          description: Days
+        markup:
+          type: number
+          format: float
+          description: Percent
+        unit_price:
+          type: number
+          format: float
+        total_price:
+          type: number
+          format: float
+    OrderMaterial:
+      type: object
+      description: This can also be null
+      properties:
+        id:
+          type: integer
+        display_name:
+          type: string
+        family:
+          type: string
+        material_class:
+          type: string
+        name:
+          type: string
+    QuoteNumberArray:
+      type: array
+      items:
+        $ref: '#/components/schemas/QuoteRevisionPair'
+    OrderProcess:
+      type: object
+      properties:
+        id:
+          type: integer
+        external_name:
+          type: string
+        name:
+          type: string
     QuoteOperation:
       type: object
       properties:
@@ -1894,89 +2015,6 @@ components:
           - number
           - 'null'
           format: float
-    OrderProcess:
-      type: object
-      properties:
-        id:
-          type: integer
-        external_name:
-          type: string
-        name:
-          type: string
-    ParentSupplierOrder:
-      type: object
-      description: Basic information about the order this was copied from, if any. This field may be NULL.
-      properties:
-        id:
-          type: integer
-        number:
-          type: integer
-        status:
-          type: string
-    QuoteItem:
-      type: object
-      description: A quote item represents a line item in a quote. Quote items can either be manual or automatic, as indicated by the 'type' property. Automatic quote items are those generated by adding a part to a quote. Pricing data for automatic quote items is automatically populated using the process, material, and operations, if they exist. Manual quote items do not have an associated part, so the pricing information must be inputted manually.
-      properties:
-        id:
-          type: integer
-        type:
-          type: string
-          enum:
-          - automatic
-          - manual
-          description: Indicates whether the quote item is associated with a part (automatic pricing), or not (manual pricing).
-        root_component_id:
-          type: integer
-          description: ID of the root component. A root component houses the pricing information for a quote item. Every quote item has a root component. In the case of an automatic quote item, the root component corresponds to a part; in the case of a manual quote item, which does not have an associated part, the root component stores the manual pricing data. As the name 'root component' implies, it is possible for a quote item to have many components, as in the case of an assembly of nested parts.
-        components:
-          type: array
-          items:
-            $ref: '#/components/schemas/QuoteComponent'
-        position:
-          type: integer
-          description: The position of the quote item in the quote display, indexed from 1.
-        export_controlled:
-          type: boolean
-          description: Whether or not this quote item contains data that is export controlled (ITAR) by the US Government.
-        component_ids:
-          type: array
-          items:
-            type: integer
-        metadata:
-          type:
-          - object
-          - 'null'
-        private_notes:
-          type:
-          - string
-          - 'null'
-        public_notes:
-          type:
-          - string
-          - 'null'
-        workflow_status:
-          type:
-          - string
-          - 'null'
-        root_component:
-          deprecated: true
-          type:
-          - object
-          - 'null'
-    OrderMaterial:
-      type: object
-      description: This can also be null
-      properties:
-        id:
-          type: integer
-        display_name:
-          type: string
-        family:
-          type: string
-        material_class:
-          type: string
-        name:
-          type: string
     QuoteQuantity:
       type: object
       description: A quantity object represents a unit price and a numerical quantity associated with a component. A component can have many quantities, and the set of quantities represents the pricing options available to the recipient of a quote.
@@ -2085,97 +2123,13 @@ components:
           - number
           - 'null'
           format: float
-    QuoteContact:
+    QuoteRevisionPair:
       type: object
       properties:
-        account:
-          type: object
-          properties:
-            erp_code:
-              type:
-              - string
-              - 'null'
-            id:
-              type: number
-              format: int
-            notes:
-              type:
-              - string
-              - 'null'
-            name:
-              type: string
-        email:
-          type: string
-          format: email
-        first_name:
-          type: string
-        id:
-          type: number
-          format: int
-        last_name:
-          type: string
-        notes:
-          type:
-          - string
-          - 'null'
-        phone:
-          type:
-          - string
-          - 'null'
-        phone_ext:
-          type:
-          - string
-          - 'null'
-    Address:
-      type: object
-      properties:
-        id:
-          type: integer
-          readOnly: true
-        address1:
-          type: string
-          maxLength: 250
-          example: 1 City Hall Sq.
-          description: (Required)
-        address2:
-          type:
-          - string
-          - 'null'
-          maxLength: 250
-          example: null
-          description: (Required)
-        city:
-          type: string
-          maxLength: 100
-          example: Boston
-          description: (Required)
-        state:
-          type: string
-          description: (Required) State/Province must be specified as standard postal abbreviation
-          example: MA
-        postal_code:
-          type: string
-          example: '02114'
-          description: (Required) US postal codes may optionally contain 4-digit extension, e.g., `'02114-1234'`
-        country:
-          type: string
-          maxLength: 3
-          description: (Required) Country must be ISO 3166-1 alpha-3 code. Currently allowed values are `'USA'`, `'CAN'`.
-          example: USA
-        erp_code:
-          type: string
-          maxLength: 50
-          description: The unique identifier for this address record in the ERP
-          example: B1234
-    ComponentChild:
-      type: object
-      properties:
-        child_id:
-          type: integer
-          description: ID of the child component
-        quantity:
-          type: integer
-          description: The number of child component instances belonging to this parent. Note, the total number of instances of this child component in this assembly tree may be larger if this child appears in multiple places in the tree.
+        quote:
+          $ref: '#/components/schemas/QuoteNumber'
+        revision_number:
+          $ref: '#/components/schemas/RevisionNumber'
     RequestForQuote:
       type: object
       description: Data representing a RequestForQuote object
@@ -2210,657 +2164,52 @@ components:
         marketing_source:
           type: string
           example: google
-    QuoteDiscountQuantity:
+    PurchasedComponentProperty:
       type: object
       properties:
-        uuid:
-          type: string
-          description: The UUID of the discount cell
-          example: f0f5bd9d-62a1-4e59-bc0e-4dbaa55d1ef9
-        quantity:
-          type: integer
-          description: The quantity of the discount cell
-        discount:
-          type: string
-          description: The UUID of the discount
-          example: f0f5bd9d-62a1-4e59-bc0e-4dbaa55d1ef9
-        calculated_discount:
-          type: number
-          format: float
-        calculated_percentage:
-          type: number
-        manual_percentage:
-          type:
-          - number
-          - 'null'
-          format: float
-    CostingVariableOverrides:
-      type: object
-      description: Costing variable value overrides, as a JSON-formatted map from variable name to override value. Variable values may be overridden on a quantity-specific basis. To remove an override, supply a value of "null" for a variable. To remove all overrides, supply a value of "null" for this field.
-      additionalProperties:
-        $ref: '#/components/schemas/CostingVariableOverride'
-      example: '{''work_center_id'': 34, ''markup'': {''1'': 2, ''5'': 1.5, ''10'': 1}}'
-    Metadata:
-      type: object
-      example: '{ crm_id: 1581 }'
-      description: Object that can be used to attach key-value data to an object. Up to 25 keys can be speficied, with key names up to 40 characters long and values up to 500 characters long.
-    QuotePricingItem:
-      type: object
-      properties:
-        uuid:
-          type: string
-          description: The UUID of the pricing item.
-          example: f0f5bd9d-62a1-4e59-bc0e-4dbaa55d1ef9
-        category:
-          type: string
-          enum:
-          - general
-          - purchased_component
-          - material
-          - outside
-          - inside
-        calculation_type:
-          type: string
-          enum:
-          - markup
-          - margin
         name:
           type: string
-          description: The name of the pricing item.
-        notes:
-          type:
-          - string
-          - 'null'
-        costing_variables:
-          type: array
-          items:
-            $ref: '#/components/schemas/OrderCostingVariable'
-        pricing_item_quantities:
-          type: array
-          items:
-            $ref: '#/components/schemas/QuotePricingItemQuantity'
-    QuoteFile_2:
-      type: object
-      properties:
-        authenticated_download_url:
-          type:
-          - string
-          - 'null'
-          format: url
-          example: https://api.paperlessparts.com/parts/files/b2145332-75dc-4be4-a092-fb97bdb5815a/download/wire-mount.step?token=token
-        category:
+          description: Name of corresponding purchased component column in table display
+        code_name:
           type: string
-          enum:
-          - RFQ_FILE
-          - VENDOR_QUOTE
-          - SUPPORTING_FILE
-          example: SUPPORTING_FILE
-        is_export_controlled:
-          type: boolean
-          example: 'false'
-        filename:
-          type: string
-          example: wire_mount.step
-        file_size:
-          type: integer
-          example: 395516
-        file_type:
-          type: string
-          example: step
-        status:
-          type: object
-        uuid:
-          type: string
-          example: b2145332-75dc-4be4-a092-fb97bdb5815a
-    ProfitItemCell:
-      type: object
-      properties:
-        uuid:
-          type: string
-          example: 64abb125-26c5-4bed-8672-42ee85c24793
-        quantity:
-          type: integer
-          example: 3200
-        profit_item:
-          type: string
-          example: 16110d43-8665-4f7c-a3eb-a2c397a8c13e
-        calculated_profit:
-          type: string
-          example: '1538.536222'
-        calculated_percentage:
-          type: number
-          format: float
-          example: 20.0
-        manual_profit:
-          type: string
-          example: '1384.682600'
-        manual_percentage:
-          type: number
-          format: float
-          example: 18.0
-        custom_cost_category:
-          type: object
-          example: '{ "cost": 20.0, "name": "CUSTOM MARKUP", "color": "#A51A54" }'
-          properties:
-            cost:
-              type: number
-              format: float
-              example: 20.0
-            name:
-              type:
-              - string
-              - 'null'
-              example: CUSTOM MARKUP
-            color:
-              type:
-              - string
-              - 'null'
-              example: '#A51A54'
-    QuoteLineAddOn:
-      type: object
-      description: An add-on on the root component of a QuoteLine
-      properties:
-        uuid:
-          type: string
-          description: The UUID of the add-on.
-          example: f0f5bd9d-62a1-4e59-bc0e-4dbaa55d1ef9
-        is_required:
-          type: boolean
-          description: Indicates whether or not this add-on is required.
-        name:
-          type: string
-          description: The name of the add-on.
-        quote_item_uuid:
-          type: string
-          description: The UUID of the quote item the add-on is tied to.
-          example: f0f5bd9d-62a1-4e59-bc0e-4dbaa55d1ef9
-        add_on_quantities:
-          type: array
-          description: Array of add-on quantity UUIDs
-          items:
-            type: string
-          example:
-          - f0f5bd9d-62a1-4e59-bc0e-4dbaa55d1ef9
-          - 414277a8-4144-49f6-9bc9-1bdcbc9f0749
-    QuoteDiscount:
-      type: object
-      properties:
-        uuid:
-          type: string
-          description: The UUID of the discount.
-          example: f0f5bd9d-62a1-4e59-bc0e-4dbaa55d1ef9
-        name:
-          type: string
-          description: The name of the discount.
-        notes:
-          type:
-          - string
-          - 'null'
-        quote_item_uuid:
-          type: string
-          description: The UUID of the quote item the discount is tied to.
-        discount_definition:
-          type:
-          - string
-          - 'null'
-          description: The UUID of the Discount Definition the Discount was generated from. If the Discount is a manual Discount the value will be 'null'.
-          example: f0f5bd9d-62a1-4e59-bc0e-4dbaa55d1ef9
-        costing_variables:
-          type: array
-          items:
-            $ref: '#/components/schemas/OrderCostingVariable'
-        discount_quantities:
-          type: array
-          items:
-            $ref: '#/components/schemas/QuoteDiscountQuantity'
-    Quote_2:
-      type: object
-      description: Data representing a Quote
-      properties:
-        authenticated_pdf_quote_url:
-          type:
-          - string
-          - 'null'
-          format: url
-        contact:
-          $ref: '#/components/schemas/QuoteContact'
-        created:
-          type: string
-          format: date-time
-        customer:
-          $ref: '#/components/schemas/QuoteCustomer'
-        digital_last_viewed_on:
-          type:
-          - string
-          - 'null'
-          format: date-time
-          description: The last time the quote recipient viewed the quote
-        erp_code:
-          type:
-          - string
-          - 'null'
-        estimator:
-          $ref: '#/components/schemas/SalesPerson_2'
-        expired:
-          type: boolean
-        expired_date:
-          type: string
-          format: date-time
-        export_controlled:
-          type: boolean
-          description: Whether or not this quote contains data that is export controlled (ITAR) by the US Government.
-        id:
-          type: integer
-        is_unviewed_drafted_rfq:
-          type: boolean
-          description: Quotes can be automatically generated by a supplier's RFQ form. If this quote was drafted via an RFQ and has not been viewed, this will be true.
-        number:
-          $ref: '#/components/schemas/QuoteNumber_2'
-        order_numbers:
-          $ref: '#/components/schemas/OrderNumberArray'
-        parent_quote:
-          $ref: '#/components/schemas/ParentQuote'
-        parent_supplier_order:
-          $ref: '#/components/schemas/ParentSupplierOrder'
-        private_notes:
-          type:
-          - string
-          - 'null'
-        quote_items:
-          type: array
-          items:
-            $ref: '#/components/schemas/QuoteItem_2'
-        quote_notes:
-          type:
-          - string
-          - 'null'
-        request_for_quote:
-          $ref: '#/components/schemas/RequestForQuote'
-        revision_number:
-          $ref: '#/components/schemas/RevisionNumber'
-        salesperson:
-          $ref: '#/components/schemas/SalesPerson_2'
-        sent_date:
-          type:
-          - string
-          - 'null'
-          format: date-time
-        status:
-          type: string
-          enum:
-          - draft
-          - outstanding
-          - expired
-          - cancelled
-          - partially_accepted
-          - accepted
-          - trash
-          - lost
-        tax_cost:
-          type: number
-          format: float
-        tax_rate:
-          type: number
-          format: float
-    QuoteNumber_2:
-      type: integer
-      description: In conjunction with the revision number, forms a unique identifier for a Quote
-      example: 37
-    QuoteHeader:
-      type: object
-      description: Data representing high level quote object
-      properties:
-        authenticated_pdf_quote_url:
-          type:
-          - string
-          - 'null'
-          format: url
-        contact_id:
-          type: integer
-          example: 1581
-        created:
-          type: string
-          format: date-time
-        digital_last_viewed_on:
-          type:
-          - string
-          - 'null'
-          format: date-time
-          description: The last time the quote recipient viewed the quote
-        erp_code:
-          type:
-          - string
-          - 'null'
-        estimator:
-          type: string
-          example: 335c5770-8cd4-46d3-98a1-7c0e12251124
-          description: The uuid for the estimator assigned to this quote
-        expired:
-          type: boolean
-        expired_date:
-          type: string
-          format: date-time
-        export_controlled:
-          type: boolean
-          description: Whether or not this quote contains data that is export controlled (ITAR) by the US Government.
-        manual_rfq_received_date:
-          type: string
-          format: date-time
-        number:
-          $ref: '#/components/schemas/QuoteNumber_2'
-        private_notes:
-          type:
-          - string
-          - 'null'
-        quote_items:
-          type: array
-          items:
-            type: string
-          description: An array of QuoteItem UUIDs
-          example:
-          - 335c5770-8cd4-46d3-98a1-7c0e12251124
-          - 414277a8-4144-49f6-9bc9-1bdcbc9f0749
-        quote_notes:
-          type:
-          - string
-          - 'null'
-        rfq_number:
-          type:
-          - string
-          - 'null'
-        revision_number:
-          $ref: '#/components/schemas/RevisionNumber'
-        salesperson:
-          type: string
-          example: 335c5770-8cd4-46d3-98a1-7c0e12251124
-          description: The uuid for the salesperson assigned to this quote
-        sent_date:
-          type:
-          - string
-          - 'null'
-          format: date-time
-        status:
-          type: string
-          enum:
-          - draft
-          - outstanding
-          - expired
-          - cancelled
-          - partially_accepted
-          - accepted
-          - trash
-          - lost
-        tax_rate:
-          type: number
-          format: float
-        metadata:
-          $ref: '#/components/schemas/Metadata'
-    Uuid:
-      type: string
-      description: Unique identifier
-      example: 2f0e5724-42fe-47ae-8233-7a902ef70346
-    QuoteLineDiscount:
-      type: object
-      description: A Discount on the root component of a QuoteLine
-      properties:
-        uuid:
-          type: string
-          description: The UUID of the Discount.
-          example: f0f5bd9d-62a1-4e59-bc0e-4dbaa55d1ef9
-        name:
-          type: string
-          description: The name of the Discount.
-          example: Good customer discount.
-        notes:
-          type: string
-          description: Notes for this Discount.
-          example: Use this discount when working with really good customers.
-        quote_item_uuid:
-          type: string
-          description: The UUID of the quote item the Discount is tied to.
-          example: f0f5bd9d-62a1-4e59-bc0e-4dbaa55d1ef9
-        discount_definition:
-          type:
-          - string
-          - 'null'
-          description: The UUID of the Discount Definition the Discount was generated from. If the Discount is a manual Discount the value will be 'null'.
-          example: f0f5bd9d-62a1-4e59-bc0e-4dbaa55d1ef9
-        discount_quantities:
-          type: array
-          description: Array of Discount quantity UUIDs
-          items:
-            type: string
-          example:
-          - f0f5bd9d-62a1-4e59-bc0e-4dbaa55d1ef9
-          - 414277a8-4144-49f6-9bc9-1bdcbc9f0749
-        costing_variables:
-          type: array
-          items:
-            $ref: '#/components/schemas/QuoteCostingVariable'
-        costing_variable_overrides:
-          $ref: '#/components/schemas/CostingVariableOverrides'
-    SalesPerson_2:
-      type: object
-      properties:
-        first_name:
-          type: string
-        last_name:
-          type: string
-        email:
-          type: string
-          format: email
-        erp_code:
-          type: string
-    QuoteLinePricingItem:
-      type: object
-      description: A pricing item on the root component of a QuoteLine
-      properties:
-        uuid:
-          type: string
-          description: The UUID of the pricing item.
-          example: f0f5bd9d-62a1-4e59-bc0e-4dbaa55d1ef9
-        category:
-          type: string
-          enum:
-          - general
-          - purchased_component
-          - material
-          - outside
-          - inside
-        calculation_type:
-          type: string
-          enum:
-          - markup
-          - margin
-        name:
-          type: string
-          description: The name of the pricing item.
-        notes:
-          type:
-          - string
-          - 'null'
-        costing_variables:
-          type: array
-          items:
-            $ref: '#/components/schemas/QuoteCostingVariable'
-        custom_category_name:
-          type:
-          - string
-          - 'null'
-          example: CUSTOM MARKUP
-        custom_category_color:
-          type:
-          - string
-          - 'null'
-          example: '#A51A54'
-    QuoteLine:
-      type: object
-      description: A quote item represents a line item in a quote.
-      properties:
-        uuid:
-          type: string
-          description: The UUID of the quote item.
-          example: f0f5bd9d-62a1-4e59-bc0e-4dbaa55d1ef9
-        position:
-          type: integer
-          description: The position of the quote item in the quote display, indexed from 1.
-        is_export_controlled:
-          type: boolean
-          description: Whether or not this quote item contains data that is export controlled (ITAR) by the US Government.
-          example: 'false'
-        part:
-          type: string
-          description: The UUID of the part the quote item is tied to.
-          example: f0f5bd9d-62a1-4e59-bc0e-4dbaa55d1ef9
-        material:
-          type: string
-          description: The UUID of the material the quote item is tied to.
-          example: f0f5bd9d-62a1-4e59-bc0e-4dbaa55d1ef9
-        process:
-          type: string
-          description: The UUID of the process the quote item is tied to.
-          example: f0f5bd9d-62a1-4e59-bc0e-4dbaa55d1ef9
-        quote:
-          type: string
-          description: The UUID of the quote the quote item is tied to.
-          example: f0f5bd9d-62a1-4e59-bc0e-4dbaa55d1ef9
-        quantities:
-          type: array
-          description: Array of quantity UUIDs
-          items:
-            type: string
-          example:
-          - f0f5bd9d-62a1-4e59-bc0e-4dbaa55d1ef9
-          - 414277a8-4144-49f6-9bc9-1bdcbc9f0749
-        add_ons:
-          type: array
-          description: Array of add-on UUIDs
-          items:
-            type: string
-          example:
-          - f0f5bd9d-62a1-4e59-bc0e-4dbaa55d1ef9
-          - 414277a8-4144-49f6-9bc9-1bdcbc9f0749
-        discounts:
-          type: array
-          description: Array of discount UUIDs
-          items:
-            type: string
-          example:
-          - f0f5bd9d-62a1-4e59-bc0e-4dbaa55d1ef9
-          - 414277a8-4144-49f6-9bc9-1bdcbc9f0749
-        pricing_items:
-          type: array
-          description: Array of pricing item UUIDs
-          items:
-            type: string
-          example:
-          - f0f5bd9d-62a1-4e59-bc0e-4dbaa55d1ef9
-          - 414277a8-4144-49f6-9bc9-1bdcbc9f0749
-        operations:
-          type: array
-          description: Array of operation UUIDs
-          items:
-            type: string
-          example:
-          - f0f5bd9d-62a1-4e59-bc0e-4dbaa55d1ef9
-          - 414277a8-4144-49f6-9bc9-1bdcbc9f0749
-        metadata:
-          $ref: '#/components/schemas/Metadata'
-        workflow_status:
-          type: string
-          enum:
-          - not_started
-          - in_progress
-          - on_hold
-          - completed
-          - no_quote
-          example: in_progress
-    QuotePricingItemQuantity:
-      type: object
-      properties:
-        uuid:
-          type: string
-          description: The UUID of the pricing item cell
-          example: f0f5bd9d-62a1-4e59-bc0e-4dbaa55d1ef9
-        quantity:
-          type: integer
-          description: The quantity of the pricing item cell
-        profit_item:
-          type: string
-          description: The UUID of the pricing item
-          example: f0f5bd9d-62a1-4e59-bc0e-4dbaa55d1ef9
-        calculated_profit:
-          type: number
-          format: float
-        calculated_percentage:
-          type: number
-        manual_profit:
-          type: number
-          format: float
-        manual_percentage:
-          type: number
-    CostingVariableOverride:
-      type: object
-      description: Costing variable value override. May be quantity-specific.
-      oneOf:
-      - description: Value that should override the calculated value for all quantities.
-        oneOf:
-        - type: string
-        - type: number
-        - type: boolean
-      - type: object
-        description: Variable value overrides, as a map from quantity to value. Only applicable to quantity-specific variables.
-        additionalProperties:
-          description: Value that should override the calculated value for a particular quantity.
-          oneOf:
-          - type: string
-          - type: number
-          - type: boolean
-      example: '{''1'': 2, ''5'': 1.5, ''10'': 1}'
-    OrderCostingVariable:
-      type: object
-      description: A CostingVariable is a piece of a Paperless Parts Programming Language (P3L) formula that determines the price and timing for an operation. CostingVariables are essentially Python variables and can represent several data types. An OrderCostingVariable represents the value a variable holds for the ordered quantity.
-      properties:
-        label:
-          type: string
-        variable_class:
-          type: string
-          enum:
-          - basic
-          - drop_down
-          - table
+          description: Name used to access property within pricing formulas via 'dot' operator
         value_type:
           type: string
           enum:
           - string
-          - number
-          - currency
           - boolean
+          - numeric
         value:
           anyOf:
           - type: string
           - type: number
-          - type: integer
           - type: boolean
-          description: This will be indicated by the value_type field.
-        row:
-          type:
-          - object
-          - 'null'
-          description: An object representing a row from a custom table. This object will have arbitrary key-value pairs based on custom table schema it was pulled from. The row field will only be non-null when the variable_class field is 'table'.
-        options:
-          type:
-          - array
-          - 'null'
-          items:
-            anyOf:
-            - type: number
-            - type: string
-          description: A list of the options for a drop down variable. Can be strings, floats, or integers indicated by value_type. The options field will only be non-null when the variable_class field is 'drop_down'.
-        type:
+          description: Value of property, None or of type corresponding to value_type
+    OrderNumber:
+      type: integer
+      description: A unique identifier for an Order
+      example: 47
+    Facility:
+      type:
+      - object
+      - 'null'
+      properties:
+        account_id:
+          type: integer
+          example: 55123
+        address:
+          $ref: '#/components/schemas/Address'
+        attention:
           type: string
-          description: To Be Deprecated
-          deprecated: false
+          example: Gordon Moore
+        id:
+          type: integer
+          example: 12
+        name:
+          type: string
+          example: Boston Office
+        salesperson:
+          $ref: '#/components/schemas/SalesPerson'
     QuoteItem_2:
       type: object
       description: A quote item represents a line item in a quote. Quote items can either be manual or automatic, as indicated by the 'type' property. Automatic quote items are those generated by adding a part to a quote. Pricing data for automatic quote items is automatically populated using the process, material, and operations, if they exist. Manual quote items do not have an associated part, so the pricing information must be inputted manually.
@@ -2912,97 +2261,115 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/QuotePricingItem'
-    QuoteLineOperation:
+    QuoteFile_2:
       type: object
-      description: An operation on the root component of a QuoteLine.
+      properties:
+        authenticated_download_url:
+          type:
+          - string
+          - 'null'
+          format: url
+          example: https://api.paperlessparts.com/parts/files/b2145332-75dc-4be4-a092-fb97bdb5815a/download/wire-mount.step?token=token
+        category:
+          type: string
+          enum:
+          - RFQ_FILE
+          - VENDOR_QUOTE
+          - SUPPORTING_FILE
+          example: SUPPORTING_FILE
+        is_export_controlled:
+          type: boolean
+          example: 'false'
+        filename:
+          type: string
+          example: wire_mount.step
+        file_size:
+          type: integer
+          example: 395516
+        file_type:
+          type: string
+          example: step
+        status:
+          type: object
+        uuid:
+          type: string
+          example: b2145332-75dc-4be4-a092-fb97bdb5815a
+    Uuid:
+      type: string
+      description: Unique identifier
+      example: 2f0e5724-42fe-47ae-8233-7a902ef70346
+    CostingVariableOverride:
+      type: object
+      description: Costing variable value override. May be quantity-specific.
+      oneOf:
+      - description: Value that should override the calculated value for all quantities.
+        oneOf:
+        - type: string
+        - type: number
+        - type: boolean
+      - type: object
+        description: Variable value overrides, as a map from quantity to value. Only applicable to quantity-specific variables.
+        additionalProperties:
+          description: Value that should override the calculated value for a particular quantity.
+          oneOf:
+          - type: string
+          - type: number
+          - type: boolean
+      example: '{''1'': 2, ''5'': 1.5, ''10'': 1}'
+    QuoteLinePricingItem:
+      type: object
+      description: A pricing item on the root component of a QuoteLine
       properties:
         uuid:
           type: string
-          description: The UUID of the operation.
+          description: The UUID of the pricing item.
           example: f0f5bd9d-62a1-4e59-bc0e-4dbaa55d1ef9
+        category:
+          type: string
+          enum:
+          - general
+          - purchased_component
+          - material
+          - outside
+          - inside
+        calculation_type:
+          type: string
+          enum:
+          - markup
+          - margin
         name:
           type: string
-          description: The name of the operation.
-        is_finish:
-          type: boolean
-          description: Indicates whether or not this operation represents a finish.
-        is_outside_service:
-          type: boolean
-          description: Indicates whether or not this operation represents an outside service.
+          description: The name of the pricing item.
         notes:
-          type: string
-          description: Notes regarding the operation.
-        quote_item:
-          type: string
-          description: The UUID of the quote item the operation is tied to.
-          example: f0f5bd9d-62a1-4e59-bc0e-4dbaa55d1ef9
+          type:
+          - string
+          - 'null'
         costing_variables:
           type: array
           items:
             $ref: '#/components/schemas/QuoteCostingVariable'
-        costing_variable_overrides:
-          $ref: '#/components/schemas/CostingVariableOverrides'
-    QuoteQuantity_2:
+        custom_category_name:
+          type:
+          - string
+          - 'null'
+          example: CUSTOM MARKUP
+        custom_category_color:
+          type:
+          - string
+          - 'null'
+          example: '#A51A54'
+    SalesPerson_2:
       type: object
-      description: A quantity object represents a unit price and a numerical quantity associated with a component. A component can have many quantities, and the set of quantities represents the pricing options available to the recipient of a quote.
       properties:
-        id:
-          type: integer
-        quantity:
-          type: integer
-        markup_1_price:
-          type:
-          - number
-          - 'null'
-          format: float
-          description: Users of Paperless Parts can specify up to two distinct markup values on a component.
-        markup_1_name:
-          type:
-          - string
-          - 'null'
-        markup_2_price:
-          type:
-          - number
-          - 'null'
-          format: float
-          description: Users of Paperless Parts can specify up to two distinct markup values on a component.
-        markup_2_name:
-          type:
-          - string
-          - 'null'
-        unit_price_before_discounts:
-          type: number
-          format: float
-        total_price_before_discounts:
-          type: number
-          format: float
-        total_discount:
-          type: number
-          format: float
-        total_discount_percentage:
-          type: number
-          format: float
-        unit_price:
-          type: number
-          format: float
-        total_price:
-          type: number
-          format: float
-        total_price_with_required_add_ons:
-          type: number
-          format: float
-        lead_time:
-          type: integer
-          description: Days
-        expedites:
-          type: array
-          items:
-            $ref: '#/components/schemas/QuoteExpedite'
-        is_most_likely_won_quantity:
-          type: boolean
-          description: Whether or not this quantity is the most likely quantity to be won.
-        most_likely_won_quantity_percent:
-          type: integer
+        first_name:
+          type: string
+        last_name:
+          type: string
+        email:
+          type: string
+          format: email
+        erp_code:
+          type: string
     QuoteComponent_2:
       type: object
       description: Represents a component in the quote item. In the simplest case, there is a single root component. If the quote item is an assembly, the array will contain each component in the assembly. Components can be manufactured (i.e., parts), assemblies (i.e., top-level or sub-assembly), or purchased (e.g., hardware). Exactly one component in the array will be the root component, but it might not be the first element in the array.
@@ -3108,13 +2475,640 @@ components:
           - manufactured
           - purchased
           description: 'Note: this field is deprecated. Use obtain_method and is_assembly instead.'
+    Quote_2:
+      type: object
+      description: Data representing a Quote
+      properties:
+        authenticated_pdf_quote_url:
+          type:
+          - string
+          - 'null'
+          format: url
+        contact:
+          $ref: '#/components/schemas/QuoteContact'
+        created:
+          type: string
+          format: date-time
+        customer:
+          $ref: '#/components/schemas/QuoteCustomer'
+        digital_last_viewed_on:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: The last time the quote recipient viewed the quote
+        erp_code:
+          type:
+          - string
+          - 'null'
+        estimator:
+          $ref: '#/components/schemas/SalesPerson_2'
+        expired:
+          type: boolean
+        expired_date:
+          type: string
+          format: date-time
+        export_controlled:
+          type: boolean
+          description: Whether or not this quote contains data that is export controlled (ITAR) by the US Government.
+        id:
+          type: integer
+        is_unviewed_drafted_rfq:
+          type: boolean
+          description: Quotes can be automatically generated by a supplier's RFQ form. If this quote was drafted via an RFQ and has not been viewed, this will be true.
+        number:
+          $ref: '#/components/schemas/QuoteNumber_2'
+        order_numbers:
+          $ref: '#/components/schemas/OrderNumberArray'
+        parent_quote:
+          $ref: '#/components/schemas/ParentQuote'
+        parent_supplier_order:
+          $ref: '#/components/schemas/ParentSupplierOrder'
+        private_notes:
+          type:
+          - string
+          - 'null'
+        quote_items:
+          type: array
+          items:
+            $ref: '#/components/schemas/QuoteItem_2'
+        quote_notes:
+          type:
+          - string
+          - 'null'
+        request_for_quote:
+          $ref: '#/components/schemas/RequestForQuote'
+        revision_number:
+          $ref: '#/components/schemas/RevisionNumber'
+        salesperson:
+          $ref: '#/components/schemas/SalesPerson_2'
+        sent_date:
+          type:
+          - string
+          - 'null'
+          format: date-time
+        status:
+          type: string
+          enum:
+          - draft
+          - outstanding
+          - expired
+          - cancelled
+          - partially_accepted
+          - accepted
+          - trash
+          - lost
+        tax_cost:
+          type: number
+          format: float
+        tax_rate:
+          type: number
+          format: float
+    QuoteNumber_2:
+      type: integer
+      description: In conjunction with the revision number, forms a unique identifier for a Quote
+      example: 37
+    QuoteLineOperation:
+      type: object
+      description: An operation on the root component of a QuoteLine.
+      properties:
+        uuid:
+          type: string
+          description: The UUID of the operation.
+          example: f0f5bd9d-62a1-4e59-bc0e-4dbaa55d1ef9
+        name:
+          type: string
+          description: The name of the operation.
+        is_finish:
+          type: boolean
+          description: Indicates whether or not this operation represents a finish.
+        is_outside_service:
+          type: boolean
+          description: Indicates whether or not this operation represents an outside service.
+        notes:
+          type: string
+          description: Notes regarding the operation.
+        quote_item:
+          type: string
+          description: The UUID of the quote item the operation is tied to.
+          example: f0f5bd9d-62a1-4e59-bc0e-4dbaa55d1ef9
+        costing_variables:
+          type: array
+          items:
+            $ref: '#/components/schemas/QuoteCostingVariable'
+        costing_variable_overrides:
+          $ref: '#/components/schemas/CostingVariableOverrides'
+    QuotePricingItem:
+      type: object
+      properties:
+        uuid:
+          type: string
+          description: The UUID of the pricing item.
+          example: f0f5bd9d-62a1-4e59-bc0e-4dbaa55d1ef9
+        category:
+          type: string
+          enum:
+          - general
+          - purchased_component
+          - material
+          - outside
+          - inside
+        calculation_type:
+          type: string
+          enum:
+          - markup
+          - margin
+        name:
+          type: string
+          description: The name of the pricing item.
+        notes:
+          type:
+          - string
+          - 'null'
+        costing_variables:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrderCostingVariable'
+        pricing_item_quantities:
+          type: array
+          items:
+            $ref: '#/components/schemas/QuotePricingItemQuantity'
+    OrderCostingVariable:
+      type: object
+      description: A CostingVariable is a piece of a Paperless Parts Programming Language (P3L) formula that determines the price and timing for an operation. CostingVariables are essentially Python variables and can represent several data types. An OrderCostingVariable represents the value a variable holds for the ordered quantity.
+      properties:
+        label:
+          type: string
+        variable_class:
+          type: string
+          enum:
+          - basic
+          - drop_down
+          - table
+        value_type:
+          type: string
+          enum:
+          - string
+          - number
+          - currency
+          - boolean
+        value:
+          anyOf:
+          - type: string
+          - type: number
+          - type: integer
+          - type: boolean
+          description: This will be indicated by the value_type field.
+        row:
+          type:
+          - object
+          - 'null'
+          description: An object representing a row from a custom table. This object will have arbitrary key-value pairs based on custom table schema it was pulled from. The row field will only be non-null when the variable_class field is 'table'.
+        options:
+          type:
+          - array
+          - 'null'
+          items:
+            anyOf:
+            - type: number
+            - type: string
+          description: A list of the options for a drop down variable. Can be strings, floats, or integers indicated by value_type. The options field will only be non-null when the variable_class field is 'drop_down'.
+        type:
+          type: string
+          description: To Be Deprecated
+          deprecated: false
+    QuoteDiscountQuantity:
+      type: object
+      properties:
+        uuid:
+          type: string
+          description: The UUID of the discount cell
+          example: f0f5bd9d-62a1-4e59-bc0e-4dbaa55d1ef9
+        quantity:
+          type: integer
+          description: The quantity of the discount cell
+        discount:
+          type: string
+          description: The UUID of the discount
+          example: f0f5bd9d-62a1-4e59-bc0e-4dbaa55d1ef9
+        calculated_discount:
+          type: number
+          format: float
+        calculated_percentage:
+          type: number
+        manual_percentage:
+          type:
+          - number
+          - 'null'
+          format: float
+    Metadata:
+      type: object
+      example: '{ crm_id: 1581 }'
+      description: Object that can be used to attach key-value data to an object. Up to 25 keys can be speficied, with key names up to 40 characters long and values up to 500 characters long.
+    QuotePricingItemQuantity:
+      type: object
+      properties:
+        uuid:
+          type: string
+          description: The UUID of the pricing item cell
+          example: f0f5bd9d-62a1-4e59-bc0e-4dbaa55d1ef9
+        quantity:
+          type: integer
+          description: The quantity of the pricing item cell
+        profit_item:
+          type: string
+          description: The UUID of the pricing item
+          example: f0f5bd9d-62a1-4e59-bc0e-4dbaa55d1ef9
+        calculated_profit:
+          type: number
+          format: float
+        calculated_percentage:
+          type: number
+        manual_profit:
+          type: number
+          format: float
+        manual_percentage:
+          type: number
+    QuoteDiscount:
+      type: object
+      properties:
+        uuid:
+          type: string
+          description: The UUID of the discount.
+          example: f0f5bd9d-62a1-4e59-bc0e-4dbaa55d1ef9
+        name:
+          type: string
+          description: The name of the discount.
+        notes:
+          type:
+          - string
+          - 'null'
+        quote_item_uuid:
+          type: string
+          description: The UUID of the quote item the discount is tied to.
+        discount_definition:
+          type:
+          - string
+          - 'null'
+          description: The UUID of the Discount Definition the Discount was generated from. If the Discount is a manual Discount the value will be 'null'.
+          example: f0f5bd9d-62a1-4e59-bc0e-4dbaa55d1ef9
+        costing_variables:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrderCostingVariable'
+        discount_quantities:
+          type: array
+          items:
+            $ref: '#/components/schemas/QuoteDiscountQuantity'
+    QuoteLineAddOn:
+      type: object
+      description: An add-on on the root component of a QuoteLine
+      properties:
+        uuid:
+          type: string
+          description: The UUID of the add-on.
+          example: f0f5bd9d-62a1-4e59-bc0e-4dbaa55d1ef9
+        is_required:
+          type: boolean
+          description: Indicates whether or not this add-on is required.
+        name:
+          type: string
+          description: The name of the add-on.
+        quote_item_uuid:
+          type: string
+          description: The UUID of the quote item the add-on is tied to.
+          example: f0f5bd9d-62a1-4e59-bc0e-4dbaa55d1ef9
+        add_on_quantities:
+          type: array
+          description: Array of add-on quantity UUIDs
+          items:
+            type: string
+          example:
+          - f0f5bd9d-62a1-4e59-bc0e-4dbaa55d1ef9
+          - 414277a8-4144-49f6-9bc9-1bdcbc9f0749
+    CostingVariableOverrides:
+      type: object
+      description: Costing variable value overrides, as a JSON-formatted map from variable name to override value. Variable values may be overridden on a quantity-specific basis. To remove an override, supply a value of "null" for a variable. To remove all overrides, supply a value of "null" for this field.
+      additionalProperties:
+        $ref: '#/components/schemas/CostingVariableOverride'
+      example: '{''work_center_id'': 34, ''markup'': {''1'': 2, ''5'': 1.5, ''10'': 1}}'
+    QuoteQuantity_2:
+      type: object
+      description: A quantity object represents a unit price and a numerical quantity associated with a component. A component can have many quantities, and the set of quantities represents the pricing options available to the recipient of a quote.
+      properties:
+        id:
+          type: integer
+        quantity:
+          type: integer
+        markup_1_price:
+          type:
+          - number
+          - 'null'
+          format: float
+          description: Users of Paperless Parts can specify up to two distinct markup values on a component.
+        markup_1_name:
+          type:
+          - string
+          - 'null'
+        markup_2_price:
+          type:
+          - number
+          - 'null'
+          format: float
+          description: Users of Paperless Parts can specify up to two distinct markup values on a component.
+        markup_2_name:
+          type:
+          - string
+          - 'null'
+        unit_price_before_discounts:
+          type: number
+          format: float
+        total_price_before_discounts:
+          type: number
+          format: float
+        total_discount:
+          type: number
+          format: float
+        total_discount_percentage:
+          type: number
+          format: float
+        unit_price:
+          type: number
+          format: float
+        total_price:
+          type: number
+          format: float
+        total_price_with_required_add_ons:
+          type: number
+          format: float
+        lead_time:
+          type: integer
+          description: Days
+        expedites:
+          type: array
+          items:
+            $ref: '#/components/schemas/QuoteExpedite'
+        is_most_likely_won_quantity:
+          type: boolean
+          description: Whether or not this quantity is the most likely quantity to be won.
+        most_likely_won_quantity_percent:
+          type: integer
+    QuoteHeader:
+      type: object
+      description: Data representing high level quote object
+      properties:
+        authenticated_pdf_quote_url:
+          type:
+          - string
+          - 'null'
+          format: url
+        contact_id:
+          type: integer
+          example: 1581
+        created:
+          type: string
+          format: date-time
+        digital_last_viewed_on:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: The last time the quote recipient viewed the quote
+        erp_code:
+          type:
+          - string
+          - 'null'
+        estimator:
+          type: string
+          example: 335c5770-8cd4-46d3-98a1-7c0e12251124
+          description: The uuid for the estimator assigned to this quote
+        expired:
+          type: boolean
+        expired_date:
+          type: string
+          format: date-time
+        export_controlled:
+          type: boolean
+          description: Whether or not this quote contains data that is export controlled (ITAR) by the US Government.
+        manual_rfq_received_date:
+          type: string
+          format: date-time
+        number:
+          $ref: '#/components/schemas/QuoteNumber_2'
+        private_notes:
+          type:
+          - string
+          - 'null'
+        quote_items:
+          type: array
+          items:
+            type: string
+          description: An array of QuoteItem UUIDs
+          example:
+          - 335c5770-8cd4-46d3-98a1-7c0e12251124
+          - 414277a8-4144-49f6-9bc9-1bdcbc9f0749
+        quote_notes:
+          type:
+          - string
+          - 'null'
+        rfq_number:
+          type:
+          - string
+          - 'null'
+        revision_number:
+          $ref: '#/components/schemas/RevisionNumber'
+        salesperson:
+          type: string
+          example: 335c5770-8cd4-46d3-98a1-7c0e12251124
+          description: The uuid for the salesperson assigned to this quote
+        sent_date:
+          type:
+          - string
+          - 'null'
+          format: date-time
+        status:
+          type: string
+          enum:
+          - draft
+          - outstanding
+          - expired
+          - cancelled
+          - partially_accepted
+          - accepted
+          - trash
+          - lost
+        tax_rate:
+          type: number
+          format: float
+        metadata:
+          $ref: '#/components/schemas/Metadata'
+    QuoteLineDiscount:
+      type: object
+      description: A Discount on the root component of a QuoteLine
+      properties:
+        uuid:
+          type: string
+          description: The UUID of the Discount.
+          example: f0f5bd9d-62a1-4e59-bc0e-4dbaa55d1ef9
+        name:
+          type: string
+          description: The name of the Discount.
+          example: Good customer discount.
+        notes:
+          type: string
+          description: Notes for this Discount.
+          example: Use this discount when working with really good customers.
+        quote_item_uuid:
+          type: string
+          description: The UUID of the quote item the Discount is tied to.
+          example: f0f5bd9d-62a1-4e59-bc0e-4dbaa55d1ef9
+        discount_definition:
+          type:
+          - string
+          - 'null'
+          description: The UUID of the Discount Definition the Discount was generated from. If the Discount is a manual Discount the value will be 'null'.
+          example: f0f5bd9d-62a1-4e59-bc0e-4dbaa55d1ef9
+        discount_quantities:
+          type: array
+          description: Array of Discount quantity UUIDs
+          items:
+            type: string
+          example:
+          - f0f5bd9d-62a1-4e59-bc0e-4dbaa55d1ef9
+          - 414277a8-4144-49f6-9bc9-1bdcbc9f0749
+        costing_variables:
+          type: array
+          items:
+            $ref: '#/components/schemas/QuoteCostingVariable'
+        costing_variable_overrides:
+          $ref: '#/components/schemas/CostingVariableOverrides'
+    ProfitItemCell:
+      type: object
+      properties:
+        uuid:
+          type: string
+          example: 64abb125-26c5-4bed-8672-42ee85c24793
+        quantity:
+          type: integer
+          example: 3200
+        profit_item:
+          type: string
+          example: 16110d43-8665-4f7c-a3eb-a2c397a8c13e
+        calculated_profit:
+          type: string
+          example: '1538.536222'
+        calculated_percentage:
+          type: number
+          format: float
+          example: 20.0
+        manual_profit:
+          type: string
+          example: '1384.682600'
+        manual_percentage:
+          type: number
+          format: float
+          example: 18.0
+        custom_cost_category:
+          type: object
+          example: '{ "cost": 20.0, "name": "CUSTOM MARKUP", "color": "#A51A54" }'
+          properties:
+            cost:
+              type: number
+              format: float
+              example: 20.0
+            name:
+              type:
+              - string
+              - 'null'
+              example: CUSTOM MARKUP
+            color:
+              type:
+              - string
+              - 'null'
+              example: '#A51A54'
+    QuoteLine:
+      type: object
+      description: A quote item represents a line item in a quote.
+      properties:
+        uuid:
+          type: string
+          description: The UUID of the quote item.
+          example: f0f5bd9d-62a1-4e59-bc0e-4dbaa55d1ef9
+        position:
+          type: integer
+          description: The position of the quote item in the quote display, indexed from 1.
+        is_export_controlled:
+          type: boolean
+          description: Whether or not this quote item contains data that is export controlled (ITAR) by the US Government.
+          example: 'false'
+        part:
+          type: string
+          description: The UUID of the part the quote item is tied to.
+          example: f0f5bd9d-62a1-4e59-bc0e-4dbaa55d1ef9
+        material:
+          type: string
+          description: The UUID of the material the quote item is tied to.
+          example: f0f5bd9d-62a1-4e59-bc0e-4dbaa55d1ef9
+        process:
+          type: string
+          description: The UUID of the process the quote item is tied to.
+          example: f0f5bd9d-62a1-4e59-bc0e-4dbaa55d1ef9
+        quote:
+          type: string
+          description: The UUID of the quote the quote item is tied to.
+          example: f0f5bd9d-62a1-4e59-bc0e-4dbaa55d1ef9
+        quantities:
+          type: array
+          description: Array of quantity UUIDs
+          items:
+            type: string
+          example:
+          - f0f5bd9d-62a1-4e59-bc0e-4dbaa55d1ef9
+          - 414277a8-4144-49f6-9bc9-1bdcbc9f0749
+        add_ons:
+          type: array
+          description: Array of add-on UUIDs
+          items:
+            type: string
+          example:
+          - f0f5bd9d-62a1-4e59-bc0e-4dbaa55d1ef9
+          - 414277a8-4144-49f6-9bc9-1bdcbc9f0749
+        discounts:
+          type: array
+          description: Array of discount UUIDs
+          items:
+            type: string
+          example:
+          - f0f5bd9d-62a1-4e59-bc0e-4dbaa55d1ef9
+          - 414277a8-4144-49f6-9bc9-1bdcbc9f0749
+        pricing_items:
+          type: array
+          description: Array of pricing item UUIDs
+          items:
+            type: string
+          example:
+          - f0f5bd9d-62a1-4e59-bc0e-4dbaa55d1ef9
+          - 414277a8-4144-49f6-9bc9-1bdcbc9f0749
+        operations:
+          type: array
+          description: Array of operation UUIDs
+          items:
+            type: string
+          example:
+          - f0f5bd9d-62a1-4e59-bc0e-4dbaa55d1ef9
+          - 414277a8-4144-49f6-9bc9-1bdcbc9f0749
+        metadata:
+          $ref: '#/components/schemas/Metadata'
+        workflow_status:
+          type: string
+          enum:
+          - not_started
+          - in_progress
+          - on_hold
+          - completed
+          - no_quote
+          example: in_progress
   parameters:
-    revision:
-      name: revision
-      in: query
-      description: '**Last known sent quote revision number**. You may supply the revision number of the last known quote.'
-      schema:
-        $ref: '#/components/schemas/RevisionNumber'
     revisionNumber:
       name: revision
       in: query
@@ -3122,6 +3116,18 @@ components:
       required: false
       schema:
         $ref: '#/components/schemas/RevisionNumber'
+    revision:
+      name: revision
+      in: query
+      description: '**Last known sent quote revision number**. You may supply the revision number of the last known quote.'
+      schema:
+        $ref: '#/components/schemas/RevisionNumber'
+    last_quote:
+      name: last_quote
+      in: query
+      description: '**Last known sent quote number**. You may supply the number of the last known quote.'
+      schema:
+        $ref: '#/components/schemas/QuoteNumber'
     quoteNumber:
       name: quoteNumber
       in: path
@@ -3129,23 +3135,10 @@ components:
       required: true
       schema:
         $ref: '#/components/schemas/QuoteNumber'
-    last_quote:
-      name: last_quote
-      in: query
-      description: '**Last known sent quote number**. You may supply the number of the last known quote.'
-      schema:
-        $ref: '#/components/schemas/QuoteNumber'
-    operationUuid:
-      name: operationUuid
+    pricingItemUuid:
+      name: pricingItemUuid
       in: path
-      description: The Operation UUID
-      required: true
-      schema:
-        $ref: '#/components/schemas/Uuid'
-    discountUuid:
-      name: discountUuid
-      in: path
-      description: The Discount UUID
+      description: The Pricing Item UUID
       required: true
       schema:
         $ref: '#/components/schemas/Uuid'
@@ -3170,10 +3163,17 @@ components:
       required: true
       schema:
         $ref: '#/components/schemas/Uuid'
-    pricingItemUuid:
-      name: pricingItemUuid
+    operationUuid:
+      name: operationUuid
       in: path
-      description: The Pricing Item UUID
+      description: The Operation UUID
+      required: true
+      schema:
+        $ref: '#/components/schemas/Uuid'
+    discountUuid:
+      name: discountUuid
+      in: path
+      description: The Discount UUID
       required: true
       schema:
         $ref: '#/components/schemas/Uuid'

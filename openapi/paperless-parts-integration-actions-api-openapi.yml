@@ -249,7 +249,7 @@ paths:
     get:
       summary: Get integration action details
       description: Get the details for a specific integration action.
-      operationId: Get integration action details
+      operationId: GetIntegrationActionDetails
       parameters:
       - in: path
         name: integration_action_uuid
@@ -274,6 +274,8 @@ paths:
                 title: Integration action with that action uuid not found
                 type: string
                 example: 'Error: Not Found'
+      x-operation-id-source: normalized
+      x-operation-id-original: Get integration action details
     patch:
       summary: Update fields on an integration action
       description: Update fields on an integration action.

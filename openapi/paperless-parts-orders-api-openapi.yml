@@ -138,488 +138,6 @@ paths:
           default: v1
 components:
   schemas:
-    OrderCompany:
-      type: object
-      properties:
-        business_name:
-          type: string
-        erp_code:
-          type: string
-    OrderComponent:
-      type: object
-      properties:
-        id:
-          type: string
-        child_ids:
-          type: array
-          items:
-            type: integer
-        children:
-          type: array
-          items:
-            $ref: '#/components/schemas/ComponentChild'
-        deliver_quantity:
-          type: integer
-          description: The quantity of this component that must be delivered (innate quantity * root component quantity).
-        description:
-          type:
-          - string
-          - 'null'
-        export_controlled:
-          type: boolean
-          description: Whether or not this order component contains data that is export controlled (ITAR) by the US Government.
-        finishes:
-          type: array
-          items:
-            type: string
-          description: 'Note: this field is deprecated. Finishes now show up as Operations.'
-        innate_quantity:
-          type: integer
-          description: The quantity of this subcomponent that must be produced to make one top-level component.
-        is_root_component:
-          type: boolean
-        make_quantity:
-          type: integer
-          description: The quantity of this component that must be made to satisfy the quantity specified by the customer as well as the yield specified for this component (innate quantity * root component quantity / yield).
-        material:
-          $ref: '#/components/schemas/OrderMaterial'
-        material_operations:
-          type: array
-          items:
-            $ref: '#/components/schemas/OrderOperation'
-        parent_ids:
-          type: array
-          items:
-            type: integer
-        part_name:
-          type: string
-        part_number:
-          type:
-          - string
-          - 'null'
-        part_url:
-          type: string
-          format: url
-        part_uuid:
-          type: string
-        process:
-          $ref: '#/components/schemas/OrderProcess'
-        purchased_component:
-          description: Reference to a purchased component object within the supplier account. Will be not null when type == 'purchased'
-          $ref: '#/components/schemas/QuotePurchasedComponent'
-        revision:
-          type:
-          - string
-          - 'null'
-        shop_operations:
-          type: array
-          items:
-            $ref: '#/components/schemas/OrderOperation'
-        supporting_files:
-          type: array
-          items:
-            $ref: '#/components/schemas/OrderSupportingFile'
-        thumbnail_url:
-          type:
-          - string
-          - 'null'
-        type:
-          type: string
-          enum:
-          - assembled
-          - manufactured
-          - purchased
-    AbstractPurchasedComponent:
-      type: object
-      properties:
-        oem_part_number:
-          type: string
-          description: Unique identifier for purchased component within a supplier account
-          example: 064-1235
-        internal_part_number:
-          type:
-          - string
-          - 'null'
-          example: a
-        description:
-          type:
-          - string
-          - 'null'
-          example: any text you want
-        piece_price:
-          type: number
-          format: decimal
-          description: Cost per piece to 4 decimal places
-          example: 2.0
-    OrderNumberArray:
-      type: array
-      items:
-        $ref: '#/components/schemas/OrderNumber'
-      description: An array of Order numbers
-      example:
-      - 38
-      - 39
-      - 40
-    OrderShipmentItem:
-      type: object
-      properties:
-        id:
-          type: integer
-        order_item_id:
-          type: integer
-        quantity:
-          type: integer
-    OrderOperation:
-      type: object
-      properties:
-        id:
-          type: integer
-        category:
-          type: string
-          enum:
-          - material
-          - operation
-        cost:
-          type: number
-          format: float
-        costing_variables:
-          type: array
-          items:
-            $ref: '#/components/schemas/OrderCostingVariable'
-        quantities:
-          type: array
-          items:
-            $ref: '#/components/schemas/OperationQuantity'
-        is_finish:
-          type: boolean
-        is_outside_service:
-          type: boolean
-        name:
-          type: string
-        erp_code:
-          type: string
-        operation_definition_name:
-          type: string
-        notes:
-          type:
-          - string
-          - 'null'
-        position:
-          type: integer
-          description: The position of the order operation in the order display, indexed from 1. Note that the position applies across both material operations and order operations. TODO - this shows up as 0 if there is only one operation on the order?
-        runtime:
-          type:
-          - number
-          - 'null'
-          format: float
-        setup_time:
-          type:
-          - number
-          - 'null'
-          format: float
-    OrderNumber:
-      type: integer
-      description: A unique identifier for an Order
-      example: 47
-    OrderSupportingFile:
-      type: object
-      properties:
-        filename:
-          type: string
-        url:
-          type: string
-          format: url
-    OrderItem:
-      type: object
-      properties:
-        id:
-          type: integer
-        components:
-          type: array
-          items:
-            $ref: '#/components/schemas/OrderComponent'
-        description:
-          type:
-          - string
-          - 'null'
-        expedite_revenue:
-          type:
-          - number
-          - 'null'
-          format: float
-        export_controlled:
-          type: boolean
-          description: Whether or not this order item contains data that is export controlled (ITAR) by the US Government.
-        filename:
-          type: string
-        lead_days:
-          type: integer
-        markup_1_price:
-          type: number
-          format: float
-        markup_1_name:
-          type: string
-        markup_2_price:
-          type: number
-          format: float
-        markup_2_name:
-          type: string
-        private_notes:
-          type:
-          - string
-          - 'null'
-        public_notes:
-          type:
-          - string
-          - 'null'
-        quantity:
-          type: integer
-        quantity_outstanding:
-          type: integer
-        quote_item_id:
-          type: integer
-        quote_item_type:
-          type: string
-          enum:
-          - automatic
-          - manual
-          description: Indicates whether the quote item is associated with a part (automatic pricing), or not (manual pricing).
-        root_component_id:
-          type: integer
-        ships_on:
-          type: string
-          format: date
-        total_price:
-          type: number
-          format: float
-        unit_price:
-          type: number
-          format: float
-        base_price:
-          type: number
-          format: float
-        add_on_fees:
-          type:
-          - number
-          - 'null'
-          format: float
-        ordered_add_ons:
-          type: array
-          items:
-            $ref: '#/components/schemas/OrderAddOn'
-        pricing_items:
-          type: array
-          items:
-            type: object
-        unit_price_before_discounts:
-          type:
-          - number
-          - 'null'
-          format: float
-    Facility:
-      type:
-      - object
-      - 'null'
-      properties:
-        account_id:
-          type: integer
-          example: 55123
-        address:
-          $ref: '#/components/schemas/Address'
-        attention:
-          type: string
-          example: Gordon Moore
-        id:
-          type: integer
-          example: 12
-        name:
-          type: string
-          example: Boston Office
-        salesperson:
-          $ref: '#/components/schemas/SalesPerson'
-    OrderShippingOption:
-      type: object
-      properties:
-        customers_account_number:
-          type:
-          - string
-          - 'null'
-        customers_carrier:
-          type:
-          - string
-          - 'null'
-          enum:
-          - ups
-          - fedex
-        shipping_method:
-          type:
-          - string
-          - 'null'
-          enum:
-          - early_am_overnight
-          - ground
-          - next_day_air
-          - second_day_air
-        type:
-          type: string
-          enum:
-          - pickup
-          - customers_shipping_account
-          - suppliers_shipping_account
-    PurchasedComponentProperty:
-      type: object
-      properties:
-        name:
-          type: string
-          description: Name of corresponding purchased component column in table display
-        code_name:
-          type: string
-          description: Name used to access property within pricing formulas via 'dot' operator
-        value_type:
-          type: string
-          enum:
-          - string
-          - boolean
-          - numeric
-        value:
-          anyOf:
-          - type: string
-          - type: number
-          - type: boolean
-          description: Value of property, None or of type corresponding to value_type
-    AddressInfo:
-      type:
-      - object
-      - 'null'
-      properties:
-        id:
-          type: integer
-          example: 55123
-        address1:
-          type: string
-          example: 1 City Hall Sq.
-        address2:
-          type:
-          - string
-          - 'null'
-          example: null
-        attention:
-          type: string
-          example: Gordon Moore
-        business_name:
-          type: string
-          example: Paperless Parts, Inc.
-        city:
-          type: string
-          example: Boston
-        country:
-          type: string
-          example: USA
-        facility_name:
-          type:
-          - string
-          - 'null'
-          example: Boston Office
-        phone:
-          type: string
-          example: '6176354500'
-        phone_ext:
-          type:
-          - string
-          - 'null'
-          example: null
-        postal_code:
-          type: string
-          example: 1153
-        state:
-          type: string
-          example: MA
-        erp_code:
-          type:
-          - string
-          - 'null'
-    Order:
-      type: object
-      properties:
-        uuid:
-          type: string
-          format: uuid
-        billing_info:
-          $ref: '#/components/schemas/AddressInfo'
-        created:
-          type: string
-          format: date-time
-        contact:
-          $ref: '#/components/schemas/OrderContact'
-        customer:
-          $ref: '#/components/schemas/OrderCustomer'
-        deliver_by:
-          type:
-          - string
-          - 'null'
-          format: date-time
-        erp_code:
-          type:
-          - string
-          - 'null'
-        estimator:
-          $ref: '#/components/schemas/OrderUser'
-        number:
-          $ref: '#/components/schemas/OrderNumber'
-        order_items:
-          type: array
-          items:
-            $ref: '#/components/schemas/OrderItem'
-        payment_details:
-          $ref: '#/components/schemas/OrderPaymentDetails'
-        private_notes:
-          type:
-          - string
-          - 'null'
-        purchase_order_file_url:
-          type:
-          - string
-          - 'null'
-          format: uri
-        quote_erp_code:
-          type:
-          - string
-          - 'null'
-        quote_number:
-          type: integer
-        quote_rfq_number:
-          type:
-          - string
-          - 'null'
-        quote_revision_number:
-          type: integer
-        sales_person:
-          deprecated: true
-          $ref: '#/components/schemas/OrderUser'
-        salesperson:
-          $ref: '#/components/schemas/OrderUser'
-        send_from_facility:
-          $ref: '#/components/schemas/Facility'
-        shipments:
-          type: array
-          items:
-            $ref: '#/components/schemas/OrderShipment'
-        shipping_info:
-          $ref: '#/components/schemas/AddressInfo'
-        shipping_option:
-          $ref: '#/components/schemas/OrderShippingOption'
-        ships_on:
-          type: string
-          format: date
-        status:
-          type: string
-          enum:
-          - pending
-          - confirmed
-          - on_hold
-          - in_process
-          - completed
-          - cancelled
     OrderPaymentDetails:
       type: object
       properties:
@@ -673,221 +191,6 @@ components:
         total_price:
           type: number
           format: float
-    QuotePurchasedComponent:
-      allOf:
-      - $ref: '#/components/schemas/AbstractPurchasedComponent'
-      - type: object
-        properties:
-          id:
-            type: string
-          properties:
-            type: array
-            items:
-              $ref: '#/components/schemas/PurchasedComponentProperty'
-    OrderContact:
-      type: object
-      properties:
-        account:
-          type: object
-          properties:
-            erp_code:
-              type:
-              - string
-              - 'null'
-            id:
-              type: number
-              format: int
-            notes:
-              type:
-              - string
-              - 'null'
-            name:
-              type: string
-            payment_terms:
-              type:
-              - string
-              - 'null'
-            payment_terms_period:
-              type:
-              - string
-              - 'null'
-        email:
-          type: string
-          format: email
-        first_name:
-          type: string
-        id:
-          type: integer
-        last_name:
-          type: string
-        notes:
-          type:
-          - string
-          - 'null'
-        phone:
-          type:
-          - string
-          - 'null'
-        phone_ext:
-          type:
-          - string
-          - 'null'
-    OrderUser:
-      type: object
-      properties:
-        first_name:
-          type: string
-        last_name:
-          type: string
-        email:
-          type: string
-          format: email
-        avatar_color:
-          type: string
-    OrderAddOn:
-      type: object
-      properties:
-        is_required:
-          type: boolean
-        name:
-          type: string
-        erp_code:
-          type: string
-        notes:
-          type: string
-        price:
-          type: number
-          format: float
-        quantity:
-          type: integer
-        costing_variables:
-          type: array
-          items:
-            $ref: '#/components/schemas/OrderCostingVariable'
-    OperationQuantity:
-      type: object
-      properties:
-        price:
-          type: number
-          format: float
-        manual_price:
-          type:
-          - number
-          - 'null'
-          format: float
-        lead_time:
-          type:
-          - integer
-          - 'null'
-        manual_lead_time:
-          type:
-          - integer
-          - 'null'
-        quantity:
-          type: integer
-    SalesPerson:
-      type: object
-      properties:
-        uuid:
-          type: string
-          format: uuid
-        first_name:
-          type: string
-        last_name:
-          type: string
-        email:
-          type: string
-          format: email
-        erp_code:
-          type: string
-    OrderProcess:
-      type: object
-      properties:
-        id:
-          type: integer
-        external_name:
-          type: string
-        name:
-          type: string
-    OrderCostingVariable:
-      type: object
-      description: A CostingVariable is a piece of a Paperless Parts Programming Language (P3L) formula that determines the price and timing for an operation. CostingVariables are essentially Python variables and can represent several data types. An OrderCostingVariable represents the value a variable holds for the ordered quantity.
-      properties:
-        label:
-          type: string
-        variable_class:
-          type: string
-          enum:
-          - basic
-          - drop_down
-          - table
-        value_type:
-          type: string
-          enum:
-          - string
-          - number
-          - currency
-          - boolean
-        value:
-          anyOf:
-          - type: string
-          - type: number
-          - type: integer
-          - type: boolean
-          description: This will be indicated by the value_type field.
-        row:
-          type:
-          - object
-          - 'null'
-          description: An object representing a row from a custom table. This object will have arbitrary key-value pairs based on custom table schema it was pulled from. The row field will only be non-null when the variable_class field is 'table'.
-        options:
-          type:
-          - array
-          - 'null'
-          items:
-            anyOf:
-            - type: number
-            - type: string
-          description: A list of the options for a drop down variable. Can be strings, floats, or integers indicated by value_type. The options field will only be non-null when the variable_class field is 'drop_down'.
-        type:
-          type: string
-          description: To Be Deprecated
-          deprecated: false
-    OrderMaterial:
-      type: object
-      description: This can also be null
-      properties:
-        id:
-          type: integer
-        display_name:
-          type: string
-        family:
-          type: string
-        material_class:
-          type: string
-        name:
-          type: string
-    OrderShipment:
-      type: object
-      properties:
-        id:
-          type: integer
-        pickup_recipient:
-          type:
-          - string
-          - 'null'
-        shipment_date:
-          type: string
-          format: date-time
-        shipment_items:
-          type: array
-          items:
-            $ref: '#/components/schemas/OrderShipmentItem'
-        shipping_cost:
-          type: number
-          format: float
-        tracking_number:
-          type: string
     Address:
       type: object
       properties:
@@ -929,6 +232,15 @@ components:
           maxLength: 50
           description: The unique identifier for this address record in the ERP
           example: B1234
+    ComponentChild:
+      type: object
+      properties:
+        child_id:
+          type: integer
+          description: ID of the child component
+        quantity:
+          type: integer
+          description: The number of child component instances belonging to this parent. Note, the total number of instances of this child component in this assembly tree may be larger if this child appears in multiple places in the tree.
     FacilitateOrderBody:
       type: object
       description: "Data representing a Quote that will be used to generate an Order. This endpoint provides an alternative to the checkout flow in the app. For each quote item you'd like to check out for, specify the quantity and unit price. Note that you may submit an arbitrary quantity and arbitrary unit price; you are not restricted to the options on the quote. \n\n NOTE: shipping_info, billing_info and shipping_option are optional. "
@@ -1061,15 +373,533 @@ components:
               enum:
               - when_ready
               - all_at_once
-    ComponentChild:
+    OrderShippingOption:
       type: object
       properties:
-        child_id:
+        customers_account_number:
+          type:
+          - string
+          - 'null'
+        customers_carrier:
+          type:
+          - string
+          - 'null'
+          enum:
+          - ups
+          - fedex
+        shipping_method:
+          type:
+          - string
+          - 'null'
+          enum:
+          - early_am_overnight
+          - ground
+          - next_day_air
+          - second_day_air
+        type:
+          type: string
+          enum:
+          - pickup
+          - customers_shipping_account
+          - suppliers_shipping_account
+    OrderComponent:
+      type: object
+      properties:
+        id:
+          type: string
+        child_ids:
+          type: array
+          items:
+            type: integer
+        children:
+          type: array
+          items:
+            $ref: '#/components/schemas/ComponentChild'
+        deliver_quantity:
           type: integer
-          description: ID of the child component
+          description: The quantity of this component that must be delivered (innate quantity * root component quantity).
+        description:
+          type:
+          - string
+          - 'null'
+        export_controlled:
+          type: boolean
+          description: Whether or not this order component contains data that is export controlled (ITAR) by the US Government.
+        finishes:
+          type: array
+          items:
+            type: string
+          description: 'Note: this field is deprecated. Finishes now show up as Operations.'
+        innate_quantity:
+          type: integer
+          description: The quantity of this subcomponent that must be produced to make one top-level component.
+        is_root_component:
+          type: boolean
+        make_quantity:
+          type: integer
+          description: The quantity of this component that must be made to satisfy the quantity specified by the customer as well as the yield specified for this component (innate quantity * root component quantity / yield).
+        material:
+          $ref: '#/components/schemas/OrderMaterial'
+        material_operations:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrderOperation'
+        parent_ids:
+          type: array
+          items:
+            type: integer
+        part_name:
+          type: string
+        part_number:
+          type:
+          - string
+          - 'null'
+        part_url:
+          type: string
+          format: url
+        part_uuid:
+          type: string
+        process:
+          $ref: '#/components/schemas/OrderProcess'
+        purchased_component:
+          description: Reference to a purchased component object within the supplier account. Will be not null when type == 'purchased'
+          $ref: '#/components/schemas/QuotePurchasedComponent'
+        revision:
+          type:
+          - string
+          - 'null'
+        shop_operations:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrderOperation'
+        supporting_files:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrderSupportingFile'
+        thumbnail_url:
+          type:
+          - string
+          - 'null'
+        type:
+          type: string
+          enum:
+          - assembled
+          - manufactured
+          - purchased
+    AbstractPurchasedComponent:
+      type: object
+      properties:
+        oem_part_number:
+          type: string
+          description: Unique identifier for purchased component within a supplier account
+          example: 064-1235
+        internal_part_number:
+          type:
+          - string
+          - 'null'
+          example: a
+        description:
+          type:
+          - string
+          - 'null'
+          example: any text you want
+        piece_price:
+          type: number
+          format: decimal
+          description: Cost per piece to 4 decimal places
+          example: 2.0
+    SalesPerson:
+      type: object
+      properties:
+        uuid:
+          type: string
+          format: uuid
+        first_name:
+          type: string
+        last_name:
+          type: string
+        email:
+          type: string
+          format: email
+        erp_code:
+          type: string
+    QuotePurchasedComponent:
+      allOf:
+      - $ref: '#/components/schemas/AbstractPurchasedComponent'
+      - type: object
+        properties:
+          id:
+            type: string
+          properties:
+            type: array
+            items:
+              $ref: '#/components/schemas/PurchasedComponentProperty'
+    OperationQuantity:
+      type: object
+      properties:
+        price:
+          type: number
+          format: float
+        manual_price:
+          type:
+          - number
+          - 'null'
+          format: float
+        lead_time:
+          type:
+          - integer
+          - 'null'
+        manual_lead_time:
+          type:
+          - integer
+          - 'null'
         quantity:
           type: integer
-          description: The number of child component instances belonging to this parent. Note, the total number of instances of this child component in this assembly tree may be larger if this child appears in multiple places in the tree.
+    OrderAddOn:
+      type: object
+      properties:
+        is_required:
+          type: boolean
+        name:
+          type: string
+        erp_code:
+          type: string
+        notes:
+          type: string
+        price:
+          type: number
+          format: float
+        quantity:
+          type: integer
+        costing_variables:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrderCostingVariable'
+    OrderCostingVariable:
+      type: object
+      description: A CostingVariable is a piece of a Paperless Parts Programming Language (P3L) formula that determines the price and timing for an operation. CostingVariables are essentially Python variables and can represent several data types. An OrderCostingVariable represents the value a variable holds for the ordered quantity.
+      properties:
+        label:
+          type: string
+        variable_class:
+          type: string
+          enum:
+          - basic
+          - drop_down
+          - table
+        value_type:
+          type: string
+          enum:
+          - string
+          - number
+          - currency
+          - boolean
+        value:
+          anyOf:
+          - type: string
+          - type: number
+          - type: integer
+          - type: boolean
+          description: This will be indicated by the value_type field.
+        row:
+          type:
+          - object
+          - 'null'
+          description: An object representing a row from a custom table. This object will have arbitrary key-value pairs based on custom table schema it was pulled from. The row field will only be non-null when the variable_class field is 'table'.
+        options:
+          type:
+          - array
+          - 'null'
+          items:
+            anyOf:
+            - type: number
+            - type: string
+          description: A list of the options for a drop down variable. Can be strings, floats, or integers indicated by value_type. The options field will only be non-null when the variable_class field is 'drop_down'.
+        type:
+          type: string
+          description: To Be Deprecated
+          deprecated: false
+    OrderSupportingFile:
+      type: object
+      properties:
+        filename:
+          type: string
+        url:
+          type: string
+          format: url
+    Order:
+      type: object
+      properties:
+        uuid:
+          type: string
+          format: uuid
+        billing_info:
+          $ref: '#/components/schemas/AddressInfo'
+        created:
+          type: string
+          format: date-time
+        contact:
+          $ref: '#/components/schemas/OrderContact'
+        customer:
+          $ref: '#/components/schemas/OrderCustomer'
+        deliver_by:
+          type:
+          - string
+          - 'null'
+          format: date-time
+        erp_code:
+          type:
+          - string
+          - 'null'
+        estimator:
+          $ref: '#/components/schemas/OrderUser'
+        number:
+          $ref: '#/components/schemas/OrderNumber'
+        order_items:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrderItem'
+        payment_details:
+          $ref: '#/components/schemas/OrderPaymentDetails'
+        private_notes:
+          type:
+          - string
+          - 'null'
+        purchase_order_file_url:
+          type:
+          - string
+          - 'null'
+          format: uri
+        quote_erp_code:
+          type:
+          - string
+          - 'null'
+        quote_number:
+          type: integer
+        quote_rfq_number:
+          type:
+          - string
+          - 'null'
+        quote_revision_number:
+          type: integer
+        sales_person:
+          deprecated: true
+          $ref: '#/components/schemas/OrderUser'
+        salesperson:
+          $ref: '#/components/schemas/OrderUser'
+        send_from_facility:
+          $ref: '#/components/schemas/Facility'
+        shipments:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrderShipment'
+        shipping_info:
+          $ref: '#/components/schemas/AddressInfo'
+        shipping_option:
+          $ref: '#/components/schemas/OrderShippingOption'
+        ships_on:
+          type: string
+          format: date
+        status:
+          type: string
+          enum:
+          - pending
+          - confirmed
+          - on_hold
+          - in_process
+          - completed
+          - cancelled
+    OrderNumberArray:
+      type: array
+      items:
+        $ref: '#/components/schemas/OrderNumber'
+      description: An array of Order numbers
+      example:
+      - 38
+      - 39
+      - 40
+    OrderOperation:
+      type: object
+      properties:
+        id:
+          type: integer
+        category:
+          type: string
+          enum:
+          - material
+          - operation
+        cost:
+          type: number
+          format: float
+        costing_variables:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrderCostingVariable'
+        quantities:
+          type: array
+          items:
+            $ref: '#/components/schemas/OperationQuantity'
+        is_finish:
+          type: boolean
+        is_outside_service:
+          type: boolean
+        name:
+          type: string
+        erp_code:
+          type: string
+        operation_definition_name:
+          type: string
+        notes:
+          type:
+          - string
+          - 'null'
+        position:
+          type: integer
+          description: The position of the order operation in the order display, indexed from 1. Note that the position applies across both material operations and order operations. TODO - this shows up as 0 if there is only one operation on the order?
+        runtime:
+          type:
+          - number
+          - 'null'
+          format: float
+        setup_time:
+          type:
+          - number
+          - 'null'
+          format: float
+    OrderShipmentItem:
+      type: object
+      properties:
+        id:
+          type: integer
+        order_item_id:
+          type: integer
+        quantity:
+          type: integer
+    OrderShipment:
+      type: object
+      properties:
+        id:
+          type: integer
+        pickup_recipient:
+          type:
+          - string
+          - 'null'
+        shipment_date:
+          type: string
+          format: date-time
+        shipment_items:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrderShipmentItem'
+        shipping_cost:
+          type: number
+          format: float
+        tracking_number:
+          type: string
+    OrderMaterial:
+      type: object
+      description: This can also be null
+      properties:
+        id:
+          type: integer
+        display_name:
+          type: string
+        family:
+          type: string
+        material_class:
+          type: string
+        name:
+          type: string
+    OrderProcess:
+      type: object
+      properties:
+        id:
+          type: integer
+        external_name:
+          type: string
+        name:
+          type: string
+    OrderContact:
+      type: object
+      properties:
+        account:
+          type: object
+          properties:
+            erp_code:
+              type:
+              - string
+              - 'null'
+            id:
+              type: number
+              format: int
+            notes:
+              type:
+              - string
+              - 'null'
+            name:
+              type: string
+            payment_terms:
+              type:
+              - string
+              - 'null'
+            payment_terms_period:
+              type:
+              - string
+              - 'null'
+        email:
+          type: string
+          format: email
+        first_name:
+          type: string
+        id:
+          type: integer
+        last_name:
+          type: string
+        notes:
+          type:
+          - string
+          - 'null'
+        phone:
+          type:
+          - string
+          - 'null'
+        phone_ext:
+          type:
+          - string
+          - 'null'
+    OrderUser:
+      type: object
+      properties:
+        first_name:
+          type: string
+        last_name:
+          type: string
+        email:
+          type: string
+          format: email
+        avatar_color:
+          type: string
+    PurchasedComponentProperty:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Name of corresponding purchased component column in table display
+        code_name:
+          type: string
+          description: Name used to access property within pricing formulas via 'dot' operator
+        value_type:
+          type: string
+          enum:
+          - string
+          - boolean
+          - numeric
+        value:
+          anyOf:
+          - type: string
+          - type: number
+          - type: boolean
+          description: Value of property, None or of type corresponding to value_type
     OrderCustomer:
       type: object
       description: Deprecated! Will be removed soon.
@@ -1087,6 +917,205 @@ components:
           type: string
         phone_ext:
           type: string
+    OrderNumber:
+      type: integer
+      description: A unique identifier for an Order
+      example: 47
+    OrderCompany:
+      type: object
+      properties:
+        business_name:
+          type: string
+        erp_code:
+          type: string
+    OrderItem:
+      type: object
+      properties:
+        id:
+          type: integer
+        components:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrderComponent'
+        description:
+          type:
+          - string
+          - 'null'
+        expedite_revenue:
+          type:
+          - number
+          - 'null'
+          format: float
+        export_controlled:
+          type: boolean
+          description: Whether or not this order item contains data that is export controlled (ITAR) by the US Government.
+        filename:
+          type: string
+        lead_days:
+          type: integer
+        markup_1_price:
+          type: number
+          format: float
+        markup_1_name:
+          type: string
+        markup_2_price:
+          type: number
+          format: float
+        markup_2_name:
+          type: string
+        private_notes:
+          type:
+          - string
+          - 'null'
+        public_notes:
+          type:
+          - string
+          - 'null'
+        quantity:
+          type: integer
+        quantity_outstanding:
+          type: integer
+        quote_item_id:
+          type: integer
+        quote_item_type:
+          type: string
+          enum:
+          - automatic
+          - manual
+          description: Indicates whether the quote item is associated with a part (automatic pricing), or not (manual pricing).
+        root_component_id:
+          type: integer
+        ships_on:
+          type: string
+          format: date
+        total_price:
+          type: number
+          format: float
+        unit_price:
+          type: number
+          format: float
+        base_price:
+          type: number
+          format: float
+        add_on_fees:
+          type:
+          - number
+          - 'null'
+          format: float
+        ordered_add_ons:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrderAddOn'
+        pricing_items:
+          type: array
+          items:
+            type: object
+        unit_price_before_discounts:
+          type:
+          - number
+          - 'null'
+          format: float
+    Facility:
+      type:
+      - object
+      - 'null'
+      properties:
+        account_id:
+          type: integer
+          example: 55123
+        address:
+          $ref: '#/components/schemas/Address'
+        attention:
+          type: string
+          example: Gordon Moore
+        id:
+          type: integer
+          example: 12
+        name:
+          type: string
+          example: Boston Office
+        salesperson:
+          $ref: '#/components/schemas/SalesPerson'
+    AddressInfo:
+      type:
+      - object
+      - 'null'
+      properties:
+        id:
+          type: integer
+          example: 55123
+        address1:
+          type: string
+          example: 1 City Hall Sq.
+        address2:
+          type:
+          - string
+          - 'null'
+          example: null
+        attention:
+          type: string
+          example: Gordon Moore
+        business_name:
+          type: string
+          example: Paperless Parts, Inc.
+        city:
+          type: string
+          example: Boston
+        country:
+          type: string
+          example: USA
+        facility_name:
+          type:
+          - string
+          - 'null'
+          example: Boston Office
+        phone:
+          type: string
+          example: '6176354500'
+        phone_ext:
+          type:
+          - string
+          - 'null'
+          example: null
+        postal_code:
+          type: string
+          example: 1153
+        state:
+          type: string
+          example: MA
+        erp_code:
+          type:
+          - string
+          - 'null'
+    OrderShippingOption_2:
+      type: object
+      properties:
+        Contacts_account_number:
+          type:
+          - string
+          - 'null'
+        customers_carrier:
+          type:
+          - string
+          - 'null'
+          enum:
+          - ups
+          - fedex
+        shipping_method:
+          type:
+          - string
+          - 'null'
+          enum:
+          - early_am_overnight
+          - ground
+          - next_day_air
+          - second_day_air
+        type:
+          type: string
+          enum:
+          - pickup
+          - customers_shipping_account
+          - suppliers_shipping_account
     OrderComponent_2:
       type: object
       properties:
@@ -1224,164 +1253,18 @@ components:
           format: float
         manual_percentage:
           type: number
-    OrderItem_2:
+    SalesPerson_2:
       type: object
       properties:
-        id:
-          type: integer
-        components:
-          type: array
-          items:
-            $ref: '#/components/schemas/OrderComponent_2'
-        description:
-          type:
-          - string
-          - 'null'
-        expedite_revenue:
-          type:
-          - number
-          - 'null'
-          format: float
-        export_controlled:
-          type: boolean
-          description: Whether or not this order item contains data that is export controlled (ITAR) by the US Government.
-        filename:
+        first_name:
           type: string
-        lead_days:
-          type: integer
-        markup_1_price:
-          type: number
-          format: float
-        markup_1_name:
+        last_name:
           type: string
-        markup_2_price:
-          type: number
-          format: float
-        markup_2_name:
+        email:
           type: string
-        private_notes:
-          type:
-          - string
-          - 'null'
-        public_notes:
-          type:
-          - string
-          - 'null'
-        quantity:
-          type: integer
-        quantity_outstanding:
-          type: integer
-        quote_item_id:
-          type: integer
-        quote_item_type:
+          format: email
+        erp_code:
           type: string
-          enum:
-          - automatic
-          - manual
-          description: Indicates whether the quote item is associated with a part (automatic pricing), or not (manual pricing).
-        root_component_id:
-          type: integer
-        ships_on:
-          type: string
-          format: date
-        total_price:
-          type: number
-          format: float
-        unit_price:
-          type: number
-          format: float
-        base_price:
-          type: number
-          format: float
-        add_on_fees:
-          type:
-          - number
-          - 'null'
-          format: float
-        ordered_add_ons:
-          type: array
-          items:
-            $ref: '#/components/schemas/OrderAddOn'
-        pricing_items:
-          type: array
-          items:
-            $ref: '#/components/schemas/OrderPricingItem'
-    OrderShippingOption_2:
-      type: object
-      properties:
-        Contacts_account_number:
-          type:
-          - string
-          - 'null'
-        customers_carrier:
-          type:
-          - string
-          - 'null'
-          enum:
-          - ups
-          - fedex
-        shipping_method:
-          type:
-          - string
-          - 'null'
-          enum:
-          - early_am_overnight
-          - ground
-          - next_day_air
-          - second_day_air
-        type:
-          type: string
-          enum:
-          - pickup
-          - customers_shipping_account
-          - suppliers_shipping_account
-    AddressInfo_2:
-      type:
-      - object
-      - 'null'
-      properties:
-        id:
-          type: integer
-          example: 55123
-        address1:
-          type: string
-          example: 1 City Hall Sq.
-        address2:
-          type:
-          - string
-          - 'null'
-          example: null
-        attention:
-          type: string
-          example: Gordon Moore
-        business_name:
-          type: string
-          example: Paperless Parts, Inc.
-        city:
-          type: string
-          example: Boston
-        country:
-          type: string
-          example: USA
-        facility_name:
-          type:
-          - string
-          - 'null'
-          example: Boston Office
-        phone:
-          type: string
-          example: '6176354500'
-        phone_ext:
-          type:
-          - string
-          - 'null'
-          example: null
-        postal_code:
-          type: string
-          example: 1153
-        state:
-          type: string
-          example: MA
     Order_2:
       type: object
       properties:
@@ -1498,30 +1381,147 @@ components:
           type:
           - string
           - 'null'
-    SalesPerson_2:
+    OrderItem_2:
       type: object
       properties:
-        first_name:
+        id:
+          type: integer
+        components:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrderComponent_2'
+        description:
+          type:
+          - string
+          - 'null'
+        expedite_revenue:
+          type:
+          - number
+          - 'null'
+          format: float
+        export_controlled:
+          type: boolean
+          description: Whether or not this order item contains data that is export controlled (ITAR) by the US Government.
+        filename:
           type: string
-        last_name:
+        lead_days:
+          type: integer
+        markup_1_price:
+          type: number
+          format: float
+        markup_1_name:
           type: string
-        email:
+        markup_2_price:
+          type: number
+          format: float
+        markup_2_name:
           type: string
-          format: email
-        erp_code:
+        private_notes:
+          type:
+          - string
+          - 'null'
+        public_notes:
+          type:
+          - string
+          - 'null'
+        quantity:
+          type: integer
+        quantity_outstanding:
+          type: integer
+        quote_item_id:
+          type: integer
+        quote_item_type:
           type: string
+          enum:
+          - automatic
+          - manual
+          description: Indicates whether the quote item is associated with a part (automatic pricing), or not (manual pricing).
+        root_component_id:
+          type: integer
+        ships_on:
+          type: string
+          format: date
+        total_price:
+          type: number
+          format: float
+        unit_price:
+          type: number
+          format: float
+        base_price:
+          type: number
+          format: float
+        add_on_fees:
+          type:
+          - number
+          - 'null'
+          format: float
+        ordered_add_ons:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrderAddOn'
+        pricing_items:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrderPricingItem'
+    AddressInfo_2:
+      type:
+      - object
+      - 'null'
+      properties:
+        id:
+          type: integer
+          example: 55123
+        address1:
+          type: string
+          example: 1 City Hall Sq.
+        address2:
+          type:
+          - string
+          - 'null'
+          example: null
+        attention:
+          type: string
+          example: Gordon Moore
+        business_name:
+          type: string
+          example: Paperless Parts, Inc.
+        city:
+          type: string
+          example: Boston
+        country:
+          type: string
+          example: USA
+        facility_name:
+          type:
+          - string
+          - 'null'
+          example: Boston Office
+        phone:
+          type: string
+          example: '6176354500'
+        phone_ext:
+          type:
+          - string
+          - 'null'
+          example: null
+        postal_code:
+          type: string
+          example: 1153
+        state:
+          type: string
+          example: MA
   parameters:
-    last_order:
-      name: last_order
-      in: query
-      description: '**Last known order number**. You may supply the number of the last known order.'
-      schema:
-        $ref: '#/components/schemas/OrderNumber'
     orderNumber:
       name: orderNumber
       in: path
       description: The order number
       required: true
+      schema:
+        $ref: '#/components/schemas/OrderNumber'
+    last_order:
+      name: last_order
+      in: query
+      description: '**Last known order number**. You may supply the number of the last known order.'
       schema:
         $ref: '#/components/schemas/OrderNumber'
   securitySchemes:
