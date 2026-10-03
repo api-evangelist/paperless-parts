@@ -1071,36 +1071,15 @@ paths:
                 type: string
                 example: 'Error: Not Found'
 components:
-  parameters:
-    facilityId:
-      name: facilityId
-      in: path
-      required: true
-      example: 30
-      schema:
-        $ref: '#/components/schemas/FacilityId'
-    billingAddressId:
-      name: billingAddressId
-      in: path
-      required: true
-      example: 27
-      schema:
-        $ref: '#/components/schemas/BillingAddressId'
-    contactId:
-      name: contactId
-      in: path
-      description: The integer idenfier of a Contact, assigned automatically by Paperless Parts
-      required: true
-      schema:
-        $ref: '#/components/schemas/CustomerId'
-    accountId:
-      name: accountId
-      in: path
-      required: true
-      example: 17
-      schema:
-        $ref: '#/components/schemas/AccountId'
   schemas:
+    CustomerId:
+      type: integer
+      description: The customer id
+      example: '32'
+    AccountId:
+      type: integer
+      description: The account id
+      example: '13'
     SalesPerson:
       type: object
       properties:
@@ -1116,6 +1095,27 @@ components:
           format: email
         erp_code:
           type: string
+    Facility:
+      type:
+      - object
+      - 'null'
+      properties:
+        account_id:
+          type: integer
+          example: 55123
+        address:
+          $ref: '#/components/schemas/Address'
+        attention:
+          type: string
+          example: Gordon Moore
+        id:
+          type: integer
+          example: 12
+        name:
+          type: string
+          example: Boston Office
+        salesperson:
+          $ref: '#/components/schemas/SalesPerson'
     Account:
       type: object
       properties:
@@ -1214,51 +1214,21 @@ components:
           - string
           - 'null'
           example: https://www.paperlessparts.com
-    Address:
-      type: object
-      properties:
-        id:
-          type: integer
-          readOnly: true
-        address1:
-          type: string
-          maxLength: 250
-          example: 1 City Hall Sq.
-          description: (Required)
-        address2:
-          type:
-          - string
-          - 'null'
-          maxLength: 250
-          example: null
-          description: (Required)
-        city:
-          type: string
-          maxLength: 100
-          example: Boston
-          description: (Required)
-        state:
-          type: string
-          description: (Required) State/Province must be specified as standard postal abbreviation
-          example: MA
-        postal_code:
-          type: string
-          example: '02114'
-          description: (Required) US postal codes may optionally contain 4-digit extension, e.g., `'02114-1234'`
-        country:
-          type: string
-          maxLength: 3
-          description: (Required) Country must be ISO 3166-1 alpha-3 code. Currently allowed values are `'USA'`, `'CAN'`.
-          example: USA
-        erp_code:
-          type: string
-          maxLength: 50
-          description: The unique identifier for this address record in the ERP
-          example: B1234
-    CustomerId:
+    BillingAddressId:
       type: integer
-      description: The customer id
-      example: '32'
+      description: The billing address id
+      example: '27'
+    BillingAddress:
+      allOf:
+      - $ref: '#/components/schemas/Address'
+      - type: object
+        properties:
+          id:
+            type: integer
+    FacilityId:
+      type: integer
+      description: The facility id
+      example: '30'
     Contact:
       type: object
       properties:
@@ -1317,46 +1287,76 @@ components:
           - 'null'
         salesperson:
           $ref: '#/components/schemas/SalesPerson'
-    BillingAddress:
-      allOf:
-      - $ref: '#/components/schemas/Address'
-      - type: object
-        properties:
-          id:
-            type: integer
-    BillingAddressId:
-      type: integer
-      description: The billing address id
-      example: '27'
-    AccountId:
-      type: integer
-      description: The account id
-      example: '13'
-    Facility:
-      type:
-      - object
-      - 'null'
+    Address:
+      type: object
       properties:
-        account_id:
-          type: integer
-          example: 55123
-        address:
-          $ref: '#/components/schemas/Address'
-        attention:
-          type: string
-          example: Gordon Moore
         id:
           type: integer
-          example: 12
-        name:
+          readOnly: true
+        address1:
           type: string
-          example: Boston Office
-        salesperson:
-          $ref: '#/components/schemas/SalesPerson'
-    FacilityId:
-      type: integer
-      description: The facility id
-      example: '30'
+          maxLength: 250
+          example: 1 City Hall Sq.
+          description: (Required)
+        address2:
+          type:
+          - string
+          - 'null'
+          maxLength: 250
+          example: null
+          description: (Required)
+        city:
+          type: string
+          maxLength: 100
+          example: Boston
+          description: (Required)
+        state:
+          type: string
+          description: (Required) State/Province must be specified as standard postal abbreviation
+          example: MA
+        postal_code:
+          type: string
+          example: '02114'
+          description: (Required) US postal codes may optionally contain 4-digit extension, e.g., `'02114-1234'`
+        country:
+          type: string
+          maxLength: 3
+          description: (Required) Country must be ISO 3166-1 alpha-3 code. Currently allowed values are `'USA'`, `'CAN'`.
+          example: USA
+        erp_code:
+          type: string
+          maxLength: 50
+          description: The unique identifier for this address record in the ERP
+          example: B1234
+  parameters:
+    facilityId:
+      name: facilityId
+      in: path
+      required: true
+      example: 30
+      schema:
+        $ref: '#/components/schemas/FacilityId'
+    accountId:
+      name: accountId
+      in: path
+      required: true
+      example: 17
+      schema:
+        $ref: '#/components/schemas/AccountId'
+    billingAddressId:
+      name: billingAddressId
+      in: path
+      required: true
+      example: 27
+      schema:
+        $ref: '#/components/schemas/BillingAddressId'
+    contactId:
+      name: contactId
+      in: path
+      description: The integer idenfier of a Contact, assigned automatically by Paperless Parts
+      required: true
+      schema:
+        $ref: '#/components/schemas/CustomerId'
   securitySchemes:
     app_id:
       type: apiKey

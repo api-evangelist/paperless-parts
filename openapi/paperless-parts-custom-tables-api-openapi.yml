@@ -185,22 +185,16 @@ paths:
           default: v1
 components:
   schemas:
-    CustomTableName:
+    CustomTableRelatedEntity:
       type: object
       properties:
+        entity_type:
+          type: string
+          enum:
+          - operation
+          - process
         name:
           type: string
-    CustomTableRowData:
-      type: object
-      description: The keys in this object must match the column names in the config property above, and the corresponding values must be castable to the specified types in the config property.
-    CustomTableRows:
-      type: object
-      properties:
-        rows:
-          type: array
-          description: A list of table rows.
-          items:
-            $ref: '#/components/schemas/CustomTableRowData'
     CustomTableColumnConfig:
       type: object
       properties:
@@ -212,10 +206,11 @@ components:
           - numeric
           - string
           - boolean
-    TableName:
-      type: string
-      description: The name of the table
-      example: sample_table
+    CustomTableName:
+      type: object
+      properties:
+        name:
+          type: string
     CustomTableDetails:
       type: object
       properties:
@@ -234,10 +229,17 @@ components:
           items:
             type: object
             description: The keys in this object will match the column names in the columns property above.
-    CustomTableListResults:
-      type: array
-      items:
-        type: string
+    CustomTableRowData:
+      type: object
+      description: The keys in this object must match the column names in the config property above, and the corresponding values must be castable to the specified types in the config property.
+    CustomTableRows:
+      type: object
+      properties:
+        rows:
+          type: array
+          description: A list of table rows.
+          items:
+            $ref: '#/components/schemas/CustomTableRowData'
     CustomTableBody:
       type: object
       properties:
@@ -257,16 +259,14 @@ components:
           - 'null'
           items:
             $ref: '#/components/schemas/CustomTableRowData'
-    CustomTableRelatedEntity:
-      type: object
-      properties:
-        entity_type:
-          type: string
-          enum:
-          - operation
-          - process
-        name:
-          type: string
+    TableName:
+      type: string
+      description: The name of the table
+      example: sample_table
+    CustomTableListResults:
+      type: array
+      items:
+        type: string
   parameters:
     tableName:
       name: tableName

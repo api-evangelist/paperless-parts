@@ -498,6 +498,21 @@ paths:
                 example: Flat pattern DXF file not available for this part.
 components:
   schemas:
+    Uuid:
+      type: string
+      description: Unique identifier
+      example: 2f0e5724-42fe-47ae-8233-7a902ef70346
+    PartStatus:
+      type: object
+      properties:
+        processing:
+          type: string
+          example: in_progress
+          description: 'The status of the part''s geometric processing: in_progress, failed, or finished'
+        interrogation:
+          type: string
+          example: in_progress
+          description: 'The status of the part''s interrogation: in_progress, failed, or finished'
     Assembly:
       type: object
       properties:
@@ -509,6 +524,21 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/PartNode'
+    PartNode:
+      type: object
+      properties:
+        parent_uuid:
+          type: string
+          example: 2f0e5724-42fe-47ae-8233-7a902ef70346
+          description: The uuid of the parent part
+        child_uuid:
+          type: string
+          example: 4b4d3e8c-cfe2-4b3c-bd6f-792c3335f1fc
+          description: The uuid of the child part
+        count:
+          type: integer
+          example: 1
+          description: The number of times this node occurs
     Part:
       type: object
       properties:
@@ -629,36 +659,6 @@ components:
                 - type: number
                 - type: boolean
                 description: The value of the custom attribute
-    PartNode:
-      type: object
-      properties:
-        parent_uuid:
-          type: string
-          example: 2f0e5724-42fe-47ae-8233-7a902ef70346
-          description: The uuid of the parent part
-        child_uuid:
-          type: string
-          example: 4b4d3e8c-cfe2-4b3c-bd6f-792c3335f1fc
-          description: The uuid of the child part
-        count:
-          type: integer
-          example: 1
-          description: The number of times this node occurs
-    PartStatus:
-      type: object
-      properties:
-        processing:
-          type: string
-          example: in_progress
-          description: 'The status of the part''s geometric processing: in_progress, failed, or finished'
-        interrogation:
-          type: string
-          example: in_progress
-          description: 'The status of the part''s interrogation: in_progress, failed, or finished'
-    Uuid:
-      type: string
-      description: Unique identifier
-      example: 2f0e5724-42fe-47ae-8233-7a902ef70346
   parameters:
     partUuid:
       name: partUuid

@@ -329,56 +329,7 @@ paths:
         version:
           default: v1
 components:
-  parameters:
-    purchasedComponentsColumnId:
-      name: purchasedComponentsColumnId
-      in: path
-      required: true
-      schema:
-        $ref: '#/components/schemas/PurchasedComponentsColumnId'
-    purchasedComponentId:
-      name: purchasedComponentId
-      in: path
-      required: true
-      schema:
-        $ref: '#/components/schemas/PurchasedComponentId'
   schemas:
-    PatchPurchasedComponentsColumn:
-      allOf:
-      - $ref: '#/components/schemas/AbstractPurchasedComponentsColumn'
-      - type: object
-        properties:
-          update_existing_defaults:
-            type: boolean
-          position:
-            type: integer
-            example: 4
-    PostPurchasedComponent:
-      allOf:
-      - $ref: '#/components/schemas/AbstractPurchasedComponent'
-      - type: object
-        properties:
-          properties:
-            type: array
-            items:
-              $ref: '#/components/schemas/PurchasedComponentCustomProperty'
-        required:
-        - oem_part_number
-        - piece_price
-        - properties
-    PurchasedComponentId:
-      type: integer
-    PostPurchasedComponentsColumn:
-      allOf:
-      - $ref: '#/components/schemas/AbstractPurchasedComponentsColumn'
-      - type: object
-        required:
-        - code_name
-        - name
-        - value_type
-        - default_numeric_value
-        - default_string_value
-        - default_boolean_value
     AbstractPurchasedComponentsColumn:
       type: object
       properties:
@@ -404,42 +355,6 @@ components:
         default_boolean_value:
           type: boolean
           example: false
-    PurchasedComponentCustomProperty:
-      type: object
-      properties:
-        key:
-          type: string
-          description: Name of corresponding purchased component column in table display
-          example: property name
-        value:
-          anyOf:
-          - type: string
-          - type: number
-          - type: boolean
-          description: Value of property, None or of type corresponding to value_type
-          example: really cool value
-    PatchPurchasedComponent:
-      allOf:
-      - $ref: '#/components/schemas/AbstractPurchasedComponent'
-      - type: object
-        properties:
-          properties:
-            type: array
-            items:
-              $ref: '#/components/schemas/PurchasedComponentCustomProperty'
-    PurchasedComponentsColumn:
-      allOf:
-      - $ref: '#/components/schemas/AbstractPurchasedComponentsColumn'
-      - type: object
-        properties:
-          id:
-            type: integer
-            readOnly: true
-            example: 25
-          position:
-            type: integer
-            example: 4
-            description: Position of the column when displayed in the table; starts at 1.
     PurchasedComponent:
       allOf:
       - $ref: '#/components/schemas/AbstractPurchasedComponent'
@@ -455,6 +370,8 @@ components:
             type:
             - string
             - 'null'
+    PurchasedComponentsColumnId:
+      type: integer
     AbstractPurchasedComponent:
       type: object
       properties:
@@ -477,8 +394,78 @@ components:
           format: decimal
           description: Cost per piece to 4 decimal places
           example: 2.0
-    PurchasedComponentsColumnId:
+    PatchPurchasedComponentsColumn:
+      allOf:
+      - $ref: '#/components/schemas/AbstractPurchasedComponentsColumn'
+      - type: object
+        properties:
+          update_existing_defaults:
+            type: boolean
+          position:
+            type: integer
+            example: 4
+    PostPurchasedComponentsColumn:
+      allOf:
+      - $ref: '#/components/schemas/AbstractPurchasedComponentsColumn'
+      - type: object
+        required:
+        - code_name
+        - name
+        - value_type
+        - default_numeric_value
+        - default_string_value
+        - default_boolean_value
+    PatchPurchasedComponent:
+      allOf:
+      - $ref: '#/components/schemas/AbstractPurchasedComponent'
+      - type: object
+        properties:
+          properties:
+            type: array
+            items:
+              $ref: '#/components/schemas/PurchasedComponentCustomProperty'
+    PurchasedComponentsColumn:
+      allOf:
+      - $ref: '#/components/schemas/AbstractPurchasedComponentsColumn'
+      - type: object
+        properties:
+          id:
+            type: integer
+            readOnly: true
+            example: 25
+          position:
+            type: integer
+            example: 4
+            description: Position of the column when displayed in the table; starts at 1.
+    PurchasedComponentId:
       type: integer
+    PurchasedComponentCustomProperty:
+      type: object
+      properties:
+        key:
+          type: string
+          description: Name of corresponding purchased component column in table display
+          example: property name
+        value:
+          anyOf:
+          - type: string
+          - type: number
+          - type: boolean
+          description: Value of property, None or of type corresponding to value_type
+          example: really cool value
+    PostPurchasedComponent:
+      allOf:
+      - $ref: '#/components/schemas/AbstractPurchasedComponent'
+      - type: object
+        properties:
+          properties:
+            type: array
+            items:
+              $ref: '#/components/schemas/PurchasedComponentCustomProperty'
+        required:
+        - oem_part_number
+        - piece_price
+        - properties
     PurchasedComponent_2:
       allOf:
       - $ref: '#/components/schemas/AbstractPurchasedComponent'
@@ -490,6 +477,19 @@ components:
             type: array
             items:
               $ref: '#/components/schemas/PurchasedComponentCustomProperty'
+  parameters:
+    purchasedComponentId:
+      name: purchasedComponentId
+      in: path
+      required: true
+      schema:
+        $ref: '#/components/schemas/PurchasedComponentId'
+    purchasedComponentsColumnId:
+      name: purchasedComponentsColumnId
+      in: path
+      required: true
+      schema:
+        $ref: '#/components/schemas/PurchasedComponentsColumnId'
   securitySchemes:
     app_id:
       type: apiKey

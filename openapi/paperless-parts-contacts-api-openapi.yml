@@ -1330,80 +1330,50 @@ paths:
                   description: ERP code for user
                   example: EMPLOYEE1
 components:
+  parameters:
+    userUuid:
+      name: userUuid
+      in: path
+      required: true
+      example: 37d984ea-ec42-4a00-9cd1-a4cc73bb721e
+      schema:
+        $ref: '#/components/schemas/UserUuid'
+    paymentTermsId:
+      name: paymentTermsId
+      in: path
+      required: true
+      example: 1234
+      schema:
+        $ref: '#/components/schemas/PaymentTermsId'
+    accountId:
+      name: accountId
+      in: path
+      required: true
+      example: 17
+      schema:
+        $ref: '#/components/schemas/AccountId'
+    contactId:
+      name: contactId
+      in: path
+      description: The integer idenfier of a Contact, assigned automatically by Paperless Parts
+      required: true
+      schema:
+        $ref: '#/components/schemas/CustomerId'
+    facilityId:
+      name: facilityId
+      in: path
+      required: true
+      example: 30
+      schema:
+        $ref: '#/components/schemas/FacilityId'
+    billingAddressId:
+      name: billingAddressId
+      in: path
+      required: true
+      example: 27
+      schema:
+        $ref: '#/components/schemas/BillingAddressId'
   schemas:
-    Address:
-      type: object
-      properties:
-        address1:
-          type: string
-          maxLength: 250
-          example: 1 City Hall Sq.
-          description: (Required)
-        address2:
-          type:
-          - string
-          - 'null'
-          maxLength: 250
-          example: null
-          description: (Required)
-        city:
-          type: string
-          maxLength: 100
-          example: Boston
-          description: (Required)
-        state:
-          type: string
-          description: (Required) State/Province must be specified as standard postal abbreviation
-          example: MA
-        postal_code:
-          type: string
-          example: '02114'
-          description: (Required) US postal codes may optionally contain 4-digit extension, e.g., `'02114-1234'`
-        country:
-          type: string
-          maxLength: 3
-          description: (Required) Country must be ISO 3166-1 alpha-3 code. Currently allowed values are `'USA'`, `'CAN'`.
-          example: USA
-        erp_code:
-          type: string
-          maxLength: 50
-          description: The unique identifier for this address record in the ERP
-          example: B1234
-    CustomerId:
-      type: integer
-      description: The customer id
-      example: '32'
-    User:
-      type: object
-      properties:
-        uuid:
-          type: string
-          example: 37d984ea-ec42-4a00-9cd1-a4cc73bb721e
-          description: the uuid (unique identifier) for the user
-        email:
-          type: string
-          example: careers@paperlessparts.com
-          description: the email address of the user
-        first_name:
-          type: string
-          example: Gordon
-          description: User first name (must be non-null)
-        last_name:
-          type: string
-          example: Moore
-          description: User last name (must be non-null)
-        erp_code:
-          type: string
-          example: EMPLOYEE1
-          description: ERP code for the user
-    FacilityId:
-      type: integer
-      description: The facility id
-      example: '30'
-    PaymentTermsId:
-      type: integer
-      description: The payment terms id
-      example: '1234'
     SalesPerson:
       type: object
       properties:
@@ -1510,6 +1480,35 @@ components:
           example: https://www.paperlessparts.com
         metadata:
           $ref: '#/components/schemas/Metadata'
+    PaymentTermsId:
+      type: integer
+      description: The payment terms id
+      example: '1234'
+    Facility:
+      type:
+      - object
+      - 'null'
+      properties:
+        account_id:
+          type: integer
+          example: 55123
+        address:
+          $ref: '#/components/schemas/Address'
+        attention:
+          type: string
+          example: Gordon Moore
+        id:
+          type: integer
+          example: 12
+        name:
+          type: string
+          example: Boston Office
+        salesperson:
+          $ref: '#/components/schemas/SalesPerson'
+    FacilityId:
+      type: integer
+      description: The facility id
+      example: '30'
     UserUuid:
       type: string
       description: The user uuid
@@ -1518,10 +1517,118 @@ components:
       type: object
       example: '{ crm_id: 1581 }'
       description: Object that can be used to attach key-value data to an object. Up to 25 keys can be speficied, with key names up to 40 characters long and values up to 500 characters long.
+    PaymentTerms:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 26198
+          description: the ID of the payment terms
+        label:
+          type: string
+          example: Net 30 days
+          description: the label for the payment terms
+        period:
+          type: integer
+          example: 30
+          description: number of days before payment is due
+    BillingAddressId:
+      type: integer
+      description: The billing address id
+      example: '27'
+    Address:
+      type: object
+      properties:
+        address1:
+          type: string
+          maxLength: 250
+          example: 1 City Hall Sq.
+          description: (Required)
+        address2:
+          type:
+          - string
+          - 'null'
+          maxLength: 250
+          example: null
+          description: (Required)
+        city:
+          type: string
+          maxLength: 100
+          example: Boston
+          description: (Required)
+        state:
+          type: string
+          description: (Required) State/Province must be specified as standard postal abbreviation
+          example: MA
+        postal_code:
+          type: string
+          example: '02114'
+          description: (Required) US postal codes may optionally contain 4-digit extension, e.g., `'02114-1234'`
+        country:
+          type: string
+          maxLength: 3
+          description: (Required) Country must be ISO 3166-1 alpha-3 code. Currently allowed values are `'USA'`, `'CAN'`.
+          example: USA
+        erp_code:
+          type: string
+          maxLength: 50
+          description: The unique identifier for this address record in the ERP
+          example: B1234
+    CustomerId:
+      type: integer
+      description: The customer id
+      example: '32'
     AccountId:
       type: integer
       description: The account id
       example: '13'
+    AddressInfo:
+      type:
+      - object
+      - 'null'
+      properties:
+        id:
+          type: integer
+          example: 55123
+        address1:
+          type: string
+          example: 1 City Hall Sq.
+        address2:
+          type:
+          - string
+          - 'null'
+          example: null
+        attention:
+          type: string
+          example: Gordon Moore
+        business_name:
+          type: string
+          example: Paperless Parts, Inc.
+        city:
+          type: string
+          example: Boston
+        country:
+          type: string
+          example: USA
+        facility_name:
+          type:
+          - string
+          - 'null'
+          example: Boston Office
+        phone:
+          type: string
+          example: '6176354500'
+        phone_ext:
+          type:
+          - string
+          - 'null'
+          example: null
+        postal_code:
+          type: string
+          example: 1153
+        state:
+          type: string
+          example: MA
     Contact:
       type: object
       properties:
@@ -1574,136 +1681,29 @@ components:
           $ref: '#/components/schemas/SalesPerson'
         metadata:
           $ref: '#/components/schemas/Metadata'
-    BillingAddressId:
-      type: integer
-      description: The billing address id
-      example: '27'
-    PaymentTerms:
+    User:
       type: object
       properties:
-        id:
-          type: integer
-          example: 26198
-          description: the ID of the payment terms
-        label:
+        uuid:
           type: string
-          example: Net 30 days
-          description: the label for the payment terms
-        period:
-          type: integer
-          example: 30
-          description: number of days before payment is due
-    Facility:
-      type:
-      - object
-      - 'null'
-      properties:
-        account_id:
-          type: integer
-          example: 55123
-        address:
-          $ref: '#/components/schemas/Address'
-        attention:
+          example: 37d984ea-ec42-4a00-9cd1-a4cc73bb721e
+          description: the uuid (unique identifier) for the user
+        email:
           type: string
-          example: Gordon Moore
-        id:
-          type: integer
-          example: 12
-        name:
+          example: careers@paperlessparts.com
+          description: the email address of the user
+        first_name:
           type: string
-          example: Boston Office
-        salesperson:
-          $ref: '#/components/schemas/SalesPerson'
-    AddressInfo:
-      type:
-      - object
-      - 'null'
-      properties:
-        id:
-          type: integer
-          example: 55123
-        address1:
+          example: Gordon
+          description: User first name (must be non-null)
+        last_name:
           type: string
-          example: 1 City Hall Sq.
-        address2:
-          type:
-          - string
-          - 'null'
-          example: null
-        attention:
+          example: Moore
+          description: User last name (must be non-null)
+        erp_code:
           type: string
-          example: Gordon Moore
-        business_name:
-          type: string
-          example: Paperless Parts, Inc.
-        city:
-          type: string
-          example: Boston
-        country:
-          type: string
-          example: USA
-        facility_name:
-          type:
-          - string
-          - 'null'
-          example: Boston Office
-        phone:
-          type: string
-          example: '6176354500'
-        phone_ext:
-          type:
-          - string
-          - 'null'
-          example: null
-        postal_code:
-          type: string
-          example: 1153
-        state:
-          type: string
-          example: MA
-  parameters:
-    contactId:
-      name: contactId
-      in: path
-      description: The integer idenfier of a Contact, assigned automatically by Paperless Parts
-      required: true
-      schema:
-        $ref: '#/components/schemas/CustomerId'
-    facilityId:
-      name: facilityId
-      in: path
-      required: true
-      example: 30
-      schema:
-        $ref: '#/components/schemas/FacilityId'
-    userUuid:
-      name: userUuid
-      in: path
-      required: true
-      example: 37d984ea-ec42-4a00-9cd1-a4cc73bb721e
-      schema:
-        $ref: '#/components/schemas/UserUuid'
-    billingAddressId:
-      name: billingAddressId
-      in: path
-      required: true
-      example: 27
-      schema:
-        $ref: '#/components/schemas/BillingAddressId'
-    accountId:
-      name: accountId
-      in: path
-      required: true
-      example: 17
-      schema:
-        $ref: '#/components/schemas/AccountId'
-    paymentTermsId:
-      name: paymentTermsId
-      in: path
-      required: true
-      example: 1234
-      schema:
-        $ref: '#/components/schemas/PaymentTermsId'
+          example: EMPLOYEE1
+          description: ERP code for the user
   securitySchemes:
     app_id:
       type: apiKey

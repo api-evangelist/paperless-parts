@@ -897,14 +897,6 @@ components:
           type: boolean
           example: false
           description: Indicates if an Add On is require
-    JobId:
-      type: integer
-      description: The job id
-      example: 37
-    Position:
-      type: integer
-      description: Position in list
-      example: 3
     Job:
       type: object
       properties:
@@ -1010,6 +1002,14 @@ components:
           type: integer
           example: 132
           description: The id of the root job
+    Position:
+      type: integer
+      description: Position in list
+      example: 3
+    JobId:
+      type: integer
+      description: The job id
+      example: 37
   parameters:
     jobId:
       name: jobId

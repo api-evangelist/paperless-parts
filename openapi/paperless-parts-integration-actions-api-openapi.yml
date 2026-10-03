@@ -313,59 +313,6 @@ paths:
                   description: The new status message for the integration
 components:
   schemas:
-    ManagedIntegrationLogo:
-      type: object
-      properties:
-        original:
-          type:
-          - string
-          - 'null'
-          format: uri
-        thumbnail:
-          type:
-          - string
-          - 'null'
-          format: uri
-    IntegrationAction:
-      type: object
-      properties:
-        uuid:
-          type: string
-          format: uuid
-        type:
-          type: string
-          example: export_order
-          description: the type of action being requested
-        created:
-          type: string
-          format: date-time
-        updated:
-          type: string
-          format: date-time
-        current_record_count:
-          type: integer
-        last_checkin:
-          type:
-          - string
-          - 'null'
-          format: date-time
-        related_object:
-          type:
-          - string
-          - 'null'
-        related_object_type:
-          type: string
-        status:
-          type: string
-          example: in_progress
-          description: The current status of the action
-        status_message:
-          type: string
-          example: Order 8 is currently being processed
-        entity_id:
-          type: string
-          example: '8'
-          description: The identifier for the entity that should be processed as part of the action. For example, process order 8
     ManagedIntegration:
       type: object
       properties:
@@ -455,9 +402,62 @@ components:
           type: string
           example: support@paperlessparts.com
           description: A contact to reach out to for support on this integration
+    ManagedIntegrationLogo:
+      type: object
+      properties:
+        original:
+          type:
+          - string
+          - 'null'
+          format: uri
+        thumbnail:
+          type:
+          - string
+          - 'null'
+          format: uri
     ManagedIntegrationDetails:
       allOf:
       - $ref: '#/components/schemas/ManagedIntegration'
+    IntegrationAction:
+      type: object
+      properties:
+        uuid:
+          type: string
+          format: uuid
+        type:
+          type: string
+          example: export_order
+          description: the type of action being requested
+        created:
+          type: string
+          format: date-time
+        updated:
+          type: string
+          format: date-time
+        current_record_count:
+          type: integer
+        last_checkin:
+          type:
+          - string
+          - 'null'
+          format: date-time
+        related_object:
+          type:
+          - string
+          - 'null'
+        related_object_type:
+          type: string
+        status:
+          type: string
+          example: in_progress
+          description: The current status of the action
+        status_message:
+          type: string
+          example: Order 8 is currently being processed
+        entity_id:
+          type: string
+          example: '8'
+          description: The identifier for the entity that should be processed as part of the action. For example, process order 8
   securitySchemes:
     app_id:
       type: apiKey
