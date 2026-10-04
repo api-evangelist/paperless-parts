@@ -313,6 +313,9 @@ paths:
                   description: The new status message for the integration
 components:
   schemas:
+    ManagedIntegrationDetails:
+      allOf:
+      - $ref: '#/components/schemas/ManagedIntegration'
     ManagedIntegration:
       type: object
       properties:
@@ -402,22 +405,6 @@ components:
           type: string
           example: support@paperlessparts.com
           description: A contact to reach out to for support on this integration
-    ManagedIntegrationLogo:
-      type: object
-      properties:
-        original:
-          type:
-          - string
-          - 'null'
-          format: uri
-        thumbnail:
-          type:
-          - string
-          - 'null'
-          format: uri
-    ManagedIntegrationDetails:
-      allOf:
-      - $ref: '#/components/schemas/ManagedIntegration'
     IntegrationAction:
       type: object
       properties:
@@ -458,6 +445,19 @@ components:
           type: string
           example: '8'
           description: The identifier for the entity that should be processed as part of the action. For example, process order 8
+    ManagedIntegrationLogo:
+      type: object
+      properties:
+        original:
+          type:
+          - string
+          - 'null'
+          format: uri
+        thumbnail:
+          type:
+          - string
+          - 'null'
+          format: uri
   securitySchemes:
     app_id:
       type: apiKey

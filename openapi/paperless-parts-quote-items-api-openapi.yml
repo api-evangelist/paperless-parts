@@ -130,6 +130,119 @@ paths:
                   example: 2
 components:
   schemas:
+    OrderSupportingFile:
+      type: object
+      properties:
+        filename:
+          type: string
+        url:
+          type: string
+          format: url
+    QuoteComponent:
+      type: object
+      description: Represents a component in the quote item. In the simplest case, there is a single root component. If the quote item is an assembly, the array will contain each component in the assembly. Components can be manufactured (i.e., parts), assemblies (i.e., top-level or sub-assembly), or purchased (e.g., hardware). Exactly one component in the array will be the root component, but it might not be the first element in the array.
+      properties:
+        id:
+          type: string
+        add_ons:
+          type: array
+          items:
+            $ref: '#/components/schemas/QuoteAddOn'
+        discounts:
+          type: array
+          items:
+            type: object
+        is_assembly:
+          type: boolean
+        obtain_method:
+          type:
+          - string
+          - 'null'
+        part_custom_attrs:
+          type: array
+          items:
+            type: object
+        pricing_items:
+          type: array
+          items:
+            type: object
+        quantities:
+          type: array
+          items:
+            $ref: '#/components/schemas/QuoteQuantity'
+        child_ids:
+          type: array
+          items:
+            type: integer
+        children:
+          type: array
+          items:
+            $ref: '#/components/schemas/ComponentChild'
+        description:
+          type:
+          - string
+          - 'null'
+        export_controlled:
+          type: boolean
+          description: Whether or not this component contains data that is export controlled (ITAR) by the US Government.
+        finishes:
+          type: array
+          items:
+            type: string
+          description: 'Note: this field is deprecated. Finishes now show up as Operations.'
+        innate_quantity:
+          type: integer
+          description: The quantity of this subcomponent that must be produced to make one top-level component.
+        is_root_component:
+          type: boolean
+        material:
+          $ref: '#/components/schemas/OrderMaterial'
+        material_operations:
+          type: array
+          items:
+            $ref: '#/components/schemas/QuoteOperation'
+        parent_ids:
+          type: array
+          items:
+            type: integer
+        part_name:
+          type: string
+        part_number:
+          type:
+          - string
+          - 'null'
+        part_url:
+          type: string
+          format: url
+        part_uuid:
+          type: string
+        process:
+          $ref: '#/components/schemas/OrderProcess'
+        purchased_component:
+          description: Reference to a purchased component object within the supplier account. Will be not null when type == 'purchased'
+          $ref: '#/components/schemas/QuotePurchasedComponent'
+        revision:
+          type:
+          - string
+          - 'null'
+        shop_operations:
+          type: array
+          items:
+            $ref: '#/components/schemas/QuoteOperation'
+        supporting_files:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrderSupportingFile'
+        thumbnail_url:
+          type:
+          - string
+          - 'null'
+        type:
+          type: string
+          enum:
+          - assembled
+          - manufactured
+          - purchased
     QuoteQuantity:
       type: object
       description: A quantity object represents a unit price and a numerical quantity associated with a component. A component can have many quantities, and the set of quantities represents the pricing options available to the recipient of a quote.
@@ -238,45 +351,39 @@ components:
           - number
           - 'null'
           format: float
-    OperationQuantity:
+    OrderMaterial:
       type: object
-      properties:
-        price:
-          type: number
-          format: float
-        manual_price:
-          type:
-          - number
-          - 'null'
-          format: float
-        lead_time:
-          type:
-          - integer
-          - 'null'
-        manual_lead_time:
-          type:
-          - integer
-          - 'null'
-        quantity:
-          type: integer
-    OrderProcess:
-      type: object
+      description: This can also be null
       properties:
         id:
           type: integer
-        external_name:
+        display_name:
+          type: string
+        family:
+          type: string
+        material_class:
           type: string
         name:
           type: string
-    ComponentChild:
+    QuoteAddOn:
       type: object
       properties:
-        child_id:
-          type: integer
-          description: ID of the child component
-        quantity:
-          type: integer
-          description: The number of child component instances belonging to this parent. Note, the total number of instances of this child component in this assembly tree may be larger if this child appears in multiple places in the tree.
+        is_required:
+          type: boolean
+        name:
+          type: string
+        erp_code:
+          type: string
+        notes:
+          type: string
+        quantities:
+          type: array
+          items:
+            $ref: '#/components/schemas/QuoteAddOnQuantity'
+        costing_variables:
+          type: array
+          items:
+            $ref: '#/components/schemas/QuoteCostingVariable'
     AbstractPurchasedComponent:
       type: object
       properties:
@@ -299,75 +406,47 @@ components:
           format: decimal
           description: Cost per piece to 4 decimal places
           example: 2.0
-    QuoteAddOn:
+    ComponentChild:
       type: object
       properties:
-        is_required:
-          type: boolean
-        name:
-          type: string
-        erp_code:
-          type: string
-        notes:
-          type: string
-        quantities:
-          type: array
-          items:
-            $ref: '#/components/schemas/QuoteAddOnQuantity'
-        costing_variables:
-          type: array
-          items:
-            $ref: '#/components/schemas/QuoteCostingVariable'
-    QuoteItem:
+        child_id:
+          type: integer
+          description: ID of the child component
+        quantity:
+          type: integer
+          description: The number of child component instances belonging to this parent. Note, the total number of instances of this child component in this assembly tree may be larger if this child appears in multiple places in the tree.
+    OperationQuantity:
       type: object
-      description: A quote item represents a line item in a quote. Quote items can either be manual or automatic, as indicated by the 'type' property. Automatic quote items are those generated by adding a part to a quote. Pricing data for automatic quote items is automatically populated using the process, material, and operations, if they exist. Manual quote items do not have an associated part, so the pricing information must be inputted manually.
       properties:
-        id:
+        price:
+          type: number
+          format: float
+        manual_price:
+          type:
+          - number
+          - 'null'
+          format: float
+        lead_time:
+          type:
+          - integer
+          - 'null'
+        manual_lead_time:
+          type:
+          - integer
+          - 'null'
+        quantity:
           type: integer
-        type:
-          type: string
-          enum:
-          - automatic
-          - manual
-          description: Indicates whether the quote item is associated with a part (automatic pricing), or not (manual pricing).
-        root_component_id:
+    QuoteAddOnQuantity:
+      type: object
+      properties:
+        price:
+          type: number
+          format: float
+        manual_price:
+          type: number
+          format: float
+        quantity:
           type: integer
-          description: ID of the root component. A root component houses the pricing information for a quote item. Every quote item has a root component. In the case of an automatic quote item, the root component corresponds to a part; in the case of a manual quote item, which does not have an associated part, the root component stores the manual pricing data. As the name 'root component' implies, it is possible for a quote item to have many components, as in the case of an assembly of nested parts.
-        components:
-          type: array
-          items:
-            $ref: '#/components/schemas/QuoteComponent'
-        position:
-          type: integer
-          description: The position of the quote item in the quote display, indexed from 1.
-        export_controlled:
-          type: boolean
-          description: Whether or not this quote item contains data that is export controlled (ITAR) by the US Government.
-        component_ids:
-          type: array
-          items:
-            type: integer
-        metadata:
-          type:
-          - object
-          - 'null'
-        private_notes:
-          type:
-          - string
-          - 'null'
-        public_notes:
-          type:
-          - string
-          - 'null'
-        workflow_status:
-          type:
-          - string
-          - 'null'
-        root_component:
-          deprecated: true
-          type:
-          - object
-          - 'null'
     QuotePurchasedComponent:
       allOf:
       - $ref: '#/components/schemas/AbstractPurchasedComponent'
@@ -398,35 +477,6 @@ components:
         total_price:
           type: number
           format: float
-    OrderSupportingFile:
-      type: object
-      properties:
-        filename:
-          type: string
-        url:
-          type: string
-          format: url
-    PurchasedComponentProperty:
-      type: object
-      properties:
-        name:
-          type: string
-          description: Name of corresponding purchased component column in table display
-        code_name:
-          type: string
-          description: Name used to access property within pricing formulas via 'dot' operator
-        value_type:
-          type: string
-          enum:
-          - string
-          - boolean
-          - numeric
-        value:
-          anyOf:
-          - type: string
-          - type: number
-          - type: boolean
-          description: Value of property, None or of type corresponding to value_type
     QuoteCostingVariable:
       type: object
       description: A CostingVariable is a piece of a Paperless Parts Programming Language (P3L) formula that determines the price and timing for an operation. CostingVariables are essentially Python variables and can represent several data types.
@@ -514,133 +564,83 @@ components:
           - 'null'
           description: The row field will only be non-null when the type field is 'table'. Row represents a row in a lookup table and is an object with arbitrary keys. To Be Deprecated
           deprecated: false
-    QuoteAddOnQuantity:
+    QuoteItem:
       type: object
-      properties:
-        price:
-          type: number
-          format: float
-        manual_price:
-          type: number
-          format: float
-        quantity:
-          type: integer
-    QuoteComponent:
-      type: object
-      description: Represents a component in the quote item. In the simplest case, there is a single root component. If the quote item is an assembly, the array will contain each component in the assembly. Components can be manufactured (i.e., parts), assemblies (i.e., top-level or sub-assembly), or purchased (e.g., hardware). Exactly one component in the array will be the root component, but it might not be the first element in the array.
+      description: A quote item represents a line item in a quote. Quote items can either be manual or automatic, as indicated by the 'type' property. Automatic quote items are those generated by adding a part to a quote. Pricing data for automatic quote items is automatically populated using the process, material, and operations, if they exist. Manual quote items do not have an associated part, so the pricing information must be inputted manually.
       properties:
         id:
-          type: string
-        add_ons:
-          type: array
-          items:
-            $ref: '#/components/schemas/QuoteAddOn'
-        discounts:
-          type: array
-          items:
-            type: object
-        is_assembly:
-          type: boolean
-        obtain_method:
-          type:
-          - string
-          - 'null'
-        part_custom_attrs:
-          type: array
-          items:
-            type: object
-        pricing_items:
-          type: array
-          items:
-            type: object
-        quantities:
-          type: array
-          items:
-            $ref: '#/components/schemas/QuoteQuantity'
-        child_ids:
-          type: array
-          items:
-            type: integer
-        children:
-          type: array
-          items:
-            $ref: '#/components/schemas/ComponentChild'
-        description:
-          type:
-          - string
-          - 'null'
-        export_controlled:
-          type: boolean
-          description: Whether or not this component contains data that is export controlled (ITAR) by the US Government.
-        finishes:
-          type: array
-          items:
-            type: string
-          description: 'Note: this field is deprecated. Finishes now show up as Operations.'
-        innate_quantity:
           type: integer
-          description: The quantity of this subcomponent that must be produced to make one top-level component.
-        is_root_component:
-          type: boolean
-        material:
-          $ref: '#/components/schemas/OrderMaterial'
-        material_operations:
-          type: array
-          items:
-            $ref: '#/components/schemas/QuoteOperation'
-        parent_ids:
-          type: array
-          items:
-            type: integer
-        part_name:
-          type: string
-        part_number:
-          type:
-          - string
-          - 'null'
-        part_url:
-          type: string
-          format: url
-        part_uuid:
-          type: string
-        process:
-          $ref: '#/components/schemas/OrderProcess'
-        purchased_component:
-          description: Reference to a purchased component object within the supplier account. Will be not null when type == 'purchased'
-          $ref: '#/components/schemas/QuotePurchasedComponent'
-        revision:
-          type:
-          - string
-          - 'null'
-        shop_operations:
-          type: array
-          items:
-            $ref: '#/components/schemas/QuoteOperation'
-        supporting_files:
-          type: array
-          items:
-            $ref: '#/components/schemas/OrderSupportingFile'
-        thumbnail_url:
-          type:
-          - string
-          - 'null'
         type:
           type: string
           enum:
-          - assembled
-          - manufactured
-          - purchased
-    OrderMaterial:
+          - automatic
+          - manual
+          description: Indicates whether the quote item is associated with a part (automatic pricing), or not (manual pricing).
+        root_component_id:
+          type: integer
+          description: ID of the root component. A root component houses the pricing information for a quote item. Every quote item has a root component. In the case of an automatic quote item, the root component corresponds to a part; in the case of a manual quote item, which does not have an associated part, the root component stores the manual pricing data. As the name 'root component' implies, it is possible for a quote item to have many components, as in the case of an assembly of nested parts.
+        components:
+          type: array
+          items:
+            $ref: '#/components/schemas/QuoteComponent'
+        position:
+          type: integer
+          description: The position of the quote item in the quote display, indexed from 1.
+        export_controlled:
+          type: boolean
+          description: Whether or not this quote item contains data that is export controlled (ITAR) by the US Government.
+        component_ids:
+          type: array
+          items:
+            type: integer
+        metadata:
+          type:
+          - object
+          - 'null'
+        private_notes:
+          type:
+          - string
+          - 'null'
+        public_notes:
+          type:
+          - string
+          - 'null'
+        workflow_status:
+          type:
+          - string
+          - 'null'
+        root_component:
+          deprecated: true
+          type:
+          - object
+          - 'null'
+    PurchasedComponentProperty:
       type: object
-      description: This can also be null
+      properties:
+        name:
+          type: string
+          description: Name of corresponding purchased component column in table display
+        code_name:
+          type: string
+          description: Name used to access property within pricing formulas via 'dot' operator
+        value_type:
+          type: string
+          enum:
+          - string
+          - boolean
+          - numeric
+        value:
+          anyOf:
+          - type: string
+          - type: number
+          - type: boolean
+          description: Value of property, None or of type corresponding to value_type
+    OrderProcess:
+      type: object
       properties:
         id:
           type: integer
-        display_name:
-          type: string
-        family:
-          type: string
-        material_class:
+        external_name:
           type: string
         name:
           type: string

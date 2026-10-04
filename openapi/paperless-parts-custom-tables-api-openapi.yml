@@ -185,6 +185,13 @@ paths:
           default: v1
 components:
   schemas:
+    TableName:
+      type: string
+      description: The name of the table
+      example: sample_table
+    CustomTableRowData:
+      type: object
+      description: The keys in this object must match the column names in the config property above, and the corresponding values must be castable to the specified types in the config property.
     CustomTableRelatedEntity:
       type: object
       properties:
@@ -195,6 +202,10 @@ components:
           - process
         name:
           type: string
+    CustomTableListResults:
+      type: array
+      items:
+        type: string
     CustomTableColumnConfig:
       type: object
       properties:
@@ -206,11 +217,6 @@ components:
           - numeric
           - string
           - boolean
-    CustomTableName:
-      type: object
-      properties:
-        name:
-          type: string
     CustomTableDetails:
       type: object
       properties:
@@ -229,9 +235,6 @@ components:
           items:
             type: object
             description: The keys in this object will match the column names in the columns property above.
-    CustomTableRowData:
-      type: object
-      description: The keys in this object must match the column names in the config property above, and the corresponding values must be castable to the specified types in the config property.
     CustomTableRows:
       type: object
       properties:
@@ -259,14 +262,11 @@ components:
           - 'null'
           items:
             $ref: '#/components/schemas/CustomTableRowData'
-    TableName:
-      type: string
-      description: The name of the table
-      example: sample_table
-    CustomTableListResults:
-      type: array
-      items:
-        type: string
+    CustomTableName:
+      type: object
+      properties:
+        name:
+          type: string
   parameters:
     tableName:
       name: tableName

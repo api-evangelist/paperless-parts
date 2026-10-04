@@ -1331,20 +1331,6 @@ paths:
                   example: EMPLOYEE1
 components:
   parameters:
-    userUuid:
-      name: userUuid
-      in: path
-      required: true
-      example: 37d984ea-ec42-4a00-9cd1-a4cc73bb721e
-      schema:
-        $ref: '#/components/schemas/UserUuid'
-    paymentTermsId:
-      name: paymentTermsId
-      in: path
-      required: true
-      example: 1234
-      schema:
-        $ref: '#/components/schemas/PaymentTermsId'
     accountId:
       name: accountId
       in: path
@@ -1366,6 +1352,20 @@ components:
       example: 30
       schema:
         $ref: '#/components/schemas/FacilityId'
+    paymentTermsId:
+      name: paymentTermsId
+      in: path
+      required: true
+      example: 1234
+      schema:
+        $ref: '#/components/schemas/PaymentTermsId'
+    userUuid:
+      name: userUuid
+      in: path
+      required: true
+      example: 37d984ea-ec42-4a00-9cd1-a4cc73bb721e
+      schema:
+        $ref: '#/components/schemas/UserUuid'
     billingAddressId:
       name: billingAddressId
       in: path
@@ -1374,18 +1374,6 @@ components:
       schema:
         $ref: '#/components/schemas/BillingAddressId'
   schemas:
-    SalesPerson:
-      type: object
-      properties:
-        first_name:
-          type: string
-        last_name:
-          type: string
-        email:
-          type: string
-          format: email
-        erp_code:
-          type: string
     Account:
       type: object
       properties:
@@ -1480,62 +1468,14 @@ components:
           example: https://www.paperlessparts.com
         metadata:
           $ref: '#/components/schemas/Metadata'
-    PaymentTermsId:
-      type: integer
-      description: The payment terms id
-      example: '1234'
-    Facility:
-      type:
-      - object
-      - 'null'
-      properties:
-        account_id:
-          type: integer
-          example: 55123
-        address:
-          $ref: '#/components/schemas/Address'
-        attention:
-          type: string
-          example: Gordon Moore
-        id:
-          type: integer
-          example: 12
-        name:
-          type: string
-          example: Boston Office
-        salesperson:
-          $ref: '#/components/schemas/SalesPerson'
-    FacilityId:
-      type: integer
-      description: The facility id
-      example: '30'
-    UserUuid:
-      type: string
-      description: The user uuid
-      example: 37d984ea-ec42-4a00-9cd1-a4cc73bb721e
     Metadata:
       type: object
       example: '{ crm_id: 1581 }'
       description: Object that can be used to attach key-value data to an object. Up to 25 keys can be speficied, with key names up to 40 characters long and values up to 500 characters long.
-    PaymentTerms:
-      type: object
-      properties:
-        id:
-          type: integer
-          example: 26198
-          description: the ID of the payment terms
-        label:
-          type: string
-          example: Net 30 days
-          description: the label for the payment terms
-        period:
-          type: integer
-          example: 30
-          description: number of days before payment is due
-    BillingAddressId:
+    FacilityId:
       type: integer
-      description: The billing address id
-      example: '27'
+      description: The facility id
+      example: '30'
     Address:
       type: object
       properties:
@@ -1578,10 +1518,58 @@ components:
       type: integer
       description: The customer id
       example: '32'
-    AccountId:
+    Facility:
+      type:
+      - object
+      - 'null'
+      properties:
+        account_id:
+          type: integer
+          example: 55123
+        address:
+          $ref: '#/components/schemas/Address'
+        attention:
+          type: string
+          example: Gordon Moore
+        id:
+          type: integer
+          example: 12
+        name:
+          type: string
+          example: Boston Office
+        salesperson:
+          $ref: '#/components/schemas/SalesPerson'
+    PaymentTermsId:
       type: integer
-      description: The account id
-      example: '13'
+      description: The payment terms id
+      example: '1234'
+    User:
+      type: object
+      properties:
+        uuid:
+          type: string
+          example: 37d984ea-ec42-4a00-9cd1-a4cc73bb721e
+          description: the uuid (unique identifier) for the user
+        email:
+          type: string
+          example: careers@paperlessparts.com
+          description: the email address of the user
+        first_name:
+          type: string
+          example: Gordon
+          description: User first name (must be non-null)
+        last_name:
+          type: string
+          example: Moore
+          description: User last name (must be non-null)
+        erp_code:
+          type: string
+          example: EMPLOYEE1
+          description: ERP code for the user
+    BillingAddressId:
+      type: integer
+      description: The billing address id
+      example: '27'
     AddressInfo:
       type:
       - object
@@ -1629,6 +1617,37 @@ components:
         state:
           type: string
           example: MA
+    UserUuid:
+      type: string
+      description: The user uuid
+      example: 37d984ea-ec42-4a00-9cd1-a4cc73bb721e
+    PaymentTerms:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 26198
+          description: the ID of the payment terms
+        label:
+          type: string
+          example: Net 30 days
+          description: the label for the payment terms
+        period:
+          type: integer
+          example: 30
+          description: number of days before payment is due
+    SalesPerson:
+      type: object
+      properties:
+        first_name:
+          type: string
+        last_name:
+          type: string
+        email:
+          type: string
+          format: email
+        erp_code:
+          type: string
     Contact:
       type: object
       properties:
@@ -1681,29 +1700,10 @@ components:
           $ref: '#/components/schemas/SalesPerson'
         metadata:
           $ref: '#/components/schemas/Metadata'
-    User:
-      type: object
-      properties:
-        uuid:
-          type: string
-          example: 37d984ea-ec42-4a00-9cd1-a4cc73bb721e
-          description: the uuid (unique identifier) for the user
-        email:
-          type: string
-          example: careers@paperlessparts.com
-          description: the email address of the user
-        first_name:
-          type: string
-          example: Gordon
-          description: User first name (must be non-null)
-        last_name:
-          type: string
-          example: Moore
-          description: User last name (must be non-null)
-        erp_code:
-          type: string
-          example: EMPLOYEE1
-          description: ERP code for the user
+    AccountId:
+      type: integer
+      description: The account id
+      example: '13'
   securitySchemes:
     app_id:
       type: apiKey

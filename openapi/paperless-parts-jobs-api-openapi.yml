@@ -866,37 +866,6 @@ components:
           type: string
           example: hr
           description: The unit for setup time. (hr, min, sec)
-    JobAddOn:
-      type: object
-      properties:
-        position:
-          type: integer
-          example: 4
-          description: The AddOn's position
-        add_on_def_id:
-          type: integer
-          example: 53
-          description: The ID of the Add On definition from which the Add On was derived
-        name:
-          type: string
-          example: admin
-          description: The name of the Add On
-        notes:
-          type: string
-          example: Example notes
-          description: Add On notes
-        overrides:
-          type: object
-          example: '{ ''unit_price'': 27, ''setup_time'': 12, }'
-          description: A json object containing variable overrides
-        actuals:
-          type: object
-          example: '{ ''unit_price'': 27, ''setup_time'': 12, }'
-          description: A json object containing the actuals values
-        is_required:
-          type: boolean
-          example: false
-          description: Indicates if an Add On is require
     Job:
       type: object
       properties:
@@ -1002,22 +971,46 @@ components:
           type: integer
           example: 132
           description: The id of the root job
-    Position:
-      type: integer
-      description: Position in list
-      example: 3
+    JobAddOn:
+      type: object
+      properties:
+        position:
+          type: integer
+          example: 4
+          description: The AddOn's position
+        add_on_def_id:
+          type: integer
+          example: 53
+          description: The ID of the Add On definition from which the Add On was derived
+        name:
+          type: string
+          example: admin
+          description: The name of the Add On
+        notes:
+          type: string
+          example: Example notes
+          description: Add On notes
+        overrides:
+          type: object
+          example: '{ ''unit_price'': 27, ''setup_time'': 12, }'
+          description: A json object containing variable overrides
+        actuals:
+          type: object
+          example: '{ ''unit_price'': 27, ''setup_time'': 12, }'
+          description: A json object containing the actuals values
+        is_required:
+          type: boolean
+          example: false
+          description: Indicates if an Add On is require
     JobId:
       type: integer
       description: The job id
       example: 37
+    Position:
+      type: integer
+      description: Position in list
+      example: 3
   parameters:
-    jobId:
-      name: jobId
-      in: path
-      required: true
-      example: 37
-      schema:
-        $ref: '#/components/schemas/JobId'
     position:
       name: position
       in: path
@@ -1025,6 +1018,13 @@ components:
       example: 3
       schema:
         $ref: '#/components/schemas/Position'
+    jobId:
+      name: jobId
+      in: path
+      required: true
+      example: 37
+      schema:
+        $ref: '#/components/schemas/JobId'
   securitySchemes:
     app_id:
       type: apiKey
