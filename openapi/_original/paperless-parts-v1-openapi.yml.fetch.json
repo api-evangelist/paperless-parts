@@ -1,0 +1,12 @@
+{
+ "url": "https://docs.paperlessparts.com/openapi.yaml",
+ "requested_url": "https://docs.paperlessparts.com/openapi.yaml",
+ "status": 200,
+ "content_type": "application/x-yaml",
+ "bytes": 152714,
+ "sha256": "3eb132ead1fee0c1499ecffff4edc2605215b0630fd46468ecab39278f1b33ba",
+ "fetched_at": "2026-10-04",
+ "fetched_by": "APIEvangelist-Harvest/1.0 (+https://apievangelist.com)",
+ "match": "byte-identical",
+ "note": "Re-fetched from the provider by verify-openapi-sources.py; the archived file is byte-identical to what the provider serves."
+}
