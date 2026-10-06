@@ -42,7 +42,7 @@ x-type: company
 x-source: harvest:secondary-market
 specificationVersion: '0.20'
 created: '2026-08-26'
-modified: '2026-09-16'
+modified: '2026-10-06'
 tags:
 - Company
 - Manufacturing
@@ -257,6 +257,8 @@ apis:
   - type: Documentation
     url: https://docs.paperlessparts.com/
 common:
+- url: https://www.paperlessparts.com/feed/
+  type: BlogRSS
 - type: License
   name: LGPL-3.0
   url: https://github.com/part-os/core-python/blob/master/LICENSE
