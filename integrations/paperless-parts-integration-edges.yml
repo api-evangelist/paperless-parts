@@ -1,0 +1,137 @@
+generated: '2026-10-12'
+method: searched
+source:
+- https://zapier.com/apps/paperless-parts/integrations
+checked:
+- https://composio.dev/toolkits/paperless-parts
+- https://monid.ai/tools/paperless-parts
+- https://n8n.io/integrations/paperless-parts/
+- https://zapier.com/apps/paperless-parts/integrations
+summary: null
+marketplace_apps:
+- marketplace: zapier
+  channel: ipaas-listing
+  app: paperless-parts
+  url: https://zapier.com/apps/paperless-parts/integrations
+  external_url: https://www.paperlessparts.com/
+  partner_tier: BRONZE
+  triggers:
+  - key: new_order
+    label: Order Created
+  - key: quote_sent
+    label: Quote Sent
+  actions:
+  - key: create_or_update_account
+    label: Create or Update Account
+  - key: create_or_update_contact
+    label: Create or Update Contact
+  - key: create_or_update_purchased_component
+    label: Create or Update Purchased Component
+  searches:
+  - key: get_order_details
+    label: Get Order Details
+  - key: get_quote_details
+    label: Get Quote Details
+edges:
+- partner_name: Airtable
+  partner: airtable
+  partner_match: domain
+  partner_candidate: null
+  type: marketplace
+  marketplace: zapier
+  channel: ipaas-usage
+  evidence: https://zapier.com/apps/paperless-parts/integrations/airtable
+  direction: third-party
+  category: Databases
+  partner_url: https://airtable.com/
+- partner_name: ClickUp
+  partner: clickup
+  partner_match: domain
+  partner_candidate: null
+  type: marketplace
+  marketplace: zapier
+  channel: ipaas-usage
+  evidence: https://zapier.com/apps/paperless-parts/integrations/clickup
+  direction: third-party
+  category: Project Management
+  partner_url: https://clickup.com/zapier
+- partner_name: Microsoft SharePoint
+  partner: sharepoint
+  partner_match: name-exact
+  partner_candidate: null
+  type: marketplace
+  marketplace: zapier
+  channel: ipaas-usage
+  evidence: https://zapier.com/apps/paperless-parts/integrations/sharepoint
+  direction: third-party
+  category: Microsoft
+  partner_url: https://www.microsoft.com/en-ca/microsoft-365/sharepoint/collaboration
+- partner_name: CraftMyPDF.com
+  partner: craftmypdf
+  partner_match: domain
+  partner_candidate: null
+  type: marketplace
+  marketplace: zapier
+  channel: ipaas-usage
+  evidence: https://zapier.com/apps/paperless-parts/integrations/craftmypdfcom
+  direction: third-party
+  category: Documents
+  partner_url: https://craftmypdf.com/?utm_source=zapier&utm_medium=integration&utm_campaign=zapier_app_directory
+- partner_name: Google Forms (Legacy)
+  partner: null
+  partner_match: null
+  partner_candidate: null
+  type: marketplace
+  marketplace: zapier
+  channel: ipaas-usage
+  evidence: https://zapier.com/apps/paperless-parts/integrations/google-forms-legacy
+  direction: third-party
+  category: Forms & Surveys
+  partner_url: http://google.com/
+templates:
+- title: Create new HubSpot deals when orders are created in Paperless Parts
+  url: https://zapier.com/apps/hubspot/integrations/paperless-parts/255594865/create-new-hubspot-deals-when-orders-are-created-in-paperless-parts
+  apps:
+  - paperless-parts
+  - hubspot
+- title: Create new records in Zapier Tables each time a quote is sent in Paperless Parts
+  url: https://zapier.com/apps/paperless-parts/integrations/zapier-tables/1734829/create-new-records-in-zapier-tables-each-time-a-quote-is-sent-in-paperless-parts
+  apps:
+  - paperless-parts
+  - zapier-tables
+- title: Create new Airtable records each time new orders are created in Paperless Parts
+  url: https://zapier.com/apps/airtable/integrations/paperless-parts/1764506/create-new-airtable-records-each-time-new-orders-are-created-in-paperless-parts
+  apps:
+  - paperless-parts
+  - airtable
+- title: Create Asana tasks from new orders in Paperless Parts
+  url: https://zapier.com/apps/asana/integrations/paperless-parts/1805931/create-asana-tasks-from-new-orders-in-paperless-parts
+  apps:
+  - paperless-parts
+  - asana
+- title: Create issues in Jira Software Cloud when new orders are created in Paperless Parts
+  url: https://zapier.com/apps/jira-software-cloud/integrations/paperless-parts/1822788/create-issues-in-jira-software-cloud-when-new-orders-are-created-in-paperless-parts
+  apps:
+  - paperless-parts
+  - jira-software-cloud
+- title: Update HubSpot deals when new quotes are sent in Paperless Parts
+  url: https://zapier.com/apps/hubspot/integrations/paperless-parts/255562116/update-hubspot-deals-when-new-quotes-are-sent-in-paperless-parts
+  apps:
+  - paperless-parts
+  - hubspot
+- title: Send quotes from Paperless Parts and add or update opportunities in LeadConnector
+  url: https://zapier.com/apps/leadconnector/integrations/paperless-parts/255597273/send-quotes-from-paperless-parts-and-add-or-update-opportunities-in-leadconnector
+  apps:
+  - paperless-parts
+  - leadconnector
+- title: Create new HubSpot deals when orders are created in Paperless Parts
+  url: https://zapier.com/apps/hubspot/integrations/paperless-parts/255663106/create-new-hubspot-deals-when-orders-are-created-in-paperless-parts
+  apps:
+  - paperless-parts
+  - hubspot
+- title: Create new HubSpot deals when quotes are sent in Paperless Parts
+  url: https://zapier.com/apps/hubspot/integrations/paperless-parts/255676554/create-new-hubspot-deals-when-quotes-are-sent-in-paperless-parts
+  apps:
+  - paperless-parts
+  - hubspot
+template_total: 9
