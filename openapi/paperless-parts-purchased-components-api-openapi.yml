@@ -330,8 +330,6 @@ paths:
           default: v1
 components:
   schemas:
-    PurchasedComponentId:
-      type: integer
     PostPurchasedComponent:
       allOf:
       - $ref: '#/components/schemas/AbstractPurchasedComponent'
@@ -345,6 +343,19 @@ components:
         - oem_part_number
         - piece_price
         - properties
+    PurchasedComponentsColumn:
+      allOf:
+      - $ref: '#/components/schemas/AbstractPurchasedComponentsColumn'
+      - type: object
+        properties:
+          id:
+            type: integer
+            readOnly: true
+            example: 25
+          position:
+            type: integer
+            example: 4
+            description: Position of the column when displayed in the table; starts at 1.
     AbstractPurchasedComponent:
       type: object
       properties:
@@ -367,19 +378,8 @@ components:
           format: decimal
           description: Cost per piece to 4 decimal places
           example: 2.0
-    PurchasedComponentsColumn:
-      allOf:
-      - $ref: '#/components/schemas/AbstractPurchasedComponentsColumn'
-      - type: object
-        properties:
-          id:
-            type: integer
-            readOnly: true
-            example: 25
-          position:
-            type: integer
-            example: 4
-            description: Position of the column when displayed in the table; starts at 1.
+    PurchasedComponentsColumnId:
+      type: integer
     AbstractPurchasedComponentsColumn:
       type: object
       properties:
@@ -405,8 +405,25 @@ components:
         default_boolean_value:
           type: boolean
           example: false
-    PurchasedComponentsColumnId:
-      type: integer
+    PatchPurchasedComponentsColumn:
+      allOf:
+      - $ref: '#/components/schemas/AbstractPurchasedComponentsColumn'
+      - type: object
+        properties:
+          update_existing_defaults:
+            type: boolean
+          position:
+            type: integer
+            example: 4
+    PatchPurchasedComponent:
+      allOf:
+      - $ref: '#/components/schemas/AbstractPurchasedComponent'
+      - type: object
+        properties:
+          properties:
+            type: array
+            items:
+              $ref: '#/components/schemas/PurchasedComponentCustomProperty'
     PostPurchasedComponentsColumn:
       allOf:
       - $ref: '#/components/schemas/AbstractPurchasedComponentsColumn'
@@ -418,6 +435,8 @@ components:
         - default_numeric_value
         - default_string_value
         - default_boolean_value
+    PurchasedComponentId:
+      type: integer
     PurchasedComponent:
       allOf:
       - $ref: '#/components/schemas/AbstractPurchasedComponent'
@@ -433,16 +452,6 @@ components:
             type:
             - string
             - 'null'
-    PatchPurchasedComponentsColumn:
-      allOf:
-      - $ref: '#/components/schemas/AbstractPurchasedComponentsColumn'
-      - type: object
-        properties:
-          update_existing_defaults:
-            type: boolean
-          position:
-            type: integer
-            example: 4
     PurchasedComponentCustomProperty:
       type: object
       properties:
@@ -457,15 +466,6 @@ components:
           - type: boolean
           description: Value of property, None or of type corresponding to value_type
           example: really cool value
-    PatchPurchasedComponent:
-      allOf:
-      - $ref: '#/components/schemas/AbstractPurchasedComponent'
-      - type: object
-        properties:
-          properties:
-            type: array
-            items:
-              $ref: '#/components/schemas/PurchasedComponentCustomProperty'
     PurchasedComponent_2:
       allOf:
       - $ref: '#/components/schemas/AbstractPurchasedComponent'

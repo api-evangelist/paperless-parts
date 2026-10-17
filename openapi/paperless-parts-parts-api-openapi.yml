@@ -498,6 +498,10 @@ paths:
                 example: Flat pattern DXF file not available for this part.
 components:
   schemas:
+    Uuid:
+      type: string
+      description: Unique identifier
+      example: 2f0e5724-42fe-47ae-8233-7a902ef70346
     PartNode:
       type: object
       properties:
@@ -513,21 +517,6 @@ components:
           type: integer
           example: 1
           description: The number of times this node occurs
-    Uuid:
-      type: string
-      description: Unique identifier
-      example: 2f0e5724-42fe-47ae-8233-7a902ef70346
-    PartStatus:
-      type: object
-      properties:
-        processing:
-          type: string
-          example: in_progress
-          description: 'The status of the part''s geometric processing: in_progress, failed, or finished'
-        interrogation:
-          type: string
-          example: in_progress
-          description: 'The status of the part''s interrogation: in_progress, failed, or finished'
     Assembly:
       type: object
       properties:
@@ -539,6 +528,17 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/PartNode'
+    PartStatus:
+      type: object
+      properties:
+        processing:
+          type: string
+          example: in_progress
+          description: 'The status of the part''s geometric processing: in_progress, failed, or finished'
+        interrogation:
+          type: string
+          example: in_progress
+          description: 'The status of the part''s interrogation: in_progress, failed, or finished'
     Part:
       type: object
       properties:

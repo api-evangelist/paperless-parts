@@ -185,64 +185,6 @@ paths:
           default: v1
 components:
   schemas:
-    TableName:
-      type: string
-      description: The name of the table
-      example: sample_table
-    CustomTableRowData:
-      type: object
-      description: The keys in this object must match the column names in the config property above, and the corresponding values must be castable to the specified types in the config property.
-    CustomTableRelatedEntity:
-      type: object
-      properties:
-        entity_type:
-          type: string
-          enum:
-          - operation
-          - process
-        name:
-          type: string
-    CustomTableListResults:
-      type: array
-      items:
-        type: string
-    CustomTableColumnConfig:
-      type: object
-      properties:
-        column_name:
-          type: string
-        value_type:
-          type: string
-          enum:
-          - numeric
-          - string
-          - boolean
-    CustomTableDetails:
-      type: object
-      properties:
-        columns:
-          type: array
-          items:
-            type: string
-        name:
-          type: string
-        related_entities:
-          type: array
-          items:
-            $ref: '#/components/schemas/CustomTableRelatedEntity'
-        rows:
-          type: array
-          items:
-            type: object
-            description: The keys in this object will match the column names in the columns property above.
-    CustomTableRows:
-      type: object
-      properties:
-        rows:
-          type: array
-          description: A list of table rows.
-          items:
-            $ref: '#/components/schemas/CustomTableRowData'
     CustomTableBody:
       type: object
       properties:
@@ -262,11 +204,69 @@ components:
           - 'null'
           items:
             $ref: '#/components/schemas/CustomTableRowData'
+    CustomTableDetails:
+      type: object
+      properties:
+        columns:
+          type: array
+          items:
+            type: string
+        name:
+          type: string
+        related_entities:
+          type: array
+          items:
+            $ref: '#/components/schemas/CustomTableRelatedEntity'
+        rows:
+          type: array
+          items:
+            type: object
+            description: The keys in this object will match the column names in the columns property above.
+    CustomTableListResults:
+      type: array
+      items:
+        type: string
     CustomTableName:
       type: object
       properties:
         name:
           type: string
+    CustomTableRowData:
+      type: object
+      description: The keys in this object must match the column names in the config property above, and the corresponding values must be castable to the specified types in the config property.
+    CustomTableRows:
+      type: object
+      properties:
+        rows:
+          type: array
+          description: A list of table rows.
+          items:
+            $ref: '#/components/schemas/CustomTableRowData'
+    CustomTableRelatedEntity:
+      type: object
+      properties:
+        entity_type:
+          type: string
+          enum:
+          - operation
+          - process
+        name:
+          type: string
+    TableName:
+      type: string
+      description: The name of the table
+      example: sample_table
+    CustomTableColumnConfig:
+      type: object
+      properties:
+        column_name:
+          type: string
+        value_type:
+          type: string
+          enum:
+          - numeric
+          - string
+          - boolean
   parameters:
     tableName:
       name: tableName
