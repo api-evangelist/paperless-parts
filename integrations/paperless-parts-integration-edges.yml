@@ -1,4 +1,4 @@
-generated: '2026-10-12'
+generated: '2026-10-20'
 method: searched
 source:
 - https://zapier.com/apps/paperless-parts/integrations
@@ -34,61 +34,6 @@ marketplace_apps:
   - key: get_quote_details
     label: Get Quote Details
 edges:
-- partner_name: Airtable
-  partner: airtable
-  partner_match: domain
-  partner_candidate: null
-  type: marketplace
-  marketplace: zapier
-  channel: ipaas-usage
-  evidence: https://zapier.com/apps/paperless-parts/integrations/airtable
-  direction: third-party
-  category: Databases
-  partner_url: https://airtable.com/
-- partner_name: ClickUp
-  partner: clickup
-  partner_match: domain
-  partner_candidate: null
-  type: marketplace
-  marketplace: zapier
-  channel: ipaas-usage
-  evidence: https://zapier.com/apps/paperless-parts/integrations/clickup
-  direction: third-party
-  category: Project Management
-  partner_url: https://clickup.com/zapier
-- partner_name: Microsoft SharePoint
-  partner: sharepoint
-  partner_match: name-exact
-  partner_candidate: null
-  type: marketplace
-  marketplace: zapier
-  channel: ipaas-usage
-  evidence: https://zapier.com/apps/paperless-parts/integrations/sharepoint
-  direction: third-party
-  category: Microsoft
-  partner_url: https://www.microsoft.com/en-ca/microsoft-365/sharepoint/collaboration
-- partner_name: CraftMyPDF.com
-  partner: craftmypdf
-  partner_match: domain
-  partner_candidate: null
-  type: marketplace
-  marketplace: zapier
-  channel: ipaas-usage
-  evidence: https://zapier.com/apps/paperless-parts/integrations/craftmypdfcom
-  direction: third-party
-  category: Documents
-  partner_url: https://craftmypdf.com/?utm_source=zapier&utm_medium=integration&utm_campaign=zapier_app_directory
-- partner_name: Google Forms (Legacy)
-  partner: null
-  partner_match: null
-  partner_candidate: null
-  type: marketplace
-  marketplace: zapier
-  channel: ipaas-usage
-  evidence: https://zapier.com/apps/paperless-parts/integrations/google-forms-legacy
-  direction: third-party
-  category: Forms & Surveys
-  partner_url: http://google.com/
 - partner_name: Zapier
   partner: zapier
   partner_match: aggregator
@@ -114,6 +59,78 @@ edges:
     builder: unknown (not in the directory record)
   detected_by: sweep-workflow-automation.py
   first_seen: '2026-10-15'
+- partner_name: Airtable
+  partner: airtable
+  partner_match: domain
+  partner_candidate: null
+  type: marketplace
+  marketplace: zapier
+  channel: ipaas-usage
+  relationship: ipaas-bridge
+  evidence: https://zapier.com/apps/paperless-parts/integrations/airtable
+  direction: third-party
+  category: Databases
+  partner_url: https://airtable.com/
+- partner_name: ClickUp
+  partner: clickup
+  partner_match: domain
+  partner_candidate: null
+  type: marketplace
+  marketplace: zapier
+  channel: ipaas-usage
+  relationship: ipaas-bridge
+  evidence: https://zapier.com/apps/paperless-parts/integrations/clickup
+  direction: third-party
+  category: Project Management
+  partner_url: https://clickup.com/zapier
+- partner_name: Microsoft SharePoint
+  partner: sharepoint
+  partner_match: domain+name-among-holders
+  partner_candidate: null
+  type: marketplace
+  marketplace: zapier
+  channel: ipaas-usage
+  relationship: ipaas-bridge
+  evidence: https://zapier.com/apps/paperless-parts/integrations/sharepoint
+  direction: third-party
+  category: Microsoft
+  partner_url: https://www.microsoft.com/en-ca/microsoft-365/sharepoint/collaboration
+- partner_name: Keap
+  partner: keap
+  partner_match: domain
+  partner_candidate: null
+  type: marketplace
+  marketplace: zapier
+  channel: ipaas-usage
+  relationship: ipaas-bridge
+  evidence: https://zapier.com/apps/paperless-parts/integrations/keap
+  direction: third-party
+  category: CRM (Customer Relationship Management)
+  partner_url: https://keap.com/
+- partner_name: CraftMyPDF.com
+  partner: craftmypdf
+  partner_match: domain
+  partner_candidate: null
+  type: marketplace
+  marketplace: zapier
+  channel: ipaas-usage
+  relationship: ipaas-bridge
+  evidence: https://zapier.com/apps/paperless-parts/integrations/craftmypdfcom
+  direction: third-party
+  category: Documents
+  partner_url: https://craftmypdf.com/?utm_source=zapier&utm_medium=integration&utm_campaign=zapier_app_directory
+- partner_name: Google Forms (Legacy)
+  partner: google-forms
+  partner_match: domain+name-among-holders
+  partner_candidate: null
+  type: marketplace
+  marketplace: zapier
+  channel: ipaas-usage
+  relationship: ipaas-bridge
+  evidence: https://zapier.com/apps/paperless-parts/integrations/google-forms-legacy
+  direction: third-party
+  category: Forms & Surveys
+  partner_url: http://google.com/
 templates:
 - title: Create new HubSpot deals when orders are created in Paperless Parts
   url: https://zapier.com/apps/hubspot/integrations/paperless-parts/255594865/create-new-hubspot-deals-when-orders-are-created-in-paperless-parts

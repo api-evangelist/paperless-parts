@@ -15,54 +15,8 @@
   evidence: https://zapier.com/apps/airtable/integrations/paperless-parts/1764506/create-new-airtable-records-each-time-new-orders-are-created-in-paperless-parts
   template: https://zapier.com/apps/airtable/integrations/paperless-parts/1764506/create-new-airtable-records-each-time-new-orders-are-created-in-paperless-parts
   source: template
+  relationship: ipaas-bridge
   status: pending-generation
-  arazzo: null
-- slug: paperless-parts-clickup
-  label: ClickUp
-  partner: clickup
-  partner_name: ClickUp
-  category: Project Management
-  type: marketplace
-  marketplace: zapier
-  channel: ipaas-usage
-  evidence: https://zapier.com/apps/paperless-parts/integrations/clickup
-  source: edge
-  status: pending-generation
-  arazzo: null
-- slug: paperless-parts-microsoft-sharepoint
-  label: Microsoft SharePoint
-  partner: sharepoint
-  partner_name: Microsoft SharePoint
-  category: Microsoft
-  type: marketplace
-  marketplace: zapier
-  channel: ipaas-usage
-  evidence: https://zapier.com/apps/paperless-parts/integrations/sharepoint
-  source: edge
-  status: pending-generation
-  arazzo: null
-- slug: paperless-parts-craftmypdf-com
-  label: CraftMyPDF.com
-  partner: craftmypdf
-  partner_name: CraftMyPDF.com
-  category: Documents
-  type: marketplace
-  marketplace: zapier
-  channel: ipaas-usage
-  evidence: https://zapier.com/apps/paperless-parts/integrations/craftmypdfcom
-  source: edge
-  status: pending-partner-spec
-  arazzo: null
-- slug: paperless-parts-google-forms-legacy
-  label: Google Forms (Legacy)
-  partner_name: Google Forms (Legacy)
-  category: Forms & Surveys
-  type: marketplace
-  marketplace: zapier
-  channel: ipaas-usage
-  evidence: https://zapier.com/apps/paperless-parts/integrations/google-forms-legacy
-  source: edge
-  status: pending-partner-spec
   arazzo: null
 - slug: paperless-parts-zapier
   label: Zapier
@@ -88,4 +42,69 @@
     beta: false
     builder: unknown (not in the directory record)
   status: not-a-workflow
+  arazzo: null
+- slug: paperless-parts-clickup
+  label: ClickUp
+  partner: clickup
+  partner_name: ClickUp
+  category: Project Management
+  type: marketplace
+  marketplace: zapier
+  channel: ipaas-usage
+  evidence: https://zapier.com/apps/paperless-parts/integrations/clickup
+  source: edge
+  relationship: ipaas-bridge
+  status: pending-generation
+  arazzo: null
+- slug: paperless-parts-microsoft-sharepoint
+  label: Microsoft SharePoint
+  partner: sharepoint
+  partner_name: Microsoft SharePoint
+  category: Microsoft
+  type: marketplace
+  marketplace: zapier
+  channel: ipaas-usage
+  evidence: https://zapier.com/apps/paperless-parts/integrations/sharepoint
+  source: edge
+  relationship: ipaas-bridge
+  status: pending-generation
+  arazzo: null
+- slug: paperless-parts-keap
+  label: Keap
+  partner: keap
+  partner_name: Keap
+  category: CRM (Customer Relationship Management)
+  type: marketplace
+  marketplace: zapier
+  channel: ipaas-usage
+  evidence: https://zapier.com/apps/paperless-parts/integrations/keap
+  source: edge
+  relationship: ipaas-bridge
+  status: pending-generation
+  arazzo: null
+- slug: paperless-parts-craftmypdf-com
+  label: CraftMyPDF.com
+  partner: craftmypdf
+  partner_name: CraftMyPDF.com
+  category: Documents
+  type: marketplace
+  marketplace: zapier
+  channel: ipaas-usage
+  evidence: https://zapier.com/apps/paperless-parts/integrations/craftmypdfcom
+  source: edge
+  relationship: ipaas-bridge
+  status: pending-partner-spec
+  arazzo: null
+- slug: paperless-parts-google-forms-legacy
+  label: Google Forms (Legacy)
+  partner: google-forms
+  partner_name: Google Forms (Legacy)
+  category: Forms & Surveys
+  type: marketplace
+  marketplace: zapier
+  channel: ipaas-usage
+  evidence: https://zapier.com/apps/paperless-parts/integrations/google-forms-legacy
+  source: edge
+  relationship: ipaas-bridge
+  status: pending-generation
   arazzo: null
