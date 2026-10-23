@@ -1363,3 +1363,9 @@ components:
       description: API key to authorize requests.
       name: Authorization
       in: header
+x-provenance:
+  method: harvested
+  publisher: Paperless Parts
+  source: https://docs.paperlessparts.com/openapi.yaml
+  note: split by refine-openapis from the provider's own published document, verified by fetch (openapi/_original/*.fetch.json);
+    stamped by stamp-openapi-provenance.py (roadmap#793)
