@@ -64,5 +64,136 @@
 > Full detail: **[Where this data comes from](https://apievangelist.com/about/where-our-data-comes-from)**
 <!-- API-EVANGELIST-PROVENANCE:END -->
 
-Paperless Parts is a company surfaced via the API Evangelist harvest backlog (source: secondary-market) and added to the network as a stub for full-pipeline profiling.
-- https://forgeglobal.com/paperless-parts_stock/
+Paperless Parts, Inc. is a Boston-based manufacturing software company founded in 2017 that builds a secure, ITAR-compliant cloud quoting and sales platform for custom part manufacturers — job shops, contract manufacturers and rapid-prototype businesses working in CNC machining, sheet metal fabrication, Swiss screw machining, wire EDM, waterjet and additive manufacturing. A patented geometry engine analyses uploaded CAD to automate costing, and the P3L pricing language lets a shop encode its own pricing logic. The company publishes a public REST API in two live versions (v1 and v2) at api.paperlessparts.com, covering quotes, quote items, orders, jobs, parts, processes, contacts and accounts, custom pricing tables, purchased components, and a managed integrations framework with a poll-based Streaming API for reacting to platform events. A first-party Python SDK is published on GitHub under the part-os organization.
+
+**Areas:** Company · Manufacturing · Quoting · CNC Machining · Sheet Metal · ERP · CRM · Job Shops · Aerospace and Defense · Pricing · Estimating · Industrial
+
+## Paperless Parts on APIs.io
+
+Everything profiled for Paperless Parts is published on APIs.io rather than in this repository. Start at the provider page — **[apis.io/providers/paperless-parts/](https://apis.io/providers/paperless-parts/)** — or go straight to one of the APIs or properties below.
+
+### APIs (12)
+
+- [Paperless Parts Contacts API](https://apis.io/apis/paperless-parts/paperless-parts-contacts-api/) — Paperless Parts includes Customer Relationship Management (CRM) functionality to make it easy to send quotes to new and existing customers, while keeping…
+- [Paperless Parts Custom Tables API](https://apis.io/apis/paperless-parts/paperless-parts-custom-tables-api/) — Endpoints for managing custom tables used by Operations to compute pricing.
+- [Paperless Parts Customers API](https://apis.io/apis/paperless-parts/paperless-parts-customers-api/) — Paperless Parts includes Customer Relationship Management (CRM) functionality to make it easy to send quotes to new and existing customers, while keeping…
+- [Paperless Parts Events API](https://apis.io/apis/paperless-parts/paperless-parts-events-api/) — Endpoints for viewing communications between Paperless Parts and ERP integrations
+- [Paperless Parts Integration Actions API](https://apis.io/apis/paperless-parts/paperless-parts-integration-actions-api/) — Endpoints for interacting with ERP integrations
+- [Paperless Parts Jobs API](https://apis.io/apis/paperless-parts/paperless-parts-jobs-api/) — Endpoints for managing Jobs
+- [Paperless Parts Orders API](https://apis.io/apis/paperless-parts/paperless-parts-orders-api/) — Endpoints for identifying newly placed orders and pulling all information related to a particular order. Also, a new order can be created via open API to…
+- [Paperless Parts API](https://apis.io/apis/paperless-parts/paperless-parts-parts-api/) — Endpoints for managing Parts
+- [Paperless Parts Processes API](https://apis.io/apis/paperless-parts/paperless-parts-processes-api/) — Endpoints for managing Processes, Operation Definitions, and Add on Definitions
+- [Paperless Parts Purchased Components API](https://apis.io/apis/paperless-parts/paperless-parts-purchased-components-api/) — Endpoints for managing purchased components and purchased components columns.
+- [Paperless Parts Quote Items API](https://apis.io/apis/paperless-parts/paperless-parts-quote-items-api/) — Endpoints for creating and managing line items on a quote.
+- [Paperless Parts Quotes API](https://apis.io/apis/paperless-parts/paperless-parts-quotes-api/) — Endpoints for identifying newly sent quotes, pulling all information related to a particular quote, and updating a quote's status.
+
+### Published properties
+
+Each property below is a page on APIs.io carrying the machine-readable artifact and what it says.
+
+#### AsyncAPI (1)
+
+Event-driven and webhook contracts.
+
+- [Paperless Parts Events](https://apis.io/asyncapis/paperless-parts/paperless-parts-events/)
+
+#### Overlays (2)
+
+OpenAPI overlays, including conversational phrasing for each operation.
+
+- [Paperless Parts V1 Overlay](https://apis.io/overlays/paperless-parts/paperless-parts-v1-overlay/)
+- [Paperless Parts V2 Overlay](https://apis.io/overlays/paperless-parts/paperless-parts-v2-overlay/)
+
+#### Security (3)
+
+Authentication, trust centre, and vulnerability disclosure.
+
+- [Paperless Parts Authentication](https://apis.io/security/paperless-parts/paperless-parts-authentication/)
+- [Paperless Parts Domain Security](https://apis.io/security/paperless-parts/paperless-parts-domain-security/)
+- [Paperless Parts Vulnerability Disclosure](https://apis.io/security/paperless-parts/paperless-parts-vulnerability-disclosure/)
+
+#### Plans and pricing (1)
+
+Published plans, tiers and prices.
+
+- [Paperless Parts Plans Pricing](https://apis.io/plans/paperless-parts/paperless-parts-plans-pricing/)
+
+#### Rate limits (1)
+
+Published request limits.
+
+- [Paperless Parts Rate Limits](https://apis.io/rate-limits/paperless-parts/paperless-parts-rate-limits/)
+
+## Where to find this API
+
+Links to the company's own pages. This repository publishes no copy of their specifications — the canonical document is theirs and lives at the URLs below.
+
+- [Website](https://www.paperlessparts.com/)
+- [Documentation](https://docs.paperlessparts.com/)
+- [Getting started](https://help.paperlessparts.com/s/article/integration-development-guide)
+- [API reference](https://docs.paperlessparts.com/v2)
+- [Pricing](https://www.paperlessparts.com/pricing/)
+- [Sign up](https://www.paperlessparts.com/demo/)
+- [Support](https://help.paperlessparts.com/s/)
+- [Changelog](https://www.paperlessparts.com/product-updates/)
+- [Blog](https://www.paperlessparts.com/blog/)
+- [Security](https://www.paperlessparts.com/vulnerability-disclosure-policy/)
+- [Compliance](https://www.paperlessparts.com/security/)
+- [Terms of service](https://help.paperlessparts.com/s/article/general-terms)
+- [Privacy policy](https://www.paperlessparts.com/privacy-policy/)
+- [GitHub](https://github.com/part-os)
+
+## API Evangelist rating
+
+**Kin Score 54.1** — developing · rubric 0.25.0 · scored 2026-10-23
+
+| Facet | Score |
+|---|---|
+| Discoverability | 73.2 |
+| Contract quality | 59.2 |
+| Contract governance | 18.2 |
+| Operational transparency | 28.9 |
+| Developer ergonomics | 49.4 |
+| Access clarity | 52.6 |
+
+**Agent readiness 36.9** — agent-ready
+
+| Agent-readiness dimension | Result |
+|---|---|
+| Spec Presence | yes |
+| Agentic Access | — |
+| Reversibility Documented | — |
+| MCP Server | — |
+| Auth Clarity | served (partial credit) |
+| Idempotency | — |
+| Error Semantics | derived (partial credit) |
+| OpenAPI Examples | verified |
+| Rate Limit Signal | documented (partial credit) |
+| Event Surface Described | derived (partial credit) |
+| Agent Skills | derived (partial credit) |
+| Well Known Catalog | yes |
+| Consent Identity | — |
+| Agent Card | — |
+| Dry Run Mode | — |
+| Delegated Identity | — |
+| Protected Resource Metadata | — |
+| Dynamic Client Registration | yes |
+| Agentic Commerce | — |
+| Pagination Ratio | — |
+| Operation Distinctiveness | distinct |
+
+**Regulatory alignment 35.3** — Horizontal (data, software, accessibility, platform)
+
+The rubric is published at [github.com/api-evangelist/kin-score](https://github.com/api-evangelist/kin-score). The per-check breakdown behind these numbers — which checks were earned, partial or missed — along with score history and how this provider compares to its peers, is available at [apis.io/providers/paperless-parts/](https://apis.io/providers/paperless-parts/).
+
+## How this profile is made
+
+API Evangelist profiles a company's public API surface the way a developer would find it: the website, developer portal and documentation, the specifications it publishes, its public repositories, and its pricing, status and changelog pages. From that it derives the properties above — contracts split per API, workflows, schemas, collections, governance rules, plans and rate limits — and scores them against the published [Kin Score rubric](https://github.com/api-evangelist/kin-score).
+
+The artifacts are published on [APIs.io](https://apis.io), not in this repository. This repository is the public record for Paperless Parts: the place to say something is wrong, missing or out of date, and to ask for a re-score or a removal.
+
+## Open an issue
+
+- **Something about this listing** — a wrong description, a missing API, a stale artifact or a question about the rating: [open an issue on this repository](https://github.com/api-evangelist/paperless-parts/issues/new).
+- **A new API, or one that is not in the catalog yet** — [submit it on APIs.io](https://apis.io/add/).
+- **Anything else** — [the APIs.io inbox](https://github.com/api-search/inbox/issues/new) or [info@apievangelist.com](mailto:info@apievangelist.com).
